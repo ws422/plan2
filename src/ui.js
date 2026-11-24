@@ -978,11 +978,19 @@ function render() {
   const sh = document.querySelector('.sheet');
   if (sh && S.keepSheetScroll) sh.scrollTop = shY;
   S.keepSheetScroll = false;
+  fitCta();
   window.scrollTo(0, y);
   drawMaps();
   wireHero();
   if (typeof navSync === 'function') navSync();
 }
+// 아래에 떠 있는 버튼 칸(.cta)만큼 화면 아래 여백을 줘요. 그래야 맨 아래 카드가 버튼 뒤에 가려지지 않아요
+function fitCta() {
+  const cta = document.querySelector('.cta'),
+    scr = document.querySelector('main.scr');
+  if (cta && scr) scr.style.paddingBottom = cta.offsetHeight + 24 + 'px';
+}
+window.addEventListener('resize', fitCta);
 // 다른 화면으로 가기 (home·dates·areas·plan)
 function go(view) {
   S.view = view;
