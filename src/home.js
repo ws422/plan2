@@ -157,9 +157,9 @@ document.addEventListener(
   true
 );
 
-// 로고
+// 앱 이름 옆 작은 로고: 홈 화면 아이콘(30번 후쿠오카 스티커)을 작게 줄인 모양 (글자는 너무 작아서 뺐어요)
 function logoSVG() {
-  return `<svg class="logo2" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="9" fill="#D63A1F"/><path d="M11.6 22.5 13.3 6h1.4l1.7 16.5z" fill="#fff"/><rect x="10.6" y="12.6" width="6.8" height="2.2" rx="1" fill="#fff"/><path d="M14 6V3" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/><path d="M6.5 22.8h15" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+  return `<svg class="logo2" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="13.6" fill="#fff"/><circle cx="14" cy="14" r="12" fill="#D63A1F"/><path d="M14 3.4v2.3" stroke="#fff" stroke-width=".9" stroke-linecap="round"/><path d="M14 5.2 15.3 9.2 16.2 19.2H11.8L12.7 9.2z" fill="#fff"/><rect x="12.4" y="13.2" width="3.2" height="1.1" fill="#F2B544"/><path d="M8 20.5h12" stroke="#fff" stroke-width="1.1" stroke-linecap="round"/><path d="M10.8 23q1.6-.9 3.2 0t3.2 0" fill="none" stroke="#F2B544" stroke-width=".9" stroke-linecap="round"/></svg>`;
 }
 
 // 결정적인 난수 (그림이 매번 같게)
