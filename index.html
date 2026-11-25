@@ -14,6 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="후쿠오카">
 <title>후쿠오카 여행 플래너</title>
+<script>try{var t=JSON.parse(localStorage.getItem('fk-theme'));if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;600;700;800&family=Outfit:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700;800&family=Nanum+Myeongjo:wght@700;800&family=Noto+Serif+JP:wght@200;300;600;700&display=swap" rel="stylesheet">
@@ -21,6 +22,7 @@
 /* ==================================================================
    style.css · 디자인 (색·글꼴·간격·모양)
    맨 위 :root 의 --이름 값이 앱 전체 색이에요. 다크 모드 색은 그 아래 @media (prefers-color-scheme: dark) 에 있어요.
+   화면 밝기 버튼으로 고르면 <html data-theme="dark|light"> 가 붙어요. 어두운 색을 고칠 땐 :root[data-theme='dark'] 쪽도 같이 고쳐 주세요.
    고치는 법: docs/수정가이드.md
    ================================================================== */
 /* 후쿠오카 플래너 v3: 따뜻한 종이색 바탕 + 하카타만 남색 + 도리이 주홍 포인트. 홈 상단은 모모치 해변의 후쿠오카 타워 그림, 곳곳에 하카타오리(五色献上) 줄무늬 */
@@ -3876,6 +3878,9 @@ small {
   cursor: pointer;
   min-height: 52px;
 }
+:root[data-theme='dark'] .tl-ic {
+  color: color-mix(in srgb, var(--c) 60%, #fff);
+}
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) .tl-ic {
     color: color-mix(in srgb, var(--c) 60%, #fff);
@@ -4053,6 +4058,42 @@ html[lang='ja'] body {
 }
 .lang-btn span {
   font-family: 'Noto Sans JP', 'Gothic A1', sans-serif;
+}
+/* 화면 밝기 버튼 (언어 버튼 옆, 같은 높이의 동그란 버튼) */
+.theme-btn {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.theme-btn .ic {
+  width: 17px;
+  height: 17px;
+}
+.theme-btn.light {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.theme-btn.light .ic {
+  width: 19px;
+  height: 19px;
+}
+.h3-tr,
+.h3-bl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .lang-btn.light {
   height: 42px;
@@ -14410,6 +14451,8 @@ const ICON = {
   up: '<path d="M6 15l6-6 6 6"/>',
   down: '<path d="M6 9l6 6 6-6"/>',
   next: '<path d="M9 5l7 7-7 7"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/>',
+  moon: '<path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6z"/>',
   out: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
   undo: '<path d="M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3"/>',
   trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
@@ -14535,6 +14578,37 @@ function lsGet(k, d) {
   }
 }
 // 이 기기에 값 저장하기
+// ---- 화면 밝기 (밝은 화면 · 어두운 화면) ----
+// 'auto' = 휴대폰 설정을 따라가요. 버튼을 한 번 누르면 'light'/'dark' 로 고정되고 기억해요 (저장 이름 fk-theme)
+let THEME = (() => {
+  const t = lsGet('fk-theme', 'auto');
+  return t === 'light' || t === 'dark' ? t : 'auto';
+})();
+const SYS_DARK = window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null;
+function isDark() {
+  return THEME === 'dark' || (THEME === 'auto' && !!(SYS_DARK && SYS_DARK.matches));
+}
+function applyTheme() {
+  const r = document.documentElement;
+  if (THEME === 'auto') delete r.dataset.theme;
+  else r.dataset.theme = THEME;
+  // 휴대폰 맨 위 상태 표시줄 색도 같이 바꿔요
+  document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
+    const dk = THEME === 'auto' ? /dark/.test(m.media) : THEME === 'dark';
+    m.content = dk ? '#0E1424' : '#F7F3ED';
+  });
+}
+// 홈 화면(모든 탭) 언어 버튼 옆 작은 버튼: 지금 밝으면 달, 어두우면 해
+// 계획 화면 위쪽 줄은 제목 자리가 좁아서 넣지 않았어요. 고른 밝기는 모든 화면에 적용돼요
+function themeBtn(light) {
+  const d = isDark();
+  return `<button class="theme-btn${light ? ' light' : ''}" data-act="toggleTheme" aria-label="${d ? L('밝은 화면으로 바꾸기', '明るい画面にする') : L('어두운 화면으로 바꾸기', '暗い画面にする')}" title="${d ? L('밝은 화면', '明るい画面') : L('어두운 화면', '暗い画面')}">${ic(d ? 'sun' : 'moon')}</button>`;
+}
+// 휴대폰 설정이 바뀌면(자동일 때만) 버튼 모양을 다시 그려요
+if (SYS_DARK && SYS_DARK.addEventListener)
+  SYS_DARK.addEventListener('change', () => {
+    if (THEME === 'auto' && typeof render === 'function') render();
+  });
 function lsSet(k, v) {
   try {
     localStorage.setItem(k, JSON.stringify(v));
@@ -16387,7 +16461,7 @@ function heroV(f) {
   return `<section class="hero t-${sc}${stock ? ' has-photo' : ''}">
     ${stock ? `<img class="hero-img stock" src="${hp.src}" alt="${esc(hp.altT)}">` : heroSVG()}
     <div class="hero-shade"></div>
-    <div class="hero-top"><span class="brand light">${logoSVG()}후쿠오카 플래너</span><span class="ht-r">${langBtn(true)}</span></div>
+    <div class="hero-top"><span class="brand light">${logoSVG()}후쿠오카 플래너</span><span class="ht-r">${themeBtn(true)}${langBtn(true)}</span></div>
     <div class="hero-txt">${txt}</div>
   </section>`;
 }
@@ -17277,6 +17351,15 @@ Object.assign(A, {
 if (IS_APP && navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
 
 Object.assign(A, {
+  toggleTheme() {
+    THEME = isDark() ? 'light' : 'dark';
+    lsSet('fk-theme', THEME);
+    applyTheme();
+    const y = window.scrollY;
+    S.keepSheetScroll = true;
+    render();
+    window.scrollTo(0, y);
+  },
   toggleLang() {
     LANG = LANG === 'ja' ? 'ko' : 'ja';
     lsSet('fk-lang', LANG);
@@ -20250,7 +20333,7 @@ function h3NavV(on) {
 // 「지금 이동 / 오늘 일정」(여행 전이면 「다가오는 여행 / 첫날 일정」) 카드가 나오고 제목은 한 줄로 줄어요
 function h3HomeV() {
   const p = h3Plan();
-  const top = `<header class="h3-top"><span class="h3-logo" data-notr${p ? '' : ' hidden'}><span class="j" lang="ja">福岡</span><b>${L('후쿠오카', 'ふくおか')}</b></span>${langBtn(true)}</header>`;
+  const top = `<header class="h3-top"><span class="h3-logo" data-notr${p ? '' : ' hidden'}><span class="j" lang="ja">福岡</span><b>${L('후쿠오카', 'ふくおか')}</b></span><span class="h3-tr">${themeBtn(true)}${langBtn(true)}</span></header>`;
   const hero = `<section class="h3-p1">
       <div class="h3-hero" data-notr>
         <div class="j" lang="ja">福岡</div>
@@ -20480,7 +20563,7 @@ function h3BandSVG() {
 }
 function h3BandV(t, s, extra) {
   return `<header class="h3-band${extra ? ' has-btn' : ''}">${S.photoBroken ? h3BandSVG() : h3Bg()}<span class="h3-bshade"></span>
-    <div class="h3-bt"><h1>${t}</h1>${s ? `<p>${s}</p>` : ''}</div><span class="h3-bl">${langBtn(true)}</span>${extra || ''}</header>`;
+    <div class="h3-bt"><h1>${t}</h1>${s ? `<p>${s}</p>` : ''}</div><span class="h3-bl">${themeBtn(true)}${langBtn(true)}</span>${extra || ''}</header>`;
 }
 
 // 여행 준비 탭
@@ -22357,6 +22440,7 @@ function drawWalk(el) {
 }
 
 applyLang();
+applyTheme();
 startTr();
 render();
 store.init();
