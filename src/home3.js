@@ -192,6 +192,14 @@ function h3LegBox(leg, A, B, t0) {
 }
 
 // 카드: 지금 이동
+// 카드 아래 버튼 줄: [일정 보기][🗑 삭제] — 삭제는 한 번 더 물어본 뒤 지워요
+function h3Acts(p, main) {
+  return `<div class="h3-acts">${main}<button class="h3-del" data-act="delAsk" data-id="${p.id}">${ic('trash')}<span>${L('삭제', '削除')}</span></button></div>`;
+}
+function h3AllBtn(p, di) {
+  return `<button class="h3-cta h3-cta-sub" data-act="openPlan" data-id="${p.id}" data-di="${di}">${ic('list')}${L('전체 일정 보기', '全体の予定を見る')}</button>`;
+}
+
 function h3MoveV(p, st) {
   const x = h3NowInfo(p, st);
   const head = `<div class="h3-ch"><span class="h3-pill">${L('지금', '現在')} ${fmt(x.now)}</span><span class="h3-dl">${L(`${x.di + 1}일차`, `${x.di + 1}日目`)} · ${mds(x.day.date)}</span>${
@@ -200,15 +208,16 @@ function h3MoveV(p, st) {
       : ''
   }</div>`;
   if (!x.c.rows.length)
-    return `<article class="h3-card">${head}<p class="h3-empty">${L('오늘은 아직 일정이 없어요.', '今日はまだ予定がありません。')}</p></article>`;
+    return `<article class="h3-card">${head}<p class="h3-empty">${L('오늘은 아직 일정이 없어요.', '今日はまだ予定がありません。')}</p>${h3Acts(p, h3AllBtn(p, x.di))}</article>`;
   // 오늘 일정이 다 끝났으면 (숙소 도착 뒤) 내일 일정으로 안내
   if (x.now >= x.c.endArr) {
     const nx = x.di + 1 < p.days.length;
-    return `<article class="h3-card">${head}<p class="h3-empty">${L(`오늘 일정을 모두 마쳤어요 · ${fmt(x.c.endArr % 1440)} ${x.toName} 도착`, `今日の予定はすべて終わりました · ${fmt(x.c.endArr % 1440)} ${x.toName}着`)}</p>${
+    return `<article class="h3-card">${head}<p class="h3-empty">${L(`오늘 일정을 모두 마쳤어요 · ${fmt(x.c.endArr % 1440)} ${x.toName} 도착`, `今日の予定はすべて終わりました · ${fmt(x.c.endArr % 1440)} ${x.toName}着`)}</p>${h3Acts(
+      p,
       nx
         ? `<button class="h3-cta" data-act="openPlan" data-id="${p.id}" data-di="${x.di + 1}">${L('내일 일정 보기', '明日の予定を見る')}</button>`
-        : ''
-    }</article>`;
+        : h3AllBtn(p, x.di)
+    )}</article>`;
   }
   const t0 = Math.max(x.now, x.leaveAt);
   return `<article class="h3-card">${head}
@@ -217,6 +226,7 @@ function h3MoveV(p, st) {
       <li class="to"><b>${esc(x.toName)}</b><small>${fmt(x.arr)} ${L('도착', '着')}</small></li>
     </ol>
     ${h3LegBox(x.leg, x.fromPt, x.toPt, t0)}
+    ${h3Acts(p, h3AllBtn(p, x.di))}
   </article>`;
 }
 
@@ -255,7 +265,7 @@ function h3SoonV(p, st) {
           `<button data-act="openPlan" data-id="${p.id}" data-di="${i}"><b>${L(`${i + 1}일차`, `${i + 1}日目`)}</b>${mds(d.date)}</button>`
       )
       .join('')}</div>
-    <button class="h3-cta" data-act="openPlan" data-id="${p.id}">${L('일정 보기', '予定を見る')}</button>
+    ${h3Acts(p, `<button class="h3-cta" data-act="openPlan" data-id="${p.id}">${L('일정 보기', '予定を見る')}</button>`)}
   </article>`;
 }
 

@@ -7288,8 +7288,9 @@ body {
   width: 20px;
   height: 20px;
 }
+/* 홈 알림: 첫 화면 아래쪽 글자(동선 자동…)·버튼 위, 비어 있는 사진 자리에 */
 .v-home .toasts {
-  bottom: calc(84px + env(safe-area-inset-bottom));
+  bottom: calc(196px + env(safe-area-inset-bottom));
 }
 /* 다른 탭: 위쪽 하늘 띠 */
 .h3-band {
@@ -7720,4 +7721,55 @@ body {
 }
 .v-plan .toasts {
   bottom: calc(84px + env(safe-area-inset-bottom));
+}
+/* 홈 카드 아래 버튼 줄: [일정 보기][🗑 삭제] */
+.h3-acts {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.h3-acts .h3-cta {
+  flex: 1;
+  min-width: 0;
+  margin-top: 0;
+}
+.h3-cta.h3-cta-sub {
+  background: color-mix(in srgb, var(--ink) 8%, var(--surface));
+  color: var(--ink);
+}
+.h3-cta .ic {
+  width: 19px;
+  height: 19px;
+}
+.h3-del {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1.5px solid color-mix(in srgb, #d63a1f 32%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, #d63a1f 7%, var(--surface));
+  color: #d63a1f;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.h3-del .ic {
+  width: 19px;
+  height: 19px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .h3-del {
+    color: #ff7d66;
+    border-color: color-mix(in srgb, #ff7d66 40%, transparent);
+  }
+}
+:root[data-theme='dark'] .h3-del {
+  color: #ff7d66;
+  border-color: color-mix(in srgb, #ff7d66 40%, transparent);
 }

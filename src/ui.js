@@ -1220,6 +1220,11 @@ const A = {
     store.writeLocal(S.plans);
     store.remove(d.id);
     S.sheet = null;
+    // 홈 두 번째 화면에서 지웠는데 보여줄 계획이 더 없으면 첫 화면으로
+    if (typeof h3Plan === 'function' && !h3Plan()) {
+      S.h3p2 = false;
+      S.hpage = 0;
+    }
     render();
     toast('계획을 삭제했어요.');
   },
