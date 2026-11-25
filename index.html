@@ -7793,6 +7793,26 @@ body {
   color: #ff7d66;
   border-color: color-mix(in srgb, #ff7d66 40%, transparent);
 }
+/* 첫차·막차: 막차가 끝나 바꾼 이동 설명, 공항 운영 시간 안내 */
+.lchip .lc-l.warn {
+  color: var(--bad);
+  font-weight: 700;
+}
+.h3-x.warn {
+  color: var(--bad);
+}
+.air-note[hidden] {
+  display: none;
+}
+.air-note {
+  align-items: flex-start;
+  background: color-mix(in srgb, var(--bad) 8%, var(--surface));
+  color: var(--ink);
+}
+.air-note .ic {
+  flex: none;
+  color: var(--bad);
+}
 
 </style>
 </head>
@@ -10669,6 +10689,51 @@ function fareUnknown(f) {
 // 출발한다고 보고, 역·정류장에 닿는 시각 이후 가장 빠른 차를 잡아요. 막차가 지나면 lastGone = true.
 const LINE_HW = { kuko: 5, hako: 7, nana: 7 }; // 지하철 노선별 배차 간격(분, 낮 기준)
 const SERVICE = { subway: [330, 1450], bus: [390, 1420], train: [330, 1440], ferry: [480, 1050] }; // 첫차~막차(분)
+// 노선별 첫차·막차 (분, 타는 곳에서 출발하는 시각). 2026년 10월 시간표 기준 대략값 — 바뀌면 여기만 고쳐요
+// out: 후쿠오카 → 그 지역 / back: 그 지역 → 후쿠오카
+const SVC_ROUTE = {
+  'yufuin:0': { out: [528, 1008], back: [480, 1020], n: ['고속버스 유후인호', '高速バスゆふいん号'] }, // 하카타BT 08:48~16:48 · 유후인 08:00~17:00
+  'yufuin:1': { out: [463, 1110], back: [548, 1167], n: ['JR 특급 유후·유후인노모리', 'JR特急ゆふ・ゆふいんの森'] }, // 하카타 07:43~18:30 · 유후인 09:08~19:27
+  'beppu:0': { out: [381, 1326], back: [321, 1298], n: ['JR 특급 소닉', 'JR特急ソニック'] }, // 하카타 06:21~22:06 · 벳푸 05:21~21:38
+  airbus: { out: [390, 1260], back: [390, 1260], n: ['공항 직행버스', '空港直行バス'] } // 국제선 → 하카타역 막차 21:00
+};
+// 이동 o 의 '주로 타는 차'가 다니는 시간 {w:[첫차, 막차], pre: 타기 전까지 걸리는 분, n: 이름}. 확인 안 하는 이동이면 null
+// (시내·동네 버스는 일반 버스 시간 6:30~23:40, 배는 섬·노선마다 달라서 따로 보지 않아요)
+function svcOf(o) {
+  if (!o) return null;
+  if (o.airBus) {
+    const r = SVC_ROUTE.airbus;
+    return { w: o.airBus.out ? r.out : r.back, pre: o.airBus.out ? 0 : Math.max(0, o.min - 23), n: L(...r.n) };
+  }
+  const g = (o.gparts || []).find(x => x.vkey);
+  const r = g && SVC_ROUTE[g.vkey];
+  if (r) return { w: g.out ? r.out : r.back, pre: o.pre || 0, n: L(...r.n) };
+  const nm = { subway: ['지하철', '地下鉄'], train: ['전철', '電車'], bus: ['버스', 'バス'] }[o.mode];
+  if (nm && SERVICE[o.mode]) return { w: SERVICE[o.mode], pre: o.pre || 0, n: L(...nm) };
+  return null;
+}
+// 출발 시각 t 기준 첫차·막차 확인 (계획 짤 때)
+//  - 첫차 전이면 첫차까지 기다리는 시간을 더해요 (firstWait · firstAt)
+//  - 막차가 지났으면 고를 수 없게(isOff) 하고 이유를 적어요 (svcGone · offNote) → 기본 선택이 택시 등으로 바뀌어요
+function svcCheck(o, t) {
+  const s = svcOf(o);
+  if (!s || t == null) return o;
+  const board = t + s.pre,
+    [f, l] = s.w;
+  if (board > l && board < f + 1440) return svcGoneOf(o, s);
+  if (board < f) return { ...o, min: o.min + (f - board), firstWait: f - board, firstAt: f, svcName: s.n };
+  return o;
+}
+function svcGoneOf(o, s) {
+  return {
+    ...o,
+    isOff: true,
+    svcGone: true,
+    svcName: s.n,
+    svcLast: s.w[1],
+    offNote: L(`막차가 끝났어요 · ${s.n} 막차 약 ${fmt(s.w[1] % 1440)}`, `最終便が終わりました · ${s.n}の最終 約${fmt(s.w[1] % 1440)}`)
+  };
+}
 // 교통편 이름으로 배차 간격(분) 추정
 function hwOf(label, mode) {
   const L = label || '';
@@ -10699,7 +10764,8 @@ function nextDep(t, hw, phase, first, last) {
 function withTimetable(o, t0) {
   if (!o || !o.hw || t0 == null || (o.mode !== 'subway' && o.mode !== 'train')) return o;
   const board = t0 + (o.pre || 0),
-    svc = SERVICE[o.mode] || [330, 1440];
+    so = svcOf(o),
+    svc = (so && so.w) || SERVICE[o.mode] || [330, 1440];
   const { d, over } = nextDep(board, o.hw, phaseOf(o.label || o.mode, o.hw), svc[0], svc[1]);
   const wait = d - board,
     wait0 = Math.min(o.wait0 == null ? o.hw / 2 : o.wait0, Math.max(0, o.min - 1));
@@ -11010,29 +11076,55 @@ function isOff(o, date) {
 }
 // 이동 방법 목록에서 기본으로 고를 것
 function pickDefault(opts, date) {
-  opts = opts.filter(o => !isOff(o, date));
+  const all = opts;
+  opts = opts.filter(o => !o.isOff && !isOff(o, date));
+  if (!opts.length) return all[0];
   const walk = opts.find(o => o.mode === 'walk');
   if (opts.length === 1) return opts[0];
   if (walk && walk.min <= 15) return walk;
   const pub = opts.filter(o => o.mode !== 'taxi' && o.mode !== 'walk');
   const eff = o => o.min + fareSum(o.fare) / 100;
-  const best = pub.sort((x, y) => eff(x) - eff(y))[0];
+  const best = pub.sort((x, y) => eff(x) - eff(y))[0],
+    taxi = opts.find(o => o.mode === 'taxi');
+  // 막차가 끝났거나 첫차를 한참 기다려야 하는 시간: 택시까지 같이 견주고, 오래 걷는 길(25분 넘게)은 고르지 않아요
+  if (taxi && all.some(o => o.svcGone || o.firstWait > 20 || (o.tt && o.wait > 20))) {
+    const b2 = [...pub, taxi].sort((x, y) => eff(x) - eff(y))[0];
+    return walk && walk.min <= 25 && walk.min <= eff(b2) + 3 ? walk : b2;
+  }
   if (walk && (!best || walk.min <= best.min + 3)) return walk;
-  return best || opts.find(o => o.mode === 'taxi') || walk || opts[0];
+  return best || taxi || walk || opts[0];
 }
 // 두 지점 사이 가장 나은 방법 하나
 function bestOpt(a, b) {
   return pickDefault(legOptions(a, b));
 }
-// 일정 칸 사이 이동: 직접 고른 방법이 있으면 그것, 없으면 기본. t 가 있으면 그 시각 기준 '다음 차'
-function chooseLeg(a, b, mode, date, t) {
+// 일정 칸 사이 이동: 직접 고른 방법이 있으면 그것, 없으면 기본.
+// t(출발 시각)가 있으면 첫차·막차를 확인하고(svcCheck), live 면 그 시각 이후 '다음 차'에 맞춰요(withTimetable)
+// 막차가 끝나 원래 고를 방법을 못 쓰면 swapFrom 에 그 방법을 적어요 (화면에 「막차 끝남 → 택시」)
+function chooseLeg(a, b, mode, date, t, live) {
   const base = legOptions(a, b),
-    timed = t == null ? base : base.map(o => withTimetable(o, t));
+    timed =
+      t == null
+        ? base
+        : base.map(o => {
+            const g = svcCheck(o, t);
+            if (g.isOff || !live) return g;
+            const tt = withTimetable(o, t);
+            if (!tt.tt) return g;
+            return tt.lastGone ? svcGoneOf(o, svcOf(o)) : tt;
+          });
   const opts = timed.map(o => (isOff(o, date) ? { ...o, isOff: true } : o));
-  const pick =
-    (mode && (opts.find(o => o.id === mode && !o.isOff) || opts.find(o => o.mode === mode && !o.isOff))) ||
-    pickDefault(opts, date);
-  return { ...pick, chosen: !!(mode && (pick.id === mode || pick.mode === mode)), opts };
+  const want = (list, ok) =>
+    (mode && (list.find(o => o.id === mode && ok(o)) || list.find(o => o.mode === mode && ok(o)))) ||
+    pickDefault(list, date);
+  const pick = want(opts, o => !o.isOff);
+  let swapFrom = null;
+  if (opts.some(o => o.svcGone)) {
+    const un = opts.map(o => (o.svcGone ? { ...o, isOff: false } : o)),
+      w = want(un, o => !isOff(o, date));
+    if (w.svcGone && w.id !== pick.id) swapFrom = { mode: w.mode, id: w.id, n: w.svcName, last: w.svcLast };
+  }
+  return { ...pick, chosen: !!(mode && (pick.id === mode || pick.mode === mode)), opts, swapFrom };
 }
 
 // ---- 계획 모델 ----
@@ -11637,7 +11729,7 @@ function computeDay(plan, di) {
   for (const it of day.items) {
     const p = itemPt(plan, it),
       key = ck + '>' + it.uid,
-      leg = chooseLeg(cur, p, day.modes[key], day.date, live ? t : null);
+      leg = chooseLeg(cur, p, day.modes[key], day.date, t, live);
     let arr = t + leg.min;
     if (it.arrAct != null) {
       arr = it.arrAct;
@@ -11665,7 +11757,7 @@ function computeDay(plan, di) {
     ck = it.uid;
   }
   const endKey = ck + '>E',
-    endLeg = chooseLeg(cur, endPt, day.modes[endKey], day.date, live ? t : null);
+    endLeg = chooseLeg(cur, endPt, day.modes[endKey], day.date, t, live);
   const endArr = t + endLeg.min,
     deadline = toMin(day.end.time);
   const walkKm =
@@ -13644,6 +13736,28 @@ function monthV(first) {
 function selT(id, val, label) {
   return `<label class="fld"><span>${label}</span><select id="${id}" data-change="${id}">${TIMES.map(t => `<option${t === val ? ' selected' : ''}>${t}</option>`).join('')}</select></label>`;
 }
+// 후쿠오카 공항은 비행기가 7:00~22:00 에만 뜨고 내려요 → 그 밖의 시간을 고르면 안내
+function airNoteV() {
+  const D = S.draft,
+    out = x => x < 420 || x > 1320,
+    a = out(toMin(D.arrive)),
+    d = out(toMin(D.depart));
+  const t = [
+    a
+      ? L(
+          '후쿠오카 공항은 비행기가 오전 7시~밤 10시에만 뜨고 내려요. 이 시간 도착은 지연됐을 때예요 — 지하철·버스가 끊긴 시간이면 일정에서 택시로 안내해요.',
+          '福岡空港の発着は朝7時〜夜10時のみです。この時間の到着は遅延時など — 地下鉄・バスが終わった時間ならタクシーで案内します。'
+        )
+      : '',
+    d
+      ? L(
+          '마지막 날 비행기 시간이 공항 운영 시간(오전 7시~밤 10시) 밖이에요. 한 번 더 확인해 주세요.',
+          '最終日の便の時刻が空港の運用時間(朝7時〜夜10時)の外です。もう一度ご確認ください。'
+        )
+      : ''
+  ].filter(Boolean);
+  return `<p class="note air-note" id="airNote"${t.length ? '' : ' hidden'}>${ic('alert')}<span>${t.map(esc).join('<br>')}</span></p>`;
+}
 // ★ 화면: 새 여행 1단계 (날짜·숙소·시간)
 function datesV() {
   const D = S.draft,
@@ -13669,6 +13783,7 @@ function datesV() {
     <section class="card">
       <h2 class="h-s">시간</h2>
       <div class="grid2">${selT('arrive', D.arrive, '첫날 공항 도착')}${selT('depart', D.depart, '마지막 날 비행기')}${selT('dayStart', D.dayStart, '하루 시작')}${selT('dayEnd', D.dayEnd, '하루 마무리')}</div>
+      ${airNoteV()}
     </section>
   </main>
   <div class="cta"><button class="btn pri big" data-act="toAreas" ${D.start && D.end ? '' : 'disabled'}>다음 · 가고 싶은 곳 고르기</button></div>`
@@ -13765,14 +13880,34 @@ function anchorLabel(an, isEnd) {
   const moving = di < p.days.length - 1 && !sameHotel(nightHotel(p, di - 1), nightHotel(p, di));
   return `${moving ? L('체크아웃하고 출발', 'チェックアウトして出発') : '숙소에서 출발'} · ${esc(hotelLabelT(nightHotel(p, di - 1)))}`;
 }
+// 이동 수단 이름 (일본어 화면이면 일본어로)
+function modeNm(m) {
+  const n = (MODE[m] || MODE.walk).n;
+  return LANG === 'ja' ? NAME_FIX[n] || n : n;
+}
+// 첫차·막차 태그: 「첫차 05:30 · 25분 대기」 / 「막차 끝남」
+function svcLegTag(leg) {
+  if (leg.swapFrom || leg.svcGone) return `<i class="nxt gone">${L('막차 끝남', '最終便終了')}</i>`;
+  if (leg.firstWait && !leg.tt)
+    return `<i class="nxt">${L(`첫차 ${fmt(leg.firstAt % 1440)} · ${leg.firstWait}분 대기`, `始発 ${fmt(leg.firstAt % 1440)} · ${leg.firstWait}分待ち`)}</i>`;
+  return '';
+}
+// 막차가 끝나 다른 방법으로 바꾼 이동의 설명 한 줄
+function svcSwapTxt(leg) {
+  const f = leg.swapFrom;
+  if (f) return L(`${f.n} 막차(약 ${fmt(f.last % 1440)})가 끝났어요 → ${modeNm(leg.mode)}`, `${f.n}の最終(約${fmt(f.last % 1440)})が終了 → ${modeNm(leg.mode)}`);
+  if (leg.svcGone) return L(`${leg.svcName} 막차(약 ${fmt(leg.svcLast % 1440)})가 끝났어요 · 갈 수 있는 차가 없어요`, `${leg.svcName}の最終(約${fmt(leg.svcLast % 1440)})が終了 · 使える便がありません`);
+  return '';
+}
 // 일정 사이 이동 칸 (지하철 12분 ¥210 등)
 function legRow(leg, li) {
   if (leg.mode === 'none') return `<li class="leg none"><span class="rail"></span></li>`;
-  const ft = fareTxt(leg.fare, true);
+  const ft = fareTxt(leg.fare, true),
+    sw = svcSwapTxt(leg);
   return `<li class="leg m-${leg.mode}" style="--m:${MODE[leg.mode].color}"><span class="rail"></span>
     <button class="lchip" data-act="leg" data-li="${li}" aria-label="이동 방법 바꾸기: ${MODE[leg.mode].n} ${leg.min}분 ${ft}">
-      ${modeIc(leg.mode, 'sm')}<span class="lc-m"><b>${MODE[leg.mode].n} ${leg.min}분</b>${ft ? `<em>${ft}</em>` : ''}${leg.chosen ? '<i class="mine">직접 고름</i>' : ''}${liveLegTag(leg)}</span>
-      <span class="lc-l">${esc(leg.mode === 'walk' ? dist(leg.km) : leg.label)}</span>${ic('next', 'chev')}
+      ${modeIc(leg.mode, 'sm')}<span class="lc-m"><b>${MODE[leg.mode].n} ${leg.min}분</b>${ft ? `<em>${ft}</em>` : ''}${leg.chosen ? '<i class="mine">직접 고름</i>' : ''}${liveLegTag(leg)}${svcLegTag(leg)}</span>
+      <span class="lc-l${sw ? ' warn' : ''}">${esc(sw || (leg.mode === 'walk' ? dist(leg.km) : leg.label))}</span>${ic('next', 'chev')}
     </button></li>`;
 }
 // ★ 일정 카드 한 장 (펼치면 시간·순서·메모 등)
@@ -14143,7 +14278,15 @@ function legSheet(sh) {
         <span class="o2"><b>${o.min}분</b><em>${ft}</em></span>
         <span class="ol">${esc(o.label)}</span>
         ${o.steps && o.steps.length ? `<ol class="osteps">${o.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>` : ''}
-        ${o.isOff ? `<span class="onote">${esc(o.off.note)}</span>` : o.note ? `<span class="onote">${esc(o.note)}</span>` : ''}</span></button>`;
+        ${
+          o.isOff
+            ? `<span class="onote">${esc(o.offNote || (o.off && o.off.note) || '')}</span>`
+            : o.firstWait && !o.tt
+              ? `<span class="onote">${esc(L(`첫차 ${fmt(o.firstAt % 1440)}까지 ${o.firstWait}분 기다려요 (기다리는 시간 포함)`, `始発${fmt(o.firstAt % 1440)}まで${o.firstWait}分待ちます(待ち時間込み)`))}</span>`
+              : o.note
+                ? `<span class="onote">${esc(o.note)}</span>`
+                : ''
+        }</span></button>`;
       })
       .join('')}</div>
     ${!hasWalk ? `<p class="note">${ic('alert')}<span>${A.z !== B.z ? '다른 지역으로 넘어가는 구간이라 걷기는 고를 수 없어요.' : '이 구간은 걸어가기 어려워요.'}</span></p>` : ''}
@@ -14831,7 +14974,11 @@ $app.addEventListener('change', e => {
     stayFromChange(t);
     return;
   }
-  if (['arrive', 'depart', 'dayStart', 'dayEnd'].includes(k)) S.draft[k] = t.value;
+  if (['arrive', 'depart', 'dayStart', 'dayEnd'].includes(k)) {
+    S.draft[k] = t.value;
+    const n = document.getElementById('airNote');
+    if (n && (k === 'arrive' || k === 'depart')) n.outerHTML = airNoteV();
+  }
   else if (k === 'moveDay' && t.value !== '') {
     const to = Number(t.value),
       p = S.plan,
@@ -18674,6 +18821,13 @@ function nowMin() {
   return d.getHours() * 60 + d.getMinutes();
 }
 
+// 막차가 끝나 다른 방법으로 바꾼 구간 안내 (배너)
+function svcLiveTxt(leg, b) {
+  return L(
+    `<b>${esc(leg.swapFrom.n)} 막차가 끝났어요</b> ${esc(b)}까지는 ${modeNm(leg.mode)}(으)로 안내해요.`,
+    `<b>${esc(leg.swapFrom.n)}の最終が終わりました</b> ${esc(b)}までは${modeNm(leg.mode)}で案内します。`
+  );
+}
 // 맞추기 전/후를 비교한 요약 (배너에 표시)
 function syncSummary(p, before, after) {
   const L = [];
@@ -18692,8 +18846,13 @@ function syncSummary(p, before, after) {
       })
     );
   legs
-    .filter(x => x.leg.lastGone)
-    .forEach(x => L.push({ k: 'warn', t: `<b>막차가 끝났어요</b> ${esc(x.b)}까지는 택시로 바꿔 보세요.` }));
+    .filter(x => x.leg.lastGone || x.leg.swapFrom || x.leg.svcGone)
+    .forEach(x =>
+      L.push({
+        k: 'warn',
+        t: x.leg.swapFrom ? svcLiveTxt(x.leg, x.b) : `<b>막차가 끝났어요</b> ${esc(x.b)}까지는 택시로 바꿔 보세요.`
+      })
+    );
   const d = after.endArr - before.endArr;
   L.push({
     k: after.over > 0 ? 'warn' : 'ok',
@@ -19024,9 +19183,11 @@ function h3LegBox(leg, A, B, t0) {
     </div>`;
   }
   const M = MODE[leg.mode] || MODE.walk;
-  const tt = leg.hw ? withTimetable(leg, t0) : null;
+  const tt = leg.hw ? withTimetable(leg, t0) : null,
+    sw = svcSwapTxt(leg);
   return `<div class="h3-leg" style="--lc:${M.color}">
     <p class="h3-lh"><span class="h3-li">${ic(leg.mode)}</span><span>${M.n}</span> ${dur(leg.min)}${fare ? ` · ${fare}` : ''}</p>
+    ${sw ? `<p class="h3-x warn">${ic('alert')}${esc(sw)}</p>` : ''}
     ${leg.label && leg.mode !== 'walk' ? `<p class="h3-dir">${esc(leg.label)}</p>` : ''}
     ${leg.mode === 'walk' && leg.km ? `<p class="h3-dir">${L(`약 ${leg.km.toFixed(1)}km 걸어요`, `約${leg.km.toFixed(1)}km歩きます`)}</p>` : ''}
     ${tt && tt.tt ? `<p class="h3-next"><span>${L(`다음 차 (약 ${leg.hw}분 간격)`, `次の便(約${leg.hw}分間隔)`)}</span><b>${fmt(tt.depAt % 1440)}</b></p>` : ''}
