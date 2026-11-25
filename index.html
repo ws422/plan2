@@ -5791,6 +5791,475 @@ body {
   margin-top: 8px;
 }
 
+/* ===== 숙소 위치 시트: 지도 핀 · 이름으로 찾기 · 좌표 ===== */
+.hp-map-wrap {
+  position: relative;
+  height: 220px;
+  margin: 14px 0 0;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--land);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.hp-map {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.hp-map svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.hp-zoom {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.hp-zoom .ib {
+  background: var(--surface);
+  box-shadow: var(--sh);
+}
+.hp-tip {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  margin: 0;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: var(--sh);
+  pointer-events: none;
+}
+.hpk path {
+  fill: var(--pri);
+  stroke: #fff;
+  stroke-width: 2.5;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.28));
+}
+.hpk circle {
+  fill: #fff;
+}
+.hpk-sh {
+  fill: rgba(0, 0, 0, 0.22);
+}
+.hpin-ap circle {
+  fill: color-mix(in srgb, var(--pri) 12%, transparent);
+  stroke: var(--pri);
+  stroke-width: 2;
+  stroke-dasharray: 5 5;
+}
+.hpin-ap circle.dot {
+  fill: var(--pri);
+  stroke: #fff;
+  stroke-dasharray: none;
+  stroke-width: 2;
+}
+.hp-now {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--warn-2);
+}
+.hp-now > .ic {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  color: var(--warn);
+}
+.hp-now span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.hp-now b {
+  font-size: 14.5px;
+}
+.hp-now small {
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.hp-now.ok {
+  background: var(--ok-2);
+}
+.hp-now.ok > .ic {
+  color: var(--ok);
+}
+.hp-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin: 16px 0 0;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+.hp-tabs button {
+  height: 38px;
+  border-radius: 11px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.hp-tabs button.on {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(21, 32, 58, 0.12);
+}
+.hp-body {
+  padding-top: 12px;
+  min-height: 150px;
+}
+.hp-find {
+  display: flex;
+  gap: 8px;
+}
+.hp-find input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+}
+.hp-find input:focus {
+  outline: none;
+  border-color: var(--pri);
+}
+.hp-find .btn {
+  flex: none;
+  height: 48px;
+  padding: 0 18px;
+  width: auto;
+}
+.hp-fine {
+  margin: 8px 2px 0;
+}
+.hp-msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 2px 0;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+.hp-msg .ic {
+  width: 16px;
+  height: 16px;
+}
+.hp-msg.bad {
+  color: var(--bad);
+}
+.hp-res {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.hp-res button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 11px 12px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+}
+.hp-res button > .ic:first-child {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  color: var(--pri);
+}
+.hp-res button span {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+.hp-res b {
+  font-size: 14.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hp-res small {
+  font-size: 12px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hp-res button.on {
+  border-color: var(--ok);
+  background: var(--ok-2);
+}
+.hp-res .ok {
+  width: 18px;
+  height: 18px;
+  color: var(--ok);
+  flex: none;
+}
+.hp-how {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+/* 숙소 위치: 실제 지도 타일 */
+.hp-map-wrap {
+  height: 280px;
+}
+.hp-map.tiles {
+  background: #eef0ea;
+  overflow: hidden;
+}
+:root[data-theme='dark'] .hp-map.tiles {
+  background: #262626;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .hp-map.tiles {
+    background: #262626;
+  }
+}
+.hp-layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.hp-tile {
+  position: absolute;
+  width: 256px;
+  height: 256px;
+  max-width: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+.hp-pin-svg {
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+}
+.hp-ap {
+  position: absolute;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--pri) 14%, transparent);
+  border: 2px dashed var(--pri);
+  pointer-events: none;
+}
+.hp-ap i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: var(--pri);
+  border: 2px solid #fff;
+}
+.hp-attr {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 2px 6px;
+  border-top-left-radius: 8px;
+  font-size: 10px;
+  line-height: 1.4;
+  color: #444;
+  background: rgba(255, 255, 255, 0.78);
+}
+.hp-attr a {
+  color: inherit;
+  text-decoration: none;
+}
+.hp-map.tiles ~ .hp-tip {
+  bottom: 22px;
+}
+.hp-off {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  margin: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--warn);
+  background: var(--warn-2);
+}
+.hp-map.tiles .hp-tile {
+  image-rendering: auto;
+}
+:root[data-theme='dark'] .hp-tile {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.88) saturate(0.7);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .hp-tile {
+    filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.88) saturate(0.7);
+  }
+}
+/* 숙소 위치: 벡터 지도 · 핀 크기 고정 */
+.hp-map .hp-pin-svg {
+  width: 32px;
+  height: 46px;
+}
+.hp-map.vector {
+  cursor: auto;
+  background: #f2f2ef;
+}
+.hp-map .hp-vmap,
+.hp-map .hp-vmap.maplibregl-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hp-vmap .maplibregl-canvas-container.maplibregl-interactive {
+  cursor: crosshair;
+}
+.hp-vmap .maplibregl-canvas-container.maplibregl-interactive:active {
+  cursor: grabbing;
+}
+.hp-vpin {
+  width: 32px;
+  height: 46px;
+  pointer-events: none;
+}
+.hp-vpin svg {
+  display: block;
+  width: 32px;
+  height: 46px;
+}
+.hp-vmap .hp-ap {
+  position: absolute;
+}
+.hp-vmap .maplibregl-ctrl-attrib {
+  font-size: 10px;
+}
+.hp-map.vector ~ .hp-tip {
+  bottom: 10px;
+}
+/* 지역 지도: 숙소 핀은 주홍색, 동네 이름표는 조금 작게 */
+.hpin-b {
+  fill: var(--pri);
+  stroke: #fff;
+  stroke-width: 2.2;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+}
+.hpin-ic {
+  stroke: #fff;
+}
+.hpin-t {
+  fill: var(--pri);
+  stroke: var(--land);
+  stroke-width: 4px;
+}
+.apin-t {
+  font-size: 13px;
+  stroke-width: 4.5px;
+}
+.apin.on .apin-t {
+  fill: var(--pri);
+}
+/* '가고 싶은 곳' 진짜 지도 */
+.rmap.vector {
+  position: relative;
+  touch-action: auto;
+}
+.rmap .rg-vmap,
+.rmap .rg-gl,
+.rmap .rg-gl.maplibregl-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.rmap .rg-ov {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.rmap .rg-ov svg.rg-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.rmap .rg-ov .apin,
+.rmap .rg-ov .rg-chip {
+  pointer-events: auto;
+  cursor: pointer;
+}
+.rmap .rg-ov .hpin-ic {
+  width: 15px;
+  height: 15px;
+}
+.rg-chip rect {
+  fill: var(--surface);
+  stroke: var(--line, rgba(0, 0, 0, 0.12));
+  stroke-width: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.18));
+}
+.rg-chip text {
+  font-size: 12px;
+  font-weight: 800;
+  fill: var(--ink);
+}
+.rg-chip .rg-ar {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.6;
+}
+.rg-chip.on rect {
+  fill: var(--pri);
+  stroke: var(--pri);
+}
+.rg-chip.on text {
+  fill: #fff;
+}
+.rg-chip.on .rg-ar {
+  stroke: #fff;
+  opacity: 1;
+}
+.map-card .map-ctl {
+  z-index: 3;
+}
+.rmap .maplibregl-ctrl-bottom-right {
+  z-index: 3;
+}
+
 </style>
 </head>
 <body>
@@ -9083,10 +9552,20 @@ function dayHotel(plan, di) {
   return nightHotel(plan, Math.min(di, Math.max(0, plan.days.length - 2)));
 }
 // 숙소 → 지도 위 지점(좌표·이름)
+// h = { lat, lng } 이면 예약한 숙소의 정확한 위치(핀)예요
+function hotelPin(h) {
+  return !!h && h.lat != null && h.lng != null && isFinite(h.lat) && isFinite(h.lng);
+}
 function hotelPt(h) {
   h = h || {};
   let p;
-  if (h.st && STATIONS[h.st]) {
+  if (hotelPin(h)) {
+    const pt = { lat: +h.lat, lng: +h.lng },
+      ns = nearStation(pt),
+      ar = nearestArea(pt);
+    p = { ...pt, z: ar && ar.z ? ar.z : 'city', j: ns ? `${ns.st.j}駅周辺` : '福岡市内', n: '숙소', pin: true };
+    if (h.addr) p.addr = h.addr;
+  } else if (h.st && STATIONS[h.st]) {
     const s = STATIONS[h.st];
     p = { j: `${s.j}駅周辺`, n: `숙소 (${s.n}역 주변)`, lat: s.lat, lng: s.lng, z: 'city' };
   } else p = { ...(PLACES.hotel[h.k] || PLACES.hotel.hakata) };
@@ -9102,6 +9581,10 @@ function hotelPt(h) {
 // 숙소 위치 이름 (일본어)
 function hotelWhereJ(h) {
   h = h || {};
+  if (hotelPin(h)) {
+    const ns = nearStation(h);
+    return ns ? `${ns.st.j}駅` : '福岡市内';
+  }
   return h.st && STATIONS[h.st]
     ? `${STATIONS[h.st].j}駅`
     : ((PLACES.hotel[h.k] || PLACES.hotel.hakata).j || '').replace(/周辺$/, '');
@@ -9109,6 +9592,10 @@ function hotelWhereJ(h) {
 // 숙소 위치 이름 (한국어, 예: 하카타역)
 function hotelWhere(h) {
   h = h || {};
+  if (hotelPin(h)) {
+    const ns = nearStation(h);
+    return ns ? `${ns.st.n}역` : '후쿠오카 시내';
+  }
   return h.st && STATIONS[h.st] ? `${STATIONS[h.st].n}역` : HOTEL_LABEL[h.k] || HOTEL_LABEL.hakata;
 }
 // 숙소 이름 + 위치 (예: 도미인 · 기온역)
@@ -9120,7 +9607,13 @@ function hotelLabel(h) {
 function sameHotel(a, b) {
   a = a || {};
   b = b || {};
-  return (a.k || '') === (b.k || '') && (a.st || '') === (b.st || '') && (a.name || '') === (b.name || '');
+  return (
+    (a.k || '') === (b.k || '') &&
+    (a.st || '') === (b.st || '') &&
+    (a.name || '') === (b.name || '') &&
+    String(a.lat ?? '') === String(b.lat ?? '') &&
+    String(a.lng ?? '') === String(b.lng ?? '')
+  );
 }
 // 어떤 지점에서 가장 가까운 숙소 동네 프리셋
 function presetNear(pt) {
@@ -11650,7 +12143,7 @@ function areasV() {
     <section class="map-card">
       <div class="rmap" id="rmap"></div>
       <div class="map-ctl"><button class="ib sm" data-act="zoom" data-n="1" aria-label="확대">${ic('plus')}</button><button class="ib sm" data-act="zoom" data-n="-1" aria-label="축소">${ic('minus')}</button></div>
-      <p class="map-cap">시내는 크게, 외곽은 작게 그린 안내 지도 · 동그라미를 눌러 고르세요</p>
+      <p class="map-cap">${rgMode() === 'vector' ? L('동그라미를 눌러 고르세요 · 화면 밖 동네는 가장자리 이름표를 누르면 돼요', '丸をタップして選んでください・画面外のエリアは端の名札をタップ') : '시내는 크게, 외곽은 작게 그린 안내 지도 · 동그라미를 눌러 고르세요'}</p>
       ${hotelLegendV()}
     </section>
     ${groups
@@ -12246,6 +12739,7 @@ const A = {
     render();
   },
   zoom(d) {
+    if (rgLive()) return Number(d.n) > 0 ? RGV.map.zoomIn() : RGV.map.zoomOut();
     const base = S.mvBase;
     if (!base) return;
     const mv = S.mv || { ...base },
@@ -14173,7 +14667,7 @@ function staysEditorV(ctx) {
         <label class="stay-in"><span>${L('이 숙소 체크인 날', 'この宿のチェックイン日')}</span><select data-change="stayFrom" data-ctx="${ctx}" data-k="${k}">${opts}</select></label>`
             : ''
         }</div>
-      <button class="stay-pick" data-act="stayPick" data-ctx="${ctx}" data-k="${k}">${ic('home')}<span><b>${esc(hotelNearT(x.h))}</b><small>${x.h.name ? esc(x.h.name) : L('눌러서 위치·숙소 이름 정하기', 'タップして場所・宿の名前を設定')}</small></span>${ic('next', 'chev')}</button></li>`;
+      <button class="stay-pick" data-act="stayPick" data-ctx="${ctx}" data-k="${k}">${ic('home')}<span><b>${esc(x.h.name || hotelNearT(x.h))}</b><small>${stayPickSub(x.h)}</small></span>${ic('next', 'chev')}</button></li>`;
     })
     .join('');
   const canAdd = st.some(x => x.n1 > x.n0);
@@ -14183,6 +14677,19 @@ function staysEditorV(ctx) {
       ? `<button class="btn soft wide stay-add" data-act="stayAdd" data-ctx="${ctx}">${ic('plus')}${L('중간에 숙소 옮기기', '途中で宿を移る')}</button>`
       : '')
   );
+}
+// 숙소 칸 아래 작은 글씨: 정확한 위치면 가까운 역까지 걸어서 몇 분
+function stayPickSub(h) {
+  if (hotelPin(h)) {
+    const ns = nearStation(h);
+    return (
+      '📍 ' +
+      (ns
+        ? L(`${ns.st.n}역까지 걸어서 ${wmin(ns.d)}분`, `${ns.st.j}駅まで徒歩${wmin(ns.d)}分`)
+        : L('정확한 위치로 정했어요', '正確な場所に設定済み'))
+    );
+  }
+  return h.name ? esc(hotelNearT(h)) : L('눌러서 예약한 숙소 정하기', 'タップして予約した宿を設定');
 }
 // 새 여행 화면의 숙소 카드
 function draftHotelCard() {
@@ -14195,38 +14702,707 @@ function draftHotelCard() {
     return `<section class="card">${head}<p class="sub">${L('당일치기라 숙소 없이 공항에서 출발해 공항으로 돌아오는 동선으로 짜요.', '日帰りなので、宿なしで空港発・空港着のルートを作ります。')}</p></section>`;
   return `<section class="card">${head}<p class="sub">${L('매일 숙소에서 출발해 숙소로 돌아오는 동선으로 짜요. 숙소를 옮기면 그날 아침 새 숙소에 짐을 맡기고 시작해요.', '毎日宿を出発して宿に戻るルートを作ります。宿を移る日は、朝に新しい宿へ荷物を預けてから始めます。')}</p>${staysEditorV('draft')}</section>`;
 }
-// 숙소 위치 고르기
+// 숙소 위치 고르기 — 지도에 핀 꽂기 · 이름으로 찾기 · 좌표 붙여넣기 · 동네만
 function hpickSheetV(sh) {
   const c = stayCtx(sh.ctx),
     st = c.get(),
     x = st[sh.k] || st[0],
-    h = sh.h;
-  const chip = (v, label, on) =>
-    `<button class="${on ? 'on' : ''}" data-act="hpPick" data-v="${v}" aria-pressed="${on}">${label}</button>`;
-  const presets = Object.keys(HOTEL_LABEL)
-    .map(k => chip('k:' + k, esc(hotelWhereT({ k })), !h.st && h.k === k))
-    .join('');
-  const skip = new Set([...Object.values(HOTEL_STATION), 'airport']),
-    seen = new Set();
-  const lines = Object.values(LINES)
-    .map(ln => {
-      const ids = ln.st.filter(id => !skip.has(id) && !seen.has(id));
-      ids.forEach(id => seen.add(id));
-      return ids.length
-        ? `<p class="hp-line"><i style="--m:${ln.color}"></i>${esc(LANG === 'ja' ? ln.j : ln.n)}</p><div class="chips-sel hp-st">${ids.map(id => chip('st:' + id, esc(LANG === 'ja' ? STATIONS[id].j : STATIONS[id].n), h.st === id)).join('')}</div>`
-        : '';
-    })
-    .join('');
+    h = sh.h,
+    tab = sh.tab || 'find',
+    pin = hotelPin(h);
+  const pt = hotelPt(h),
+    ns = nearStation(pt);
+  const nowSub = pin
+    ? ns
+      ? L(`${ns.st.n}역까지 걸어서 ${wmin(ns.d)}분`, `${ns.st.j}駅まで徒歩${wmin(ns.d)}分`)
+      : L('가까운 지하철역이 없어요 · 버스·택시로 계산해요', '近くに地下鉄駅がありません · バス・タクシーで計算します')
+    : L(`지금은 「${hotelWhereT(h)} 근처」로 대략 계산해요`, `今は「${hotelWhereT(h)}周辺」でおおまかに計算しています`);
+  const tabBtn = (t, label) =>
+    `<button role="tab" class="${tab === t ? 'on' : ''}" aria-selected="${tab === t}" data-act="hpTab" data-t="${t}">${label}</button>`;
+  let body = '';
+  if (tab === 'find') {
+    let res = '';
+    if (sh.busy) res = `<p class="hp-msg">${ic('search')}${L('찾는 중…', '検索中…')}</p>`;
+    else if (sh.err) res = `<p class="hp-msg bad">${esc(sh.err)}</p>`;
+    else if (sh.res && !sh.res.length)
+      res = `<p class="hp-msg">${L('못 찾았어요. 일본어·영어 이름으로 다시 찾거나, 위 지도에서 숙소 자리를 직접 눌러 주세요.', '見つかりませんでした。日本語・英語の名前で探すか、上の地図で宿の場所を直接タップしてください。')}</p>`;
+    else if (sh.res)
+      res = `<ul class="hp-res">${sh.res
+        .map(
+          (r, i) =>
+            `<li><button class="${pin && +h.lat === r.lat && +h.lng === r.lng ? 'on' : ''}" data-act="hpRes" data-i="${i}">${ic('pin')}<span><b>${esc(r.name)}</b><small>${esc(r.addr)}</small></span>${pin && +h.lat === r.lat && +h.lng === r.lng ? ic('check', 'ok') : ''}</button></li>`
+        )
+        .join('')}</ul>`;
+    body = `<div class="hp-find"><input id="hQ" type="search" enterkeyhint="search" autocomplete="off" value="${esc(sh.q ?? '')}" placeholder="${L('예: Dormy Inn Hakata, ドーミーイン博多', '例: ドーミーイン博多、Dormy Inn')}"><button class="btn pri" data-act="hpFind">${L('찾기', '検索')}</button></div>
+      <p class="fine hp-fine">${L('예약 확인서에 적힌 일본어·영어 호텔 이름으로 찾으면 잘 나와요. 인터넷이 필요해요.', '予約確認書の日本語・英語のホテル名で探すと見つかりやすいです。インターネットが必要です。')}</p>${res}`;
+  } else if (tab === 'paste') {
+    body = `<div class="hp-find"><input id="hPaste" type="text" inputmode="decimal" autocomplete="off" value="${esc(sh.paste ?? '')}" placeholder="33.5905, 130.4207"><button class="btn pri" data-act="hpPaste">${L('적용', '適用')}</button></div>
+      <ol class="hp-how">
+        <li>${L('구글 지도에서 숙소를 찾아 그 자리를 꾹 눌러요', 'Googleマップで宿を探し、その場所を長押しします')}</li>
+        <li>${L('위에 나온 숫자 좌표(33.59…, 130.41…)를 복사해요', '上に出る数字の座標(33.59…, 130.41…)をコピーします')}</li>
+        <li>${L('여기에 붙여 넣고 「적용」을 눌러요. 주소창의 긴 링크도 돼요', 'ここに貼り付けて「適用」。アドレスバーの長いリンクでもOK')}</li>
+      </ol>`;
+  } else {
+    const chip = (v, label, on) =>
+      `<button class="${on ? 'on' : ''}" data-act="hpPick" data-v="${v}" aria-pressed="${on}">${label}</button>`;
+    const presets = Object.keys(HOTEL_LABEL)
+      .map(k => chip('k:' + k, esc(hotelWhereT({ k })), !pin && !h.st && h.k === k))
+      .join('');
+    const skip = new Set([...Object.values(HOTEL_STATION), 'airport']),
+      seen = new Set();
+    const lines = Object.values(LINES)
+      .map(ln => {
+        const ids = ln.st.filter(id => !skip.has(id) && !seen.has(id));
+        ids.forEach(id => seen.add(id));
+        return ids.length
+          ? `<p class="hp-line"><i style="--m:${ln.color}"></i>${esc(LANG === 'ja' ? ln.j : ln.n)}</p><div class="chips-sel hp-st">${ids.map(id => chip('st:' + id, esc(LANG === 'ja' ? STATIONS[id].j : STATIONS[id].n), !pin && h.st === id)).join('')}</div>`
+          : '';
+      })
+      .join('');
+    body = `<p class="fine hp-fine">${L('정확한 위치를 모를 때 동네나 가까운 역만 골라도 돼요. 동선은 그 근처 기준으로 짜요.', '正確な場所がわからなければ、エリアか最寄り駅だけでもOK。その周辺を基準にルートを作ります。')}</p>
+      <h3 class="sec"><span>${L('많이 묵는 동네', '人気の宿泊エリア')}</span></h3><div class="chips-sel">${presets}</div>
+      <h3 class="sec"><span>${L('다른 역 근처', 'ほかの駅の近く')}</span></h3>${lines}`;
+  }
   return (
     shHead(
       L('숙소 위치', '宿の場所'),
       `${L(`${sh.k + 1}번째 숙소`, `${sh.k + 1}番目の宿`)} · ${mds(nightDate(c.start, x.n0))} – ${mds(nightDate(c.start, x.n1 + 1))}`
     ) +
-    `<label class="fld hp-name"><span>${L('숙소 이름 (안 적어도 돼요)', '宿の名前(空欄でもOK)')}</span><input id="hName" type="text" maxlength="40" value="${esc(h.name || '')}" placeholder="${L('예: 도미인 하카타', '例: ドーミーイン博多')}" autocomplete="off"></label>
-    <h3 class="sec"><span>${L('많이 묵는 동네', '人気の宿泊エリア')}</span></h3><div class="chips-sel">${presets}</div>
-    <h3 class="sec"><span>${L('다른 역 근처', 'ほかの駅の近く')}</span><small>${L('숙소에서 가장 가까운 역', '宿から一番近い駅')}</small></h3>${lines}
+    `<label class="fld hp-name"><span>${L('숙소 이름', '宿の名前')}</span><input id="hName" type="text" maxlength="40" value="${esc(sh.nm ?? h.name ?? '')}" placeholder="${L('예: 도미인 하카타 기온', '例: ドーミーイン博多祇園')}" autocomplete="off"></label>
+    <div class="hp-map-wrap">
+      <div class="hp-map" id="hpmap" role="application" aria-label="${L('숙소 위치 지도 · 눌러서 핀 꽂기', '宿の場所の地図 · タップでピンを置く')}"></div>
+      <div class="hp-zoom"><button class="ib sm" data-act="hpZoom" data-n="1" aria-label="${L('확대', '拡大')}">${ic('plus')}</button><button class="ib sm" data-act="hpZoom" data-n="-1" aria-label="${L('축소', '縮小')}">${ic('minus')}</button></div>
+      ${hpMode(sh) === 'svg' ? `<p class="hp-off">${L('인터넷이 없어 간단한 지도로 보여요', 'オフラインのため簡易地図で表示しています')}</p>` : ''}
+      <p class="hp-tip">${pin ? L('다른 곳을 누르면 핀이 옮겨져요', '別の場所をタップするとピンが移動します') : L('숙소 자리를 눌러 핀을 꽂아요', '宿の場所をタップしてピンを置きます')}</p>
+    </div>
+    <div class="hp-now${pin ? ' ok' : ''}">${ic(pin ? 'check' : 'pin')}<span><b>${pin ? L('정확한 위치로 정했어요', '正確な場所に設定しました') : L('아직 대략적인 위치예요', 'まだおおまかな場所です')}</b><small>${nowSub}</small></span></div>
+    <div class="hp-tabs" role="tablist">${tabBtn('find', L('이름으로 찾기', '名前で探す'))}${tabBtn('paste', L('좌표·링크', '座標・リンク'))}${tabBtn('area', L('동네만 고르기', 'エリアだけ'))}</div>
+    <div class="hp-body">${body}</div>
     <div class="sh-foot"><button class="btn pri" data-act="hpSave">${ic('check')}${L('이 숙소로 정하기', 'この宿に決める')}</button></div>`
   );
+}
+// 숙소 위치 지도 (실제 축척 · 끌어서 이동 · 눌러서 핀)
+function hpView(sh) {
+  if (!sh.view) {
+    const pt = hotelPt(sh.h);
+    sh.view = { lat: pt.lat, lng: pt.lng, span: hotelPin(sh.h) ? 1.4 : 2.6 };
+  }
+  return sh.view;
+}
+function hpProj(v, W, H) {
+  const s = W / v.span;
+  return {
+    s,
+    P: (lat, lng) => [W / 2 + (lng - v.lng) * KX * s, H / 2 - (lat - v.lat) * KY * s],
+    inv: (x, y) => ({ lat: v.lat - (y - H / 2) / (KY * s), lng: v.lng + (x - W / 2) / (KX * s) })
+  };
+}
+function hpMapSVG(sh, W, H) {
+  const v = hpView(sh),
+    { P, s } = hpProj(v, W, H);
+  let h = geoSVG(P, 1, { stations: v.span < 6, riverW: clamp(s * 0.05, 1.5, 6), lineW: 2.4 });
+  const pt = hotelPt(sh.h),
+    [x, y] = P(pt.lat, pt.lng);
+  if (hotelPin(sh.h)) {
+    h += `<g class="hpk" transform="translate(${f1(x)},${f1(y)})"><ellipse class="hpk-sh" cx="0" cy="1" rx="7" ry="3"/><path d="M0 0C-3 -8 -13 -14 -13 -24A13 13 0 1 1 13 -24C13 -14 3 -8 0 0Z"/><circle cy="-24" r="5"/></g>`;
+  } else {
+    h += `<g class="hpin-ap" transform="translate(${f1(x)},${f1(y)})"><circle r="${f1(clamp(0.45 * s, 18, 70))}"/><circle class="dot" r="5"/></g>`;
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-hidden="true">${h}</svg>`;
+}
+// ---- 실제 지도 (일본 국토지리원 지도 · 안 되면 OpenStreetMap) — 둘 다 API 키가 필요 없어요 ----
+// 인터넷이 있으면 길·건물까지 보이는 지도, 없거나 타일이 안 오면 간단한 그림 지도로 바꿔요
+const HP_TILE = 256,
+  HP_ZMIN = 11,
+  HP_ZMAX = 18;
+function hpDark() {
+  const t = document.documentElement.dataset.theme;
+  return t === 'dark' || (t !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+}
+function hpTileUrl(z, x, y) {
+  return `https://cyberjapandata.gsi.go.jp/xyz/pale/${z}/${x}/${y}.png`;
+}
+function hpTileUrlOsm(z, x, y) {
+  return `https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
+}
+// 위도·경도 ↔ 지도 픽셀 (웹 메르카토르)
+function merc(lat, lng, z) {
+  const ws = HP_TILE * 2 ** z,
+    r = (Math.max(-85, Math.min(85, lat)) * Math.PI) / 180;
+  return [((lng + 180) / 360) * ws, ((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2) * ws];
+}
+function mercInv(x, y, z) {
+  const ws = HP_TILE * 2 ** z;
+  return { lat: (Math.atan(Math.sinh(Math.PI * (1 - (2 * y) / ws))) * 180) / Math.PI, lng: (x / ws) * 360 - 180 };
+}
+function hpTileView(sh) {
+  if (!sh.tv) {
+    const pt = hotelPt(sh.h);
+    sh.tv = { lat: pt.lat, lng: pt.lng, z: hotelPin(sh.h) ? 16 : 15 };
+  }
+  return sh.tv;
+}
+// 지도 종류: vector(예쁜 벡터 지도) → raster(지리원 연한 지도) → svg(간단한 그림 지도) 순으로 물러나요
+function hpMode(sh) {
+  return sh.mapMode || (navigator.onLine === false ? 'svg' : 'vector');
+}
+function hpUseTiles(sh) {
+  return hpMode(sh) === 'raster';
+}
+function hpTilesHTML(sh, W, H) {
+  const v = hpTileView(sh),
+    [cx, cy] = merc(v.lat, v.lng, v.z),
+    left = cx - W / 2,
+    top = cy - H / 2,
+    n = 2 ** v.z;
+  let h = '';
+  for (let ty = Math.floor(top / HP_TILE); ty <= Math.floor((top + H) / HP_TILE); ty++) {
+    if (ty < 0 || ty >= n) continue;
+    for (let tx = Math.floor(left / HP_TILE); tx <= Math.floor((left + W) / HP_TILE); tx++) {
+      const x = ((tx % n) + n) % n;
+      h += `<img class="hp-tile" alt="" draggable="false" src="${hpTileUrl(v.z, x, ty)}" data-fb="${hpTileUrlOsm(v.z, x, ty)}" style="left:${Math.round(tx * HP_TILE - left)}px;top:${Math.round(ty * HP_TILE - top)}px">`;
+    }
+  }
+  const pt = hotelPt(sh.h),
+    [px, py] = merc(pt.lat, pt.lng, v.z),
+    x = px - left,
+    y = py - top;
+  if (hotelPin(sh.h)) {
+    h += `<svg class="hp-pin-svg" style="left:${f1(x - 16)}px;top:${f1(y - 42)}px" width="32" height="46" viewBox="-16 -42 32 46" aria-hidden="true"><g class="hpk"><ellipse class="hpk-sh" cx="0" cy="1" rx="7" ry="3"/><path d="M0 0C-3 -8 -13 -14 -13 -24A13 13 0 1 1 13 -24C13 -14 3 -8 0 0Z"/><circle cy="-24" r="5"/></g></svg>`;
+  } else {
+    const mpp = (156543.03 * Math.cos((pt.lat * Math.PI) / 180)) / n,
+      r = clamp(450 / mpp, 22, 140);
+    h += `<span class="hp-ap" style="left:${f1(x - r)}px;top:${f1(y - r)}px;width:${f1(r * 2)}px;height:${f1(r * 2)}px"><i></i></span>`;
+  }
+  return `<div class="hp-layer">${h}</div><p class="hp-attr"><a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル</a> · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></p>`;
+}
+// 지도 그리기 (타일 또는 그림 지도)
+function hpRedraw(el) {
+  const sh = S.sheet;
+  if (!sh || sh.type !== 'hpick' || !el || hpMode(sh) === 'vector') return;
+  const W = el.clientWidth,
+    H = el.clientHeight;
+  if (!W || !H) return;
+  if (!hpUseTiles(sh)) {
+    el.classList.remove('tiles');
+    el.innerHTML = hpMapSVG(sh, W, H);
+    return;
+  }
+  el.classList.add('tiles');
+  el.innerHTML = hpTilesHTML(sh, W, H);
+  // 타일이 하나도 안 오면 그림 지도로
+  const imgs = el.querySelectorAll('img.hp-tile');
+  imgs.forEach(img => {
+    img.addEventListener('load', () => (sh.tileOk = true), { once: true });
+    img.addEventListener(
+      'error',
+      () => {
+        // 지리원 지도가 안 오면 같은 칸을 OpenStreetMap 으로 한 번 더
+        if (img.dataset.fb) {
+          img.src = img.dataset.fb;
+          delete img.dataset.fb;
+          img.addEventListener('error', () => fail(img), { once: true });
+          return;
+        }
+        fail(img);
+      },
+      { once: true }
+    );
+  });
+  function fail(img) {
+    img.style.visibility = 'hidden';
+    sh.tileErr = (sh.tileErr || 0) + 1;
+    if (!sh.tileOk && sh.tileErr >= Math.min(3, imgs.length) && hpMode(sh) === 'raster' && S.sheet === sh) {
+      sh.mapMode = 'svg';
+      S.keepSheetScroll = true;
+      hpKeep();
+      render();
+    }
+  }
+}
+function drawHpMap(el) {
+  const sh = S.sheet;
+  if (!sh || sh.type !== 'hpick') return;
+  if (hpMode(sh) === 'vector') {
+    hpVector(el, sh);
+    return;
+  }
+  if (HPV) hpVecDrop();
+  hpRedraw(el);
+  if (el.__hp) return;
+  el.__hp = true;
+  let st = null;
+  const layer = () => el.querySelector('.hp-layer, svg');
+  el.addEventListener('pointerdown', e => {
+    if (e.target.closest('a')) return;
+    st = { x: e.clientX, y: e.clientY, moved: false, id: e.pointerId };
+  });
+  el.addEventListener('pointermove', e => {
+    if (!st) return;
+    const dx = e.clientX - st.x,
+      dy = e.clientY - st.y;
+    if (!st.moved && Math.hypot(dx, dy) < 6) return;
+    if (!st.moved) {
+      st.moved = true;
+      try {
+        el.setPointerCapture(e.pointerId);
+      } catch (_) {}
+    }
+    // 끄는 동안은 그림만 옮기고, 손을 떼면 그 자리로 다시 그려요
+    const ly = layer();
+    if (ly) ly.style.transform = `translate(${dx}px,${dy}px)`;
+    st.dx = dx;
+    st.dy = dy;
+  });
+  const finish = e => {
+    if (!st) return;
+    const s0 = st;
+    st = null;
+    const W = el.clientWidth,
+      H = el.clientHeight;
+    if (s0.moved) {
+      if (hpUseTiles(sh)) {
+        const v = hpTileView(sh),
+          [cx, cy] = merc(v.lat, v.lng, v.z),
+          g = mercInv(cx - s0.dx, cy - s0.dy, v.z);
+        sh.tv = { ...v, lat: g.lat, lng: g.lng };
+      } else {
+        const v = hpView(sh),
+          s = W / v.span;
+        sh.view = { ...v, lat: v.lat + s0.dy / (KY * s), lng: v.lng - s0.dx / (KX * s) };
+      }
+      hpRedraw(el);
+      return;
+    }
+    if (e.type !== 'pointerup') return;
+    const r = el.getBoundingClientRect(),
+      ox = e.clientX - r.left,
+      oy = e.clientY - r.top;
+    let g;
+    if (hpUseTiles(sh)) {
+      const v = hpTileView(sh),
+        [cx, cy] = merc(v.lat, v.lng, v.z);
+      g = mercInv(cx - W / 2 + ox, cy - H / 2 + oy, v.z);
+    } else g = hpProj(hpView(sh), W, H).inv(ox, oy);
+    hpKeep();
+    sh.h = { lat: +g.lat.toFixed(6), lng: +g.lng.toFixed(6) };
+    S.keepSheetScroll = true;
+    render();
+  };
+  el.addEventListener('pointerup', finish);
+  el.addEventListener('pointercancel', finish);
+  // 마우스 휠·트랙패드로 확대·축소
+  el.addEventListener(
+    'wheel',
+    e => {
+      e.preventDefault();
+      if (Math.abs(e.deltaY) < 4) return;
+      A.hpZoom({ n: e.deltaY < 0 ? 1 : -1 });
+    },
+    { passive: false }
+  );
+}
+
+// ---- 예쁜 벡터 지도 (OpenFreeMap · MapLibre) — API 키 없이 써요 ----
+// 시트를 다시 그려도 지도는 하나를 계속 써요 (상자째로 옮겨 붙여요)
+const ML_VER = '4.7.1',
+  ML_BASE = `https://unpkg.com/maplibre-gl@${ML_VER}/dist/`,
+  HP_STYLE = 'https://tiles.openfreemap.org/styles/positron';
+let HPV = null,
+  MLP = null;
+function loadMapLibre() {
+  if (window.maplibregl) return Promise.resolve(window.maplibregl);
+  if (MLP) return MLP;
+  MLP = new Promise((res, rej) => {
+    const css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = ML_BASE + 'maplibre-gl.css';
+    document.head.appendChild(css);
+    const js = document.createElement('script');
+    js.src = ML_BASE + 'maplibre-gl.js';
+    js.onload = () => (window.maplibregl ? res(window.maplibregl) : rej(new Error('maplibre')));
+    js.onerror = () => rej(new Error('maplibre load'));
+    document.head.appendChild(js);
+    setTimeout(() => rej(new Error('maplibre timeout')), 12000);
+  });
+  MLP.catch(() => (MLP = null));
+  return MLP;
+}
+function hpVecDrop() {
+  if (!HPV) return;
+  try {
+    if (HPV.map) HPV.map.remove();
+  } catch (_) {}
+  HPV = null;
+}
+// 벡터 지도가 안 되면 지리원 지도로
+function hpVecFail(sh) {
+  if (S.sheet !== sh || hpMode(sh) !== 'vector') return;
+  hpVecDrop();
+  sh.mapMode = 'raster';
+  hpKeep();
+  S.keepSheetScroll = true;
+  render();
+}
+function hpVector(el, sh) {
+  if (HPV && HPV.sh !== sh) hpVecDrop();
+  if (!HPV) {
+    const box = document.createElement('div');
+    box.className = 'hp-vmap';
+    HPV = { sh, box, map: null };
+    loadMapLibre()
+      .then(gl => hpVecInit(gl, sh))
+      .catch(() => hpVecFail(sh));
+  }
+  el.classList.add('vector');
+  el.innerHTML = '';
+  el.appendChild(HPV.box);
+  if (HPV.map) {
+    HPV.map.resize();
+    hpVecSync(sh);
+  }
+}
+function hpVecInit(gl, sh) {
+  if (!HPV || HPV.sh !== sh || HPV.map) return;
+  const pt = hotelPt(sh.h);
+  let map;
+  try {
+    map = new gl.Map({
+      container: HPV.box,
+      style: HP_STYLE,
+      center: [pt.lng, pt.lat],
+      zoom: hotelPin(sh.h) ? 15.5 : 14,
+      minZoom: 9,
+      maxZoom: 19,
+      dragRotate: false,
+      pitchWithRotate: false,
+      touchPitch: false,
+      attributionControl: { compact: true },
+      fadeDuration: 0
+    });
+  } catch (e) {
+    hpVecFail(sh);
+    return;
+  }
+  map.touchZoomRotate.disableRotation();
+  HPV.map = map;
+  map.on('load', () => {
+    if (!HPV || HPV.map !== map) return;
+    HPV.loaded = true;
+    try {
+      hpVecStyle(map);
+      hpVecOverlay(map);
+    } catch (e) {
+      console.warn('map style', e);
+    }
+    hpVecSync(sh);
+  });
+  setTimeout(() => {
+    if (HPV && HPV.map === map && !HPV.loaded) hpVecFail(sh);
+  }, 10000);
+  map.on('click', e => {
+    if (S.sheet !== sh) return;
+    hpKeep();
+    sh.h = { lat: +e.lngLat.lat.toFixed(6), lng: +e.lngLat.lng.toFixed(6) };
+    S.keepSheetScroll = true;
+    render();
+  });
+  map.on('zoom', () => hpVecRing());
+  hpVecSync(sh);
+}
+// ---- 플래너 지도 스타일: 앱 색으로 칠하고, 필요 없는 건 숨기고, 지하철·역·걷는 길을 위에 그려요 ----
+function hpPalette() {
+  return hpDark()
+    ? {
+        land: '#172036',
+        land2: '#1b2540',
+        water: '#12324a',
+        park: '#1b3a2a',
+        bld: '#222c45',
+        road: '#2e3a58',
+        road2: '#3a4868',
+        casing: '#121a2c',
+        rail: '#56627a',
+        text: '#e6ebf5',
+        text2: '#a8b0c2',
+        halo: '#0e1424'
+      }
+    : {
+        land: '#fbf8f2',
+        land2: '#f4efe6',
+        water: '#c9def0',
+        park: '#d8eacd',
+        bld: '#ece6dc',
+        road: '#ffffff',
+        road2: '#fff3d6',
+        casing: '#ddd5c8',
+        rail: '#b8bcc4',
+        text: '#15203a',
+        text2: '#5a6175',
+        halo: '#ffffff'
+      };
+}
+function hpVecStyle(map) {
+  const C = hpPalette(),
+    hide = new Set([
+      'poi',
+      'housenumber',
+      'mountain_peak',
+      'aerodrome_label',
+      'aeroway',
+      'transportation_name',
+      'boundary',
+      'waterway_name'
+    ]);
+  const set = (id, k, v) => {
+    try {
+      map.setPaintProperty(id, k, v);
+    } catch (_) {}
+  };
+  (map.getStyle().layers || []).forEach(l => {
+    const sl = l['source-layer'] || '',
+      id = l.id;
+    if (l.type === 'background') return set(id, 'background-color', C.land);
+    if (hide.has(sl)) {
+      try {
+        map.setLayoutProperty(id, 'visibility', 'none');
+      } catch (_) {}
+      return;
+    }
+    if (l.type === 'fill') {
+      if (sl === 'water') set(id, 'fill-color', C.water);
+      else if (sl === 'park' || (sl === 'landcover' && /wood|grass|park|forest/.test(id)))
+        set(id, 'fill-color', C.park);
+      else if (sl === 'building') {
+        set(id, 'fill-color', C.bld);
+        set(id, 'fill-outline-color', C.bld);
+      } else if (sl === 'landuse' || sl === 'landcover') set(id, 'fill-color', C.land2);
+    } else if (l.type === 'line') {
+      if (sl === 'waterway') set(id, 'line-color', C.water);
+      else if (sl === 'transportation') {
+        if (/rail|transit/.test(id)) set(id, 'line-color', C.rail);
+        else if (/casing/.test(id)) set(id, 'line-color', C.casing);
+        else set(id, 'line-color', /motorway|trunk|primary/.test(id) ? C.road2 : C.road);
+      }
+    } else if (l.type === 'symbol') {
+      set(id, 'text-color', sl === 'water_name' ? (hpDark() ? '#7fa7c8' : '#4f7ea6') : C.text);
+      set(id, 'text-halo-color', C.halo);
+      set(id, 'text-halo-width', 1.4);
+    }
+  });
+  hpVecLang(map);
+}
+function hpFont(map) {
+  const l = (map.getStyle().layers || []).find(x => x.type === 'symbol' && x.layout && x.layout['text-font']);
+  return l ? l.layout['text-font'] : ['Noto Sans Regular'];
+}
+// 지하철 노선·역 (앱 데이터로 직접 그려요) + 숙소 → 가까운 역 걷는 길
+function hpVecOverlay(map) {
+  const C = hpPalette(),
+    before = ((map.getStyle().layers || []).find(l => l.type === 'symbol') || {}).id,
+    font = hpFont(map),
+    lineOf = {};
+  const lines = Object.entries(LINES).map(([k, ln]) => {
+    ln.st.forEach(id => (lineOf[id] = lineOf[id] || ln.color));
+    return {
+      type: 'Feature',
+      properties: { c: ln.color },
+      geometry: { type: 'LineString', coordinates: ln.st.map(id => [STATIONS[id].lng, STATIONS[id].lat]) }
+    };
+  });
+  const sts = Object.entries(STATIONS)
+    .filter(([id]) => lineOf[id])
+    .map(([id, st]) => ({
+      type: 'Feature',
+      properties: { id, c: lineOf[id], t: LANG === 'ja' ? st.j : st.n },
+      geometry: { type: 'Point', coordinates: [st.lng, st.lat] }
+    }));
+  map.addSource('fk-lines', { type: 'geojson', data: { type: 'FeatureCollection', features: lines } });
+  map.addSource('fk-st', { type: 'geojson', data: { type: 'FeatureCollection', features: sts } });
+  map.addLayer(
+    {
+      id: 'fk-line-casing',
+      type: 'line',
+      source: 'fk-lines',
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: { 'line-color': C.halo, 'line-width': ['interpolate', ['linear'], ['zoom'], 11, 4, 16, 9] }
+    },
+    before
+  );
+  map.addLayer(
+    {
+      id: 'fk-line',
+      type: 'line',
+      source: 'fk-lines',
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: { 'line-color': ['get', 'c'], 'line-width': ['interpolate', ['linear'], ['zoom'], 11, 2.2, 16, 5.5] }
+    },
+    before
+  );
+  map.addLayer({
+    id: 'fk-st-dot',
+    type: 'circle',
+    source: 'fk-st',
+    paint: {
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 11, 3, 16, 7],
+      'circle-color': C.halo,
+      'circle-stroke-color': ['get', 'c'],
+      'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 11, 1.5, 16, 3]
+    }
+  });
+  map.addLayer({
+    id: 'fk-st-label',
+    type: 'symbol',
+    source: 'fk-st',
+    minzoom: 12.5,
+    layout: {
+      'text-field': ['get', 't'],
+      'text-font': font,
+      'text-size': ['interpolate', ['linear'], ['zoom'], 13, 11, 17, 14],
+      'text-offset': [0, 1.1],
+      'text-anchor': 'top',
+      'text-optional': true
+    },
+    paint: { 'text-color': C.text, 'text-halo-color': C.halo, 'text-halo-width': 1.6 }
+  });
+  if (HPV) HPV.font = font;
+}
+// 숙소 핀 → 가장 가까운 역까지 점선 + 「○○역까지 도보 N분」 (핀이 바뀔 때마다 새로 만들어요)
+function hpVecWalk(sh) {
+  const map = HPV && HPV.map;
+  if (!map || !HPV.loaded || !map.getLayer('fk-st-dot')) return;
+  ['fk-walk-label', 'fk-walk-line'].forEach(id => map.getLayer(id) && map.removeLayer(id));
+  ['fk-walk-t', 'fk-walk'].forEach(id => map.getSource(id) && map.removeSource(id));
+  if (!hotelPin(sh.h)) return;
+  const ns = nearStation(sh.h);
+  if (!ns) return;
+  const a = [+sh.h.lng, +sh.h.lat],
+    b = [ns.st.lng, ns.st.lat];
+  // 선과 글자는 따로 둬요 (글꼴을 못 받아도 선은 보이게)
+  map.addSource('fk-walk', {
+    type: 'geojson',
+    data: { type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [a, b] } }
+  });
+  map.addSource('fk-walk-t', {
+    type: 'geojson',
+    data: {
+      type: 'Feature',
+      properties: { t: L(`${ns.st.n}역까지 도보 ${wmin(ns.d)}분`, `${ns.st.j}駅まで徒歩${wmin(ns.d)}分`) },
+      geometry: { type: 'Point', coordinates: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2] }
+    }
+  });
+  map.addLayer(
+    {
+      id: 'fk-walk-line',
+      type: 'line',
+      source: 'fk-walk',
+      layout: { 'line-cap': 'round' },
+      paint: { 'line-color': '#1D8A55', 'line-width': 4, 'line-dasharray': [0.1, 1.8] }
+    },
+    'fk-st-dot'
+  );
+  map.addLayer({
+    id: 'fk-walk-label',
+    type: 'symbol',
+    source: 'fk-walk-t',
+    layout: {
+      'text-field': ['get', 't'],
+      'text-font': HPV.font || ['Noto Sans Regular'],
+      'text-size': 12.5,
+      'text-allow-overlap': true,
+      'text-ignore-placement': true
+    },
+    paint: { 'text-color': '#ffffff', 'text-halo-color': '#1D8A55', 'text-halo-width': 6 }
+  });
+}
+// 지명은 한국어 → 일본어 → 현지 이름 순으로 (일본어 화면이면 일본어)
+function hpVecLang(map) {
+  const field =
+    LANG === 'ja'
+      ? ['coalesce', ['get', 'name:ja'], ['get', 'name']]
+      : ['coalesce', ['get', 'name:ko'], ['get', 'name:ja'], ['get', 'name']];
+  (map.getStyle().layers || []).forEach(l => {
+    const tf = l.layout && l.layout['text-field'];
+    if (l.type === 'symbol' && tf && /name/.test(JSON.stringify(tf)))
+      try {
+        map.setLayoutProperty(l.id, 'text-field', field);
+      } catch (_) {}
+  });
+}
+function hpVecSync(sh) {
+  const gl = window.maplibregl,
+    map = HPV && HPV.map;
+  if (!gl || !map) return;
+  const pt = hotelPt(sh.h),
+    pin = hotelPin(sh.h);
+  if (sh.recenter) {
+    map.jumpTo({ center: [pt.lng, pt.lat], zoom: sh.recenter });
+    sh.recenter = 0;
+  }
+  if (!HPV.pin) {
+    const a = document.createElement('div');
+    a.className = 'hp-vpin';
+    a.innerHTML = `<svg width="32" height="46" viewBox="-16 -42 32 46" aria-hidden="true"><g class="hpk"><ellipse class="hpk-sh" cx="0" cy="1" rx="7" ry="3"/><path d="M0 0C-3 -8 -13 -14 -13 -24A13 13 0 1 1 13 -24C13 -14 3 -8 0 0Z"/><circle cy="-24" r="5"/></g></svg>`;
+    HPV.pin = new gl.Marker({ element: a, anchor: 'bottom', offset: [0, 4] });
+    const b = document.createElement('div');
+    b.className = 'hp-ap';
+    b.innerHTML = '<i></i>';
+    HPV.ring = new gl.Marker({ element: b, anchor: 'center' });
+  }
+  hpVecWalk(sh);
+  if (pin) {
+    HPV.ring.remove();
+    HPV.pin.setLngLat([pt.lng, pt.lat]).addTo(map);
+  } else {
+    HPV.pin.remove();
+    HPV.ring.setLngLat([pt.lng, pt.lat]).addTo(map);
+    hpVecRing();
+  }
+}
+// 대략 위치 동그라미: 반지름 약 450m
+function hpVecRing() {
+  if (!HPV || !HPV.map || !HPV.ring) return;
+  const el = HPV.ring.getElement(),
+    lat = HPV.ring.getLngLat() ? HPV.ring.getLngLat().lat : 33.59,
+    mpp = (40075016.686 * Math.cos((lat * Math.PI) / 180)) / (512 * 2 ** HPV.map.getZoom()),
+    r = clamp(450 / mpp, 22, 160);
+  el.style.width = el.style.height = `${f1(r * 2)}px`;
+}
+// 다시 그리기 전에 입력칸 값을 시트 상태에 담아 둬요
+function hpKeep() {
+  const sh = S.sheet;
+  if (!sh || sh.type !== 'hpick') return;
+  [
+    ['hName', 'nm'],
+    ['hQ', 'q'],
+    ['hPaste', 'paste']
+  ].forEach(([id, k]) => {
+    const el = document.getElementById(id);
+    if (el) sh[k] = el.value;
+  });
+}
+// 숙소 이름으로 찾기 (OpenStreetMap Nominatim · 후쿠오카 주변만)
+async function hpSearch(q) {
+  const u =
+    'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&namedetails=1&bounded=1' +
+    '&viewbox=129.95,33.85,130.75,33.30&accept-language=ja&q=' +
+    encodeURIComponent(q);
+  const r = await fetch(u, { headers: { Accept: 'application/json' } });
+  if (!r.ok) throw new Error('http ' + r.status);
+  const js = await r.json();
+  return js
+    .map(x => {
+      const nd = x.namedetails || {},
+        ja = nd.name || x.name || '',
+        ko = nd['name:ko'] || nd['name:en'] || ja;
+      const addr = (x.display_name || '')
+        .split(', ')
+        .filter(p => p && p !== ja && !/^\d{3}-\d{4}$/.test(p) && p !== '日本')
+        .reverse()
+        .join('');
+      return { lat: +(+x.lat).toFixed(6), lng: +(+x.lon).toFixed(6), name: LANG === 'ja' ? ja : ko, ja, addr };
+    })
+    .filter(x => x.name && isFinite(x.lat));
 }
 SHEETS.hpick = hpickSheetV;
 SHEET_LABEL.hpick = '숙소 위치';
@@ -14268,22 +15444,127 @@ Object.assign(A, {
     const st = stayCtx(d.ctx).get(),
       k = Number(d.k);
     if (!st[k]) return;
-    S.sheet = { type: 'hpick', ctx: d.ctx, k, h: clone(st[k].h), back: d.ctx === 'plan' ? 'stays' : null };
+    const h = clone(st[k].h);
+    S.sheet = { type: 'hpick', ctx: d.ctx, k, h, tab: 'find', back: d.ctx === 'plan' ? 'stays' : null };
+    if (h.name && !hotelPin(h)) S.sheet.q = h.name;
     render();
   },
   hpPick(d) {
-    const nm = document.getElementById('hName'),
-      name = nm ? nm.value.trim().slice(0, 40) : S.sheet.h.name;
+    hpKeep();
     const [t, v] = d.v.split(':');
     S.sheet.h = t === 'k' ? { k: v } : { st: v };
-    if (name) S.sheet.h.name = name;
+    S.sheet.view = null;
+    S.sheet.tv = null;
+    S.sheet.recenter = 14;
+    S.keepSheetScroll = true;
+    render();
+  },
+  hpTab(d) {
+    hpKeep();
+    S.sheet.tab = d.t;
+    S.keepSheetScroll = true;
+    render();
+    const f = document.getElementById(d.t === 'find' ? 'hQ' : d.t === 'paste' ? 'hPaste' : '');
+    if (f && !f.value) f.focus();
+  },
+  hpZoom(d) {
+    const sh = S.sheet;
+    if (!sh || sh.type !== 'hpick') return;
+    if (hpMode(sh) === 'vector') {
+      if (HPV && HPV.map) Number(d.n) > 0 ? HPV.map.zoomIn() : HPV.map.zoomOut();
+      return;
+    }
+    if (hpUseTiles(sh)) {
+      const v = hpTileView(sh);
+      v.z = clamp(v.z + (Number(d.n) > 0 ? 1 : -1), HP_ZMIN, HP_ZMAX);
+    } else {
+      const v = hpView(sh);
+      v.span = clamp(v.span * (Number(d.n) > 0 ? 0.6 : 1 / 0.6), 0.5, 14);
+    }
+    hpRedraw(document.getElementById('hpmap'));
+  },
+  async hpFind() {
+    hpKeep();
+    const sh = S.sheet,
+      q = (sh.q || '').trim();
+    if (!q) {
+      const f = document.getElementById('hQ');
+      if (f) f.focus();
+      return;
+    }
+    Object.assign(sh, { busy: true, err: '', res: null });
+    S.keepSheetScroll = true;
+    render();
+    try {
+      const res = await hpSearch(q);
+      if (S.sheet !== sh) return;
+      sh.res = res;
+    } catch (e) {
+      if (S.sheet !== sh) return;
+      sh.err = L(
+        '지금은 찾을 수 없어요. 인터넷 연결을 확인하거나, 좌표 붙여넣기·지도에서 직접 찍기를 써 주세요.',
+        '今は検索できません。接続を確認するか、座標の貼り付け・地図で直接タップを使ってください。'
+      );
+    }
+    sh.busy = false;
+    hpKeep();
+    S.keepSheetScroll = true;
+    render();
+  },
+  hpRes(d) {
+    hpKeep();
+    const sh = S.sheet,
+      r = sh.res && sh.res[Number(d.i)];
+    if (!r) return;
+    sh.h = { lat: r.lat, lng: r.lng, addr: r.ja && r.addr ? r.addr : undefined };
+    if (!sh.h.addr) delete sh.h.addr;
+    if (!(sh.nm || '').trim()) sh.nm = r.name;
+    sh.view = { lat: r.lat, lng: r.lng, span: 1.4 };
+    sh.tv = { lat: r.lat, lng: r.lng, z: 17 };
+    sh.recenter = 16;
+    S.keepSheetScroll = true;
+    render();
+    toast(L('지도에서 핀 위치가 맞는지 확인해 주세요.', '地図でピンの位置が合っているか確認してください。'));
+  },
+  hpPaste() {
+    hpKeep();
+    const sh = S.sheet,
+      t = sh.paste || '';
+    if (/goo\.gl|maps\.app/.test(t) && !/\d{2}\.\d{3}/.test(t)) {
+      toast(
+        L(
+          '짧은 공유 링크에는 좌표가 없어요. 지도를 꾹 눌러 나온 숫자 좌표를 복사해 주세요.',
+          '短い共有リンクには座標がありません。地図を長押しして出る数字の座標をコピーしてください。'
+        )
+      );
+      return;
+    }
+    const g = parseLatLng(t);
+    if (!g || g.far) {
+      toast(
+        g
+          ? L(
+              '후쿠오카에서 너무 먼 좌표예요. 숫자를 다시 확인해 주세요.',
+              '福岡から遠すぎる座標です。数字を確認してください。'
+            )
+          : L(
+              '좌표를 못 찾았어요. 「33.5905, 130.4207」처럼 숫자 두 개를 붙여 넣어 주세요.',
+              '座標が見つかりません。「33.5905, 130.4207」のように数字を2つ貼り付けてください。'
+            )
+      );
+      return;
+    }
+    sh.h = { lat: +g.lat.toFixed(6), lng: +g.lng.toFixed(6) };
+    sh.view = { lat: g.lat, lng: g.lng, span: 1.4 };
+    sh.tv = { lat: g.lat, lng: g.lng, z: 17 };
+    sh.recenter = 16;
     S.keepSheetScroll = true;
     render();
   },
   hpSave() {
+    hpKeep();
     const sh = S.sheet,
-      nm = document.getElementById('hName'),
-      name = nm ? nm.value.trim().slice(0, 40) : '';
+      name = (sh.nm || '').trim().slice(0, 40);
     const h = { ...sh.h };
     delete h.name;
     if (name) h.name = name;
@@ -14343,6 +15624,17 @@ function stayFromChange(t) {
   S.keepSheetScroll = true;
   render();
 }
+// 숙소 찾기·좌표 칸에서 엔터를 누르면 바로 찾기/적용
+$app.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' || e.isComposing) return;
+  if (e.target.id === 'hQ') {
+    e.preventDefault();
+    A.hpFind();
+  } else if (e.target.id === 'hPaste') {
+    e.preventDefault();
+    A.hpPaste();
+  }
+});
 
 // ======================================================================
 // alt.js · 웨이팅 길 때 근처 다른 식당
@@ -15518,7 +16810,7 @@ function jaSheet(sh) {
   } else if (!B.sid && (B.hotel || B.name === '숙소' || (B.j && /周辺/.test(B.j)))) {
     const hn = B.hn || '',
       readable = hn && !/[가-힣]/.test(hn);
-    big = readable ? hn : '宿泊先のホテル';
+    big = readable ? hn : B.addr ? B.addr : '宿泊先のホテル';
     phrase = readable ? `${hn}まで お願いします` : 'このホテルまで お願いします';
     ko =
       LANG === 'ja' && B.hwj
@@ -16019,15 +17311,82 @@ function geoSVG(P, k, o = {}) {
 }
 // 화면에 있는 지도 모두 그리기
 function drawMaps() {
+  if (HPV && (!S.sheet || S.sheet !== HPV.sh)) hpVecDrop();
   const r = document.getElementById('rmap');
   if (r) drawRegion(r, r.classList.contains('deco'));
   const d = document.getElementById('dmap');
   if (d) drawDay(d);
   const w = document.getElementById('wmap');
   if (w) drawWalk(w);
+  const hm = document.getElementById('hpmap');
+  if (hm) drawHpMap(hm);
 }
 // ★ 새 여행 2단계 지도 (동네 동그라미 + 내 숙소 핀)
+// 글자 폭 재기 (1px 글꼴 기준 폭을 기억해 둬요. 못 재면 대충 계산)
+const TEXT_EM = new Map();
+function textEm(t) {
+  t = String(t);
+  if (TEXT_EM.has(t)) return TEXT_EM.get(t);
+  let w = 0;
+  try {
+    const c = (textEm.c = textEm.c || document.createElement('canvas').getContext('2d'));
+    c.font = `800 100px ${getComputedStyle(document.body).fontFamily}`;
+    w = c.measureText(t).width / 100;
+  } catch (e) {}
+  if (!(w > 0)) for (const ch of t) w += /[　-鿿가-힯＀-￯]/.test(ch) ? 1 : /[·・\s]/.test(ch) ? 0.45 : 0.62;
+  TEXT_EM.set(t, w);
+  return w;
+}
+// 이름표 자리 정하기: 아래 → 위 → 오른쪽 → 왼쪽 → 대각선 순으로, 아무것과도 안 겹치는 첫 자리
+function placeLabels(items, obstacles, bounds) {
+  const boxes = obstacles.slice(),
+    hit = (a, b) => !(a.x1 <= b.x0 || b.x1 <= a.x0 || a.y1 <= b.y0 || b.y1 <= a.y0),
+    over = (a, b) =>
+      hit(a, b) ? (Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0)) * (Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0)) : 0;
+  const pad = items.length ? items[0].hgt * 0.12 : 0;
+  const tryAt = (it, w) => {
+    const { x, y, r, hgt, gap } = it;
+    const cands = [
+      { ax: 'middle', tx: x, ty: y + r + gap + hgt * 0.8 },
+      { ax: 'middle', tx: x, ty: y - r - gap - hgt * 0.2 },
+      { ax: 'start', tx: x + r + gap, ty: y + hgt * 0.32 },
+      { ax: 'end', tx: x - r - gap, ty: y + hgt * 0.32 },
+      { ax: 'start', tx: x + r * 0.7, ty: y + r + gap + hgt * 0.7 },
+      { ax: 'end', tx: x - r * 0.7, ty: y + r + gap + hgt * 0.7 },
+      { ax: 'start', tx: x + r * 0.7, ty: y - r - gap },
+      { ax: 'end', tx: x - r * 0.7, ty: y - r - gap }
+    ];
+    let best = null;
+    for (const c of cands) {
+      const x0 = c.ax === 'middle' ? c.tx - w / 2 : c.ax === 'start' ? c.tx : c.tx - w;
+      const b = { x0: x0 - pad, x1: x0 + w + pad, y0: c.ty - hgt * 0.8 - pad, y1: c.ty + hgt * 0.2 + pad };
+      let cost = boxes.reduce((t, o) => t + over(b, o), 0);
+      if (bounds && (b.x0 < bounds.x0 || b.x1 > bounds.x1 || b.y0 < bounds.y0 || b.y1 > bounds.y1))
+        cost += w * hgt * 0.5;
+      if (!best || cost < best.cost - 1e-6) best = { ...c, b, cost };
+      if (cost === 0) break;
+    }
+    return best;
+  };
+  items.forEach(it => {
+    let best = tryAt(it, it.w);
+    // 자리가 모자라면 짧은 이름(· 앞부분)으로 한 번 더
+    if (best.cost > 0 && it.w2) {
+      const b2 = tryAt(it, it.w2);
+      if (b2.cost < best.cost) ((best = b2), (it.short = true));
+    }
+    it.at = best;
+    boxes.push(best.b);
+  });
+}
+// 좁을 때 쓰는 짧은 동네 이름: '오호리공원·성터' → '오호리공원'
+function shortArea(n) {
+  const i = String(n).search(/[·・]/);
+  return i > 1 ? String(n).slice(0, i) : String(n);
+}
 function drawRegion(el, deco) {
+  if (!deco && rgMode() === 'vector') return rgVector(el);
+  el.classList.remove('vector');
   const W = el.clientWidth,
     H = el.clientHeight;
   if (!W || !H) return;
@@ -16046,15 +17405,76 @@ function drawRegion(el, deco) {
     const p = fish(sp.lat, sp.lng);
     h += `<circle class="sdot${sel.includes(sp.a) ? ' on' : ''}" cx="${f1(p[0])}" cy="${f1(p[1])}" r="${f1(2.6 * k)}"/>`;
   });
-  AREAS.filter(a => a.kind !== 'trip').forEach(a => {
-    const p = fish(a.lat, a.lng),
-      on = sel.includes(a.id);
-    const lab = `<text class="apin-t" y="${a.lab === 'up' ? -22 : 31}">${a.n}</text>`;
-    h += deco
-      ? `<g class="apin deco" transform="translate(${f1(p[0])},${f1(p[1])}) scale(${f1(k * 0.85)})"><circle r="9" class="apin-c"/>${lab}</g>`
-      : `<g class="apin${on ? ' on' : ''}" data-act="toggleArea" data-id="${a.id}" tabindex="0" role="button" aria-pressed="${on}" aria-label="${a.n}" transform="translate(${f1(p[0])},${f1(p[1])}) scale(${f1(k)})"><circle r="22" class="apin-hit"/><circle r="15" class="apin-c"/>${on ? '<path class="apin-k" d="M-6 0l4 4 8-9"/>' : '<circle r="4" class="apin-d"/>'}${lab}</g>`;
+  const areas = AREAS.filter(a => a.kind !== 'trip'),
+    sc = deco ? k * 0.85 : k,
+    R = (deco ? 9 : 13) * sc,
+    FS = 13 * sc;
+  // 숙소 핀 (이름표 자리 잡을 때 피해 가야 해요)
+  const hp = deco ? [] : draftHotelPinData(),
+    obstacles = [],
+    items = [];
+  areas.forEach(a => {
+    const p = fish(a.lat, a.lng);
+    obstacles.push({
+      x0: p[0] - R - 1.5 * sc,
+      x1: p[0] + R + 1.5 * sc,
+      y0: p[1] - R - 1.5 * sc,
+      y1: p[1] + R + 1.5 * sc
+    });
+    const nm = L(a.n, AREA_JA[a.id] || a.n),
+      sn = shortArea(nm);
+    items.push({
+      kind: 'a',
+      a,
+      nm,
+      x: p[0],
+      y: p[1],
+      r: R,
+      sn,
+      w2: sn !== nm ? textEm(sn) * FS + 5 * sc : 0,
+      w: textEm(nm) * FS + 5 * sc,
+      hgt: FS * 1.25,
+      gap: 4 * sc,
+      on: sel.includes(a.id)
+    });
   });
-  if (!deco) h += draftHotelPins(k);
+  hp.forEach(g => {
+    const p = fish(g.pt.lat, g.pt.lng);
+    g.p = p;
+    obstacles.push({ x0: p[0] - 12 * k, x1: p[0] + 12 * k, y0: p[1] - 31 * k, y1: p[1] + 2 * k });
+  });
+  // 숙소 이름표 먼저, 그다음 고른 동네, 나머지 순서
+  const hItems = hp.map(g => ({
+    kind: 'h',
+    g,
+    x: g.p[0],
+    y: g.p[1] - 19 * k,
+    r: 13 * k,
+    w: textEm(g.lab) * 12.5 * k + 5 * k,
+    hgt: 12.5 * k * 1.25,
+    gap: 3 * k
+  }));
+  const order = [...hItems, ...items.filter(i => i.on), ...items.filter(i => !i.on)];
+  const bounds = { x0: mv.x + 2 * k, x1: mv.x + mv.w - 2 * k, y0: mv.y + 2 * k, y1: mv.y + mv.h - 2 * k };
+  placeLabels(order, obstacles, bounds);
+  items.forEach(it => {
+    const a = it.a,
+      [x, y] = [it.x, it.y],
+      t = it.at,
+      lab = `<text class="apin-t" x="${f1((t.tx - x) / sc)}" y="${f1((t.ty - y) / sc)}" style="text-anchor:${t.ax}">${esc(it.short ? it.sn : it.nm)}</text>`;
+    h += deco
+      ? `<g class="apin deco" transform="translate(${f1(x)},${f1(y)}) scale(${f1(sc)})"><circle r="9" class="apin-c"/>${lab}</g>`
+      : `<g class="apin${it.on ? ' on' : ''}" data-act="toggleArea" data-id="${a.id}" tabindex="0" role="button" aria-pressed="${it.on}" aria-label="${a.n}" transform="translate(${f1(x)},${f1(y)}) scale(${f1(sc)})"><circle r="21" class="apin-hit"/><circle r="13" class="apin-c"/>${it.on ? '<path class="apin-k" d="M-5.4 0l3.6 3.6 7.2-8"/>' : '<circle r="3.6" class="apin-d"/>'}${lab}</g>`;
+  });
+  hItems.forEach(it => {
+    const g = it.g,
+      [x, y] = g.p,
+      t = it.at;
+    h += `<g class="hpin" transform="translate(${f1(x)},${f1(y)}) scale(${f1(k)})" aria-hidden="true">
+      <path class="hpin-b" d="M0 0C-4 -7 -12 -11 -12 -19a12 12 0 1 1 24 0c0 8 -8 12 -12 19z"/>
+      <svg x="-7.5" y="-26.5" width="15" height="15" viewBox="0 0 24 24" class="hpin-ic">${ICON.home}</svg>
+      <text class="hpin-t" x="${f1((t.tx - x) / k)}" y="${f1((t.ty - y) / k)}" style="text-anchor:${t.ax}">${esc(g.lab)}</text></g>`;
+  });
   el.innerHTML = `<svg viewBox="${f1(mv.x)} ${f1(mv.y)} ${f1(mv.w)} ${f1(mv.h)}" role="img" aria-label="후쿠오카 안내 지도"${deco ? '' : ' class="pan"'}>${h}</svg>`;
   if (!deco) enablePan(el.querySelector('svg'), W);
 }
@@ -16064,10 +17484,296 @@ function draftHotelStays() {
   if (!D || !D.start || !D.end) return [];
   return normStays(D.stays, draftNights(), D.hotel);
 }
-// 2단계 지도의 숙소 핀
-function draftHotelPins(k) {
+// ======================================================================
+// ★ '가고 싶은 곳' 진짜 지도 (MapLibre). 동그라미·이름표·숙소 핀은 앱이 직접 위에 그려요.
+//    화면 밖 동네(다자이후·이토시마 등)는 가장자리 이름표로 보여 줘요. 못 불러오면 안내 지도로.
+// ======================================================================
+let RGV = null,
+  RGV_FAIL = false;
+function rgMode() {
+  return RGV_FAIL || navigator.onLine === false ? 'svg' : 'vector';
+}
+function rgLive() {
+  const r = document.getElementById('rmap');
+  return !!(RGV && RGV.map && RGV.loaded && r && r.contains(RGV.box));
+}
+function rgDrop() {
+  if (!RGV) return;
+  try {
+    if (RGV.map) RGV.map.remove();
+  } catch (_) {}
+  RGV = null;
+}
+function rgFail() {
+  if (RGV_FAIL) return;
+  RGV_FAIL = true;
+  rgDrop();
+  render();
+}
+function rgVector(el) {
+  const key = `${hpDark() ? 'd' : 'l'}${LANG}`;
+  if (RGV && RGV.key !== key) rgDrop();
+  if (!RGV) {
+    const box = document.createElement('div'),
+      gl = document.createElement('div'),
+      ov = document.createElement('div');
+    box.className = 'rg-vmap';
+    gl.className = 'rg-gl';
+    ov.className = 'rg-ov';
+    box.append(gl, ov);
+    RGV = { key, box, gl, ov, map: null };
+    loadMapLibre().then(rgInit).catch(rgFail);
+  }
+  el.classList.add('vector');
+  if (RGV.box.parentNode !== el) {
+    el.innerHTML = '';
+    el.appendChild(RGV.box);
+  }
+  if (RGV.map) RGV.map.resize();
+  rgOverlay();
+}
+function rgInit(gl) {
+  const R = RGV;
+  if (!R || R.map) return;
+  const city = AREAS.filter(a => a.kind === 'city'),
+    lats = city.map(a => a.lat),
+    lngs = city.map(a => a.lng);
+  let map;
+  try {
+    map = new gl.Map({
+      container: R.gl,
+      style: HP_STYLE,
+      bounds: [
+        [Math.min(...lngs), Math.min(...lats)],
+        [Math.max(...lngs), Math.max(...lats)]
+      ],
+      fitBoundsOptions: { padding: { top: 46, bottom: 40, left: 64, right: 64 }, maxZoom: 14 },
+      minZoom: 8.5,
+      maxZoom: 17,
+      dragRotate: false,
+      pitchWithRotate: false,
+      touchPitch: false,
+      attributionControl: { compact: true },
+      fadeDuration: 0
+    });
+  } catch (e) {
+    rgFail();
+    return;
+  }
+  map.touchZoomRotate.disableRotation();
+  R.map = map;
+  R.fit = () => {
+    const pad = { top: 46, bottom: 40, left: 80, right: 56 },
+      b = [
+        [Math.min(...lngs), Math.min(...lats)],
+        [Math.max(...lngs), Math.max(...lats)]
+      ];
+    map.resize();
+    const cam = map.cameraForBounds(b, { padding: pad, maxZoom: 14 });
+    if (!cam) return;
+    // 너무 멀리 빼면 시내 동그라미가 뭉쳐요 → 조금만 더 뺄 수 있게
+    map.setMinZoom(Math.max(8.5, cam.zoom - 0.5));
+    const all = AREAS.filter(a => a.kind !== 'trip');
+    map.setMaxBounds([
+      [Math.min(...all.map(a => a.lng)) - 0.12, Math.min(...all.map(a => a.lat)) - 0.1],
+      [Math.max(...all.map(a => a.lng)) + 0.12, Math.max(...all.map(a => a.lat)) + 0.1]
+    ]);
+    map.jumpTo(cam);
+  };
+  map.on('load', () => {
+    if (RGV !== R) return;
+    R.loaded = true;
+    R.fit();
+    try {
+      hpVecStyle(map);
+      hpVecOverlay(map);
+      // 역 이름은 많이 확대했을 때만 (동네 이름이 먼저 보이게)
+      if (map.getLayer('fk-st-label')) map.setLayerZoomRange('fk-st-label', 14.5, 24);
+    } catch (e) {
+      console.warn('region style', e);
+    }
+    rgOverlay();
+  });
+  setTimeout(() => {
+    if (RGV === R && !R.loaded) rgFail();
+  }, 10000);
+  map.on('move', rgOverlay);
+  map.on('resize', rgOverlay);
+}
+// 지도 위 그림 (화면 픽셀 기준으로 매번 새로 그려요)
+function rgOverlay() {
+  const R = RGV;
+  if (!R || !R.map || !S.draft) return;
+  const map = R.map,
+    W = R.box.clientWidth,
+    H = R.box.clientHeight;
+  if (!W || !H) return;
+  const sel = S.draft.areas || [],
+    Rr = 13,
+    FS = 13,
+    M = 6,
+    obstacles = [],
+    items = [],
+    chips = [];
+  // 동네: 화면 안이면 동그라미, 밖이면 가장자리 이름표
+  AREAS.filter(a => a.kind !== 'trip').forEach(a => {
+    const p = map.project([a.lng, a.lat]),
+      on = sel.includes(a.id),
+      nm = L(a.n, AREA_JA[a.id] || a.n);
+    if (p.x >= Rr && p.x <= W - Rr && p.y >= Rr && p.y <= H - Rr) {
+      const sn = shortArea(nm);
+      obstacles.push({ x0: p.x - Rr - 1.5, x1: p.x + Rr + 1.5, y0: p.y - Rr - 1.5, y1: p.y + Rr + 1.5 });
+      items.push({
+        a,
+        nm,
+        sn,
+        on,
+        x: p.x,
+        y: p.y,
+        r: Rr,
+        w: textEm(nm) * FS + 5,
+        w2: sn !== nm ? textEm(sn) * FS + 5 : 0,
+        hgt: FS * 1.25,
+        gap: 4
+      });
+    } else chips.push({ a, nm, on, p, w: textEm(nm) * 12 + 34, h: 26 });
+  });
+  // 가장자리 이름표: 지도 가운데에서 그 동네 쪽으로 쭉 간 자리의 테두리에
+  const cx = W / 2,
+    cy = H / 2;
+  chips.forEach(c => {
+    const dx = c.p.x - cx,
+      dy = c.p.y - cy,
+      hw = W / 2 - M - c.w / 2,
+      hh = H / 2 - M - c.h / 2,
+      t = Math.min(Math.abs(dx) > 1e-6 ? hw / Math.abs(dx) : 1e9, Math.abs(dy) > 1e-6 ? hh / Math.abs(dy) : 1e9);
+    c.x = cx + dx * t;
+    c.y = cy + dy * t;
+    c.ang = (Math.atan2(dy, dx) * 180) / Math.PI;
+    c.side = Math.abs(c.x - cx) >= hw - 0.5 ? (c.x < cx ? 'L' : 'R') : c.y < cy ? 'T' : 'B';
+  });
+  // 같은 테두리끼리 겹치지 않게 줄 세우기 (오른쪽 위 확대 버튼 자리는 비워요)
+  const spread = (list, pos, size, lo, hi) => {
+    list.sort((a, b) => a[pos] - b[pos]);
+    for (let i = 0; i < list.length; i++) {
+      const c = list[i],
+        min = i ? list[i - 1][pos] + (list[i - 1][size] + c[size]) / 2 + 4 : lo + c[size] / 2;
+      c[pos] = Math.max(c[pos], min);
+    }
+    for (let i = list.length - 1; i >= 0; i--) {
+      const c = list[i],
+        max = i < list.length - 1 ? list[i + 1][pos] - (list[i + 1][size] + c[size]) / 2 - 4 : hi - c[size] / 2;
+      c[pos] = Math.min(c[pos], max);
+    }
+  };
+  spread(
+    chips.filter(c => c.side === 'L'),
+    'y',
+    'h',
+    M,
+    H - M
+  );
+  spread(
+    chips.filter(c => c.side === 'R'),
+    'y',
+    'h',
+    100,
+    H - M
+  );
+  spread(
+    chips.filter(c => c.side === 'T'),
+    'x',
+    'w',
+    M,
+    W - 60
+  );
+  spread(
+    chips.filter(c => c.side === 'B'),
+    'x',
+    'w',
+    M,
+    W - M
+  );
+  chips.forEach(c => {
+    c.x = clamp(c.x, M + c.w / 2, W - M - c.w / 2);
+    c.y = clamp(c.y, M + c.h / 2, H - M - c.h / 2);
+  });
+  // 이름표가 동그라미를 가리면 테두리를 따라 조금 옮겨요
+  const cbox = (c, x, y) => ({ x0: x - c.w / 2 - 2, x1: x + c.w / 2 + 2, y0: y - c.h / 2 - 2, y1: y + c.h / 2 + 2 }),
+    clash = (b, list) => list.some(o => !(b.x1 <= o.x0 || o.x1 <= b.x0 || b.y1 <= o.y0 || o.y1 <= b.y0));
+  const circles = obstacles.slice(),
+    done = [];
+  chips.forEach(c => {
+    const vert = c.side === 'L' || c.side === 'R',
+      step = vert ? c.h + 4 : c.w / 2 + 4;
+    for (const k of [0, 1, -1, 2, -2, 3, -3]) {
+      const x = vert ? c.x : clamp(c.x + k * step, M + c.w / 2, W - M - c.w / 2),
+        y = vert ? clamp(c.y + k * step, (c.side === 'R' ? 100 : M) + c.h / 2, H - M - c.h / 2) : c.y,
+        b = cbox(c, x, y);
+      if (!clash(b, circles) && !clash(b, done)) {
+        c.x = x;
+        c.y = y;
+        break;
+      }
+    }
+    done.push(cbox(c, c.x, c.y));
+  });
+  chips.forEach(c =>
+    obstacles.push({ x0: c.x - c.w / 2 - 2, x1: c.x + c.w / 2 + 2, y0: c.y - c.h / 2 - 2, y1: c.y + c.h / 2 + 2 })
+  );
+  // 숙소 핀
+  const hp = draftHotelPinData()
+    .map(g => {
+      const p = map.project([g.pt.lng, g.pt.lat]);
+      return { ...g, x: p.x, y: p.y };
+    })
+    .filter(g => g.x > 8 && g.x < W - 8 && g.y > 26 && g.y < H + 2);
+  hp.forEach(g => obstacles.push({ x0: g.x - 12, x1: g.x + 12, y0: g.y - 31, y1: g.y + 2 }));
+  // 지도 오른쪽 위 확대 버튼 자리도 피해요
+  obstacles.push({ x0: W - 54, x1: W, y0: 0, y1: 96 });
+  const hItems = hp.map(g => ({
+    g,
+    x: g.x,
+    y: g.y - 19,
+    r: 13,
+    w: textEm(g.lab) * 12.5 + 5,
+    hgt: 12.5 * 1.25,
+    gap: 3
+  }));
+  placeLabels([...hItems, ...items.filter(i => i.on), ...items.filter(i => !i.on)], obstacles, {
+    x0: 2,
+    x1: W - 2,
+    y0: 2,
+    y1: H - 2
+  });
+  let h = '';
+  items.forEach(it => {
+    const t = it.at,
+      a = it.a;
+    h += `<g class="apin${it.on ? ' on' : ''}" data-act="toggleArea" data-id="${a.id}" tabindex="0" role="button" aria-pressed="${it.on}" aria-label="${esc(it.nm)}" transform="translate(${f1(it.x)},${f1(it.y)})"><circle r="21" class="apin-hit"/><circle r="13" class="apin-c"/>${it.on ? '<path class="apin-k" d="M-5.4 0l3.6 3.6 7.2-8"/>' : '<circle r="3.6" class="apin-d"/>'}<text class="apin-t" x="${f1(t.tx - it.x)}" y="${f1(t.ty - it.y)}" style="text-anchor:${t.ax}">${esc(it.short ? it.sn : it.nm)}</text></g>`;
+  });
+  chips.forEach(c => {
+    // 화살표는 이름표 안쪽 끝에, 동네 방향으로
+    const ax = c.w / 2 - 13;
+    h += `<g class="rg-chip${c.on ? ' on' : ''}" data-act="toggleArea" data-id="${c.a.id}" tabindex="0" role="button" aria-pressed="${c.on}" aria-label="${esc(c.nm)}" transform="translate(${f1(c.x)},${f1(c.y)})">
+      <rect x="${f1(-c.w / 2)}" y="${f1(-c.h / 2)}" width="${f1(c.w)}" height="${c.h}" rx="${c.h / 2}"/>
+      <text x="${f1(-c.w / 2 + 11)}" y="4.3">${esc(c.nm)}</text>
+      <g transform="translate(${f1(ax)},0) rotate(${f1(c.ang)})"><path class="rg-ar" d="M-4.5 0H4.5M0.5 -4L4.5 0L0.5 4"/></g></g>`;
+  });
+  hItems.forEach(it => {
+    const g = it.g,
+      t = it.at;
+    h += `<g class="hpin" transform="translate(${f1(g.x)},${f1(g.y)})" aria-hidden="true">
+      <path class="hpin-b" d="M0 0C-4 -7 -12 -11 -12 -19a12 12 0 1 1 24 0c0 8 -8 12 -12 19z"/>
+      <svg x="-7.5" y="-26.5" width="15" height="15" viewBox="0 0 24 24" class="hpin-ic">${ICON.home}</svg>
+      <text class="hpin-t" x="${f1(t.tx - g.x)}" y="${f1(t.ty - g.y)}" style="text-anchor:${t.ax}">${esc(g.lab)}</text></g>`;
+  });
+  R.ov.innerHTML = `<svg class="rg-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${h}</svg>`;
+}
+// 2단계 지도의 숙소 핀 (같은 자리면 하나로 합쳐요)
+function draftHotelPinData() {
   const st = draftHotelStays();
-  if (!st.length) return '';
+  if (!st.length) return [];
   const multi = st.length > 1,
     groups = new Map();
   st.forEach((x, i) => {
@@ -16076,16 +17782,10 @@ function draftHotelPins(k) {
     if (!groups.has(key)) groups.set(key, { pt, n: [] });
     groups.get(key).n.push(i + 1);
   });
-  let h = '';
-  groups.forEach(g => {
-    const p = fish(g.pt.lat, g.pt.lng),
-      lab = multi ? L(`숙소 ${g.n.join('·')}`, `宿${g.n.join('・')}`) : L('내 숙소', '宿');
-    h += `<g class="hpin" transform="translate(${f1(p[0])},${f1(p[1])}) scale(${f1(k)})" aria-hidden="true">
-      <path class="hpin-b" d="M0 0C-4 -7 -12 -11 -12 -19a12 12 0 1 1 24 0c0 8 -8 12 -12 19z"/>
-      <svg x="-7.5" y="-26.5" width="15" height="15" viewBox="0 0 24 24" class="hpin-ic">${ICON.home}</svg>
-      <text class="hpin-t" x="15" y="-14">${esc(lab)}</text></g>`;
-  });
-  return h;
+  return [...groups.values()].map(g => ({
+    ...g,
+    lab: multi ? L(`숙소 ${g.n.join('·')}`, `宿${g.n.join('・')}`) : L('내 숙소', '宿')
+  }));
 }
 // 확대한 지도 손가락으로 끌기
 function enablePan(svg, W) {
