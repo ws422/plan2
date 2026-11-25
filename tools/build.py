@@ -35,7 +35,8 @@ JS_FILES = [
     'guide.js',      # 길안내 탭, 일본어로 보여주기
     'here.js',       # 지금 위치(GPS)에서 다음 장소까지 길 안내
     'live.js',       # 여행 중 다시 짜기 (지금 도착·지금 출발, 다음 차 계산)
-    'home3.js',      # 새 홈: 모모치 바다 일러스트 + 지금 이동/오늘 일정 카드 + 아래 5칸 메뉴
+    'home3.js',      # 새 홈: 사진 배경 + 지금 이동/오늘 일정 카드 + 아래 4칸 메뉴
+    'wish.js',       # 가고 싶은 곳: 직접 장소 추가, 동네 탭 목록, 가고 싶은 곳으로 계획 짜기
     'maps.js',       # 지도 그리기
 ]
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'

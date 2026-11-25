@@ -50,8 +50,42 @@ for (let len = 0; len <= 5; len++) {
     }
   }
 }
+// 3) 가고 싶은 곳으로 짜기 (직접 고르기): 담은 곳이 빠지거나 겹치지 않는지, ★·날짜 고정이 지켜지는지
+let wished = 0;
+for (let t = 0; t < 12; t++) {
+  const len = t % 5,
+    N = len + 1,
+    pick = SPOTS.filter((s, i) => (i * 7 + t * 3) % 9 < 2).slice(0, 4 + N * 3);
+  const entries = pick.map((s, i) => ({ w: { id: 'w' + i, sid: s.id }, must: i % 5 === 0, day: i % 7 === 3 ? i % N : null, at: null }));
+  entries.push({ w: { id: 'c', n: '점검용 식당', c: 'food', stay: 90, lat: 33.5905, lng: 130.3976, z: 'city', a: 'tenjin' }, must: true, day: N > 1 ? 1 : 0, at: 1140 });
+  const set = { start: day(60 + t * 7), end: day(60 + t * 7 + len), hotel: hotels[t % hotels.length], stays: null, arrive: '10:00', depart: '18:00', dayStart: '09:30', dayEnd: '21:30' };
+  try {
+    const p = E.createPlanWish(set, entries, { fill: t % 2 === 0 });
+    wished++;
+    const placed = new Map(),
+      seen = new Set();
+    p.days.forEach((d, i) =>
+      d.items.forEach(it => {
+        if (it.wid) placed.set(it.wid, i);
+        if (it.sid && seen.has(it.sid)) problems.push(`가고 싶은 곳 ${t}: ${it.sid} 가 두 번 들어갔어요`);
+        if (it.sid) seen.add(it.sid);
+      })
+    );
+    const parked = new Set(p.parked.map(x => x.wid).filter(Boolean));
+    entries.forEach(e => {
+      if (!placed.has(e.w.id) && !parked.has(e.w.id)) problems.push(`가고 싶은 곳 ${t}: ${e.w.sid || e.w.n} 가 사라졌어요`);
+      if (e.must && !placed.has(e.w.id)) problems.push(`가고 싶은 곳 ${t}: 꼭 갈 곳 ${e.w.sid || e.w.n} 가 빠졌어요`);
+      if (e.day != null && placed.has(e.w.id) && placed.get(e.w.id) !== e.day) problems.push(`가고 싶은 곳 ${t}: ${e.w.sid || e.w.n} 가 고정한 날이 아니에요`);
+    });
+    p.days.forEach((d, i) => E.computeDay(p, i).rows.forEach(r => { if (!Number.isFinite(r.arr)) problems.push(`가고 싶은 곳 ${t} ${i + 1}일차: 시각 계산 오류`); }));
+    E.wishSummary(p);
+    E.farePlan(p);
+  } catch (e) {
+    problems.push(`가고 싶은 곳으로 짜기 ${t} 만들다가 오류: ${e.message}`);
+  }
+}
 if (problems.length) {
   console.error(`[점검 실패] 문제 ${problems.length}개\n- ` + problems.slice(0, 30).join('\n- '));
   process.exit(1);
 }
-console.log(`점검 통과: 장소 ${SPOTS.length}곳, 여행 ${made}개를 만들어 봤어요.`);
+console.log(`점검 통과: 장소 ${SPOTS.length}곳, 여행 ${made}개 · 가고 싶은 곳으로 짠 여행 ${wished}개를 만들어 봤어요.`);
