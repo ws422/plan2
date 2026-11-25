@@ -303,6 +303,7 @@ function guideTab() {
     })
     .join('');
   return `<section class="daycard g-top"><div class="dc-h"><div><h2>${S.di + 1}일차 이동 안내</h2><small>${md(c.day.date)} · 이동 ${legs.filter(l => l.mode !== 'none').length}번</small></div></div><div class="g-sum">${sum}</div></section>
+    ${hereCardV()}
     <details class="card tips"${S.tipsOpen ? ' open' : ''}><summary>${ic('spark')}<b>처음이라면 · 타는 법</b>${ic('down', 'chev')}</summary>
       ${howtoDL()}</details>
     <div class="glist">${cards}</div>

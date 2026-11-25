@@ -585,6 +585,7 @@ function itemRow(p, r, i, N) {
         <label class="ed col"><span>메모</span><input type="text" id="memo-${it.uid}" data-input="memo" data-uid="${it.uid}" value="${esc(it.memo || '')}" placeholder="예약 번호, 먹고 싶은 메뉴" maxlength="120"></label>
         <div class="row2"><button class="btn soft" data-act="replanHere" data-uid="${it.uid}">${ic('shuffle')}여기부터 다시 짜기</button><button class="btn soft" data-act="toPark" data-uid="${it.uid}">${ic('box')}보류함으로</button></div>
         ${s ? `<button class="btn soft wide" data-act="spotSheet" data-id="${s.id}">${ic('info')}장소 정보·가는 법 보기</button>` : ''}
+        <button class="btn soft wide" data-act="gpsGo" data-uid="${it.uid}">${ic('pin')}${L('지금 위치에서 가는 길', '現在地からの行き方')}</button>
         ${it.custom ? `<button class="btn soft wide" data-act="whereSheet" data-uid="${it.uid}">${ic('pin')}${L('위치 바꾸기', '場所を変える')}<small class="wh-cur">${esc(whereLabel(it) || L('정해지지 않음', '未設定'))}</small></button>` : ''}
       </div>`
           : ''

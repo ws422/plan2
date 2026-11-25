@@ -5569,3 +5569,126 @@ body {
   color: var(--ink-2);
   text-align: center;
 }
+
+/* 지금 위치에서 길찾기 (here.js) */
+.here-c {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  text-align: left;
+  border: 2px solid color-mix(in srgb, var(--blue) 35%, transparent);
+}
+.here-c > .ic:first-child {
+  width: 40px;
+  height: 40px;
+  padding: 9px;
+  border-radius: 13px;
+  flex: none;
+  color: var(--blue);
+  background: var(--blue-2);
+}
+.here-c span {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.here-c b {
+  font-size: 15px;
+  font-weight: 800;
+}
+.here-c small {
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.here-c .chev {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  color: var(--ink-3);
+}
+.here-loc {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--blue-2);
+}
+.here-loc > .ic {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  color: var(--blue);
+}
+.here-loc > span {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.here-loc b {
+  font-size: 15px;
+}
+.here-loc small {
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.here-to {
+  margin-top: 12px;
+}
+.here-opts {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin: 8px -4px 4px;
+  padding: 4px 4px 8px;
+}
+.here-opts button {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--sh);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.here-opts button.on {
+  background: var(--ink);
+  color: var(--bg);
+}
+.here-wait {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  padding: 40px 0;
+  color: var(--ink-2);
+}
+.here-wait .ic {
+  width: 34px;
+  height: 34px;
+  color: var(--blue);
+  animation: herePulse 1.2s ease-in-out infinite;
+}
+@keyframes herePulse {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .here-wait .ic {
+    animation: none;
+  }
+}
+.here-g {
+  margin-top: 0;
+}
