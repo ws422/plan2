@@ -567,17 +567,80 @@ function phraseSheetV(sh) {
 // 시트: 동네 둘러보기 (사진 + 장소 목록)
 function areaSheetV(sh) {
   const a = AREA[sh.id],
-    list = SPOTS.filter(s => s.a === a.id).sort((x, y) => (x.p || 3) - (y.p || 3));
+    // 추천(p)이 높은 곳부터
+    list = SPOTS.filter(s => s.a === a.id).sort((x, y) => (y.p || 3) - (x.p || 3));
   const [c1, c2] = AREA_TONE[a.id] || ['#F0703A', '#B92E1C'],
     ph = areaPh(a.id);
+  const tm = a.min + 2 * accessMin(a.z),
+    time = a.kind === 'trip' ? '하루' : tm >= 400 ? '하루' : tm >= 240 ? '반나절+' : '반나절';
+  // 한 줄 소개(a.sub)를 쉼표로 나눠 꼬리표로. 일본어 화면은 먼저 통째로 옮기고 나눠요
+  const kw = (LANG === 'ja' ? trText(a.sub) : a.sub).split(/[、,]\s*/).filter(Boolean);
+  // 4곳 이하면 모두 「꼭 가 볼 곳」, 그보다 많으면 위 3곳만
+  const top = list.length <= 4 ? list : list.slice(0, 3),
+    rest = list.slice(top.length);
+  const cats = [...new Set(rest.map(s => s.c))],
+    cat = cats.includes(sh.cat) ? sh.cat : 'all',
+    shown = cat === 'all' ? rest : rest.filter(s => s.c === cat);
+  const st = (k, v) => `<div class="ar-st"><span>${k}</span><b>${v}</b></div>`;
   return (
-    shHead(`${a.n}`, `${esc(a.sub)} · ${areaMeta(a)}`) +
-    `<div class="ar-band${ph ? ' has-ph' : ''}" style="--c1:${c1};--c2:${c2}">${ph ? areaImg(a.id) : ''}<span lang="ja">${AREA_JA[a.id] || ''}</span><small>${list.length}곳</small></div>
+    shHead(`${a.n}`) +
+    `<div class="ar-band${ph ? ' has-ph' : ''}" style="--c1:${c1};--c2:${c2}">${ph ? areaImg(a.id) : ''}<span lang="ja">${AREA_JA[a.id] || ''}</span></div>
+    <div class="ar-stats">${st(L('둘러보는 시간', '回る時間'), time)}${st(L('갈 만한 곳', '見どころ'), `${list.length}곳`)}${
+      a.kind === 'trip'
+        ? st(L('가는 데', '行き方'), a.far)
+        : st(L('위치', '場所'), a.kind === 'outer' ? '근교' : '시내')
+    }</div>
+    <div class="ar-kw">${kw.map(k => `<span>${esc(k)}</span>`).join('')}</div>
+    <h3 class="ar-h">${ic('star')}${L('꼭 가 볼 곳', '必見スポット')}</h3>
+    <ul class="ar-top">${top
+      .map(
+        s =>
+          `<li><button class="ar-tc" data-act="spotSheet" data-id="${s.id}">${catTile(s.c)}<span class="ar-tt"><b>${esc(s.n)}</b><small>${esc(firstSentence(s.d))}</small></span><span class="ar-time">${dur(s.s)}</span></button></li>`
+      )
+      .join('')}</ul>
+    ${
+      rest.length
+        ? `<h3 class="ar-h">${L('더 둘러보기', 'ほかの見どころ')}</h3>
+    ${
+      cats.length > 1
+        ? `<div class="ar-tabs" role="tablist">${[
+            ['all', L('전체', 'すべて'), rest.length],
+            ...cats.map(c => [c, CATS[c].n, rest.filter(s => s.c === c).length])
+          ]
+            .map(
+              ([c, t, n]) =>
+                `<button role="tab" aria-selected="${cat === c}" class="${cat === c ? 'on' : ''}" data-act="areaCat" data-c="${c}"><span>${t}</span> <b>${n}</b></button>`
+            )
+            .join('')}</div>`
+        : ''
+    }
+    <ul class="ar-list">${shown
+      .map(
+        s =>
+          `<li><button class="arl-b" data-act="spotSheet" data-id="${s.id}"><i class="arl-dot c-${s.c}"></i><span class="arl-n">${esc(s.n)}</span><span class="arl-m"><span>${CATS[s.c].n}</span> · <span>${dur(s.s)}</span></span>${ic('next', 'chev')}</button></li>`
+      )
+      .join('')}</ul>`
+        : ''
+    }
+    <p class="ar-tip">${L('이름을 누르면 설명·가는 법·일본어 이름이 나와요', '名前を押すと説明・行き方・日本語名が出ます')}</p>
     ${ph ? `<p class="ph-cr">${L('사진', '写真')} <a href="https://unsplash.com/photos/${AREA_PHOTOS[a.id][1]}" target="_blank" rel="noopener">${AREA_PHOTOS[a.id][0]}</a> · Unsplash</p>` : ''}
-    <ul class="spl">${list.map(s => `<li><button class="spl-b" data-act="spotSheet" data-id="${s.id}">${catTile(s.c)}<span class="al-t"><b>${esc(s.n)}</b><small>${CATS[s.c].n} · ${dur(s.s)}${s.j ? ` · <span lang="ja">${esc(s.j)}</span>` : ''}</small><span class="sp-d">${esc(s.d)}</span></span>${ic('next', 'chev')}</button></li>`).join('')}</ul>
-    <div class="sh-foot"><button class="btn soft" data-act="closeSheet">닫기</button><button class="btn pri" data-act="planArea" data-id="${a.id}">이 동네 넣어서 계획 세우기</button></div>`
+    <div class="sh-foot"><button class="btn soft" data-act="closeSheet">닫기</button><button class="btn pri" data-act="planArea" data-id="${a.id}">${L('이 동네로 계획 세우기', 'このエリアで計画を作る')}</button></div>`
   );
 }
+// 설명의 첫 문장만 (동네 둘러보기의 짧은 소개). 일본어 화면은 옮긴 뒤 자르기
+function firstSentence(d) {
+  const t = LANG === 'ja' ? trText(d) : d;
+  return t.split(/(?<=[.。!?])\s*/)[0].replace(/[.。]$/, '');
+}
+Object.assign(A, {
+  // 동네 둘러보기 「더 둘러보기」 종류 탭
+  areaCat(d) {
+    if (!S.sheet || S.sheet.type !== 'area') return;
+    S.sheet = { ...S.sheet, cat: d.c };
+    S.keepSheetScroll = true;
+    render();
+  }
+});
 
 const SHEETS = { air: airSheetV, pass: passSheetV, how: howSheetV, phrase: phraseSheetV, area: areaSheetV };
 const SHEET_LABEL = {
