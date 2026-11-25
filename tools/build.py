@@ -34,6 +34,7 @@ JS_FILES = [
     'nav.js',        # 안드로이드 뒤로가기
     'guide.js',      # 길안내 탭, 일본어로 보여주기
     'here.js',       # 지금 위치(GPS)에서 다음 장소까지 길 안내
+    'live.js',       # 여행 중 다시 짜기 (지금 도착·지금 출발, 다음 차 계산)
     'maps.js',       # 지도 그리기
 ]
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
