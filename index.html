@@ -7832,6 +7832,681 @@ body {
   }
 }
 
+/* ===== 가고 싶은 곳 (wish.js) ===== */
+/* 동네 탭: 사진 오른쪽 「＋ 직접 장소 추가」 (부제목 줄과 가운데 맞춤) */
+.h3-bandbtn {
+  position: absolute;
+  z-index: 3;
+  right: 16px;
+  bottom: 27px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 11px;
+  border-radius: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(20, 24, 36, 0.38);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.h3-bandbtn .ic {
+  width: 16px;
+  height: 16px;
+}
+.h3-band.has-btn .h3-bt {
+  right: 144px;
+}
+.h3-band.has-btn .h3-bt p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 380px) {
+  .h3-band.has-btn .bopt {
+    display: none;
+  }
+  .h3-band.has-btn .h3-bt p {
+    font-size: 12px;
+  }
+}
+@media (max-width: 420px) {
+  html[lang='ja'] .h3-band.has-btn .bopt {
+    display: none;
+  }
+}
+.h3-seg.w4 {
+  grid-template-columns: 0.8fr 0.8fr 1.05fr 1.35fr;
+}
+.h3-seg.w4 button {
+  white-space: nowrap;
+  font-size: 14px;
+  padding: 0 4px;
+}
+@media (max-width: 370px) {
+  .h3-seg.w4 button {
+    font-size: 12.5px;
+  }
+}
+.h3-page.w-page {
+  padding-bottom: calc(160px + env(safe-area-inset-bottom));
+}
+.w-top,
+.w-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+.w-top b {
+  color: var(--ink);
+}
+.w-top > .ic,
+.w-hint > .ic {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--pri);
+}
+.w-hint {
+  background: none;
+  padding: 2px 2px 0;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+.w-hint > .ic {
+  width: 16px;
+  height: 16px;
+  color: #e0a00f;
+}
+.w-grp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 2px -4px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink-2);
+}
+.w-grp .ic {
+  width: 15px;
+  height: 15px;
+}
+.w-grp i {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+.w-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.w-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 11px 12px;
+  border: 1.5px solid transparent;
+}
+.w-row.in {
+  border-color: color-mix(in srgb, var(--pri) 35%, transparent);
+}
+.w-row > .ct {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+}
+.w-t {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  text-align: left;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+}
+button.w-t {
+  cursor: pointer;
+}
+.w-t b {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.w-t small {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.w-u,
+.w-app {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 800;
+  vertical-align: 1px;
+  color: var(--blue);
+  background: color-mix(in srgb, var(--blue) 10%, var(--surface));
+}
+.w-app {
+  color: var(--pri);
+  background: color-mix(in srgb, var(--pri) 10%, var(--surface));
+}
+.w-x {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.w-x .ic {
+  width: 16px;
+  height: 16px;
+}
+.w-addline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 13px;
+  border: 1.5px dashed color-mix(in srgb, var(--pri) 50%, transparent);
+  border-radius: 16px;
+  background: none;
+  color: var(--pri);
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.w-addline .ic {
+  width: 18px;
+  height: 18px;
+}
+.w-empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 26px 18px;
+  text-align: center;
+  background: var(--surface);
+  border-radius: 18px;
+}
+.w-empty > .ic {
+  width: 28px;
+  height: 28px;
+  color: var(--pri);
+}
+.w-empty b {
+  font-size: 15.5px;
+  color: var(--ink);
+}
+.w-empty small {
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+/* 「이 장소들로 계획 짜기」: 아래 메뉴 바로 위에 고정 */
+.w-cta {
+  position: fixed;
+  z-index: 29;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(68px + env(safe-area-inset-bottom));
+  width: 100%;
+  max-width: 520px;
+  box-sizing: border-box;
+  padding: 10px 16px 12px;
+  background: linear-gradient(to top, var(--bg) 75%, transparent);
+}
+.w-cta .btn {
+  width: 100%;
+}
+/* 동네 둘러보기·추천 목록의 ＋ / ✓ */
+.ar-top li,
+.ar-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ar-top li .ar-tc,
+.ar-list li .arl-b {
+  flex: 1;
+  min-width: 0;
+}
+.w-plus {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--line);
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+.w-plus .ic {
+  width: 17px;
+  height: 17px;
+}
+.w-plus.on {
+  background: var(--pri);
+  border-color: var(--pri);
+  color: #fff;
+}
+/* 직접 장소 추가: 주의사항 · 종류·시간 */
+.w-caution {
+  margin-top: 12px;
+  padding: 13px 14px;
+  border-radius: 16px;
+  background: color-mix(in srgb, #e8a317 12%, var(--surface));
+  border: 1.5px solid color-mix(in srgb, #e8a317 45%, transparent);
+}
+.w-caution.hot {
+  border-color: var(--bad);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--bad) 15%, transparent);
+}
+.w-caution h4 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 8px;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.w-caution h4 .ic {
+  width: 18px;
+  height: 18px;
+  color: #c98a00;
+}
+.w-caution ol {
+  margin: 0;
+  padding: 0 0 0 18px;
+  display: grid;
+  gap: 6px;
+}
+.w-caution li {
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.w-caution li b {
+  color: var(--ink);
+}
+.w-caution small {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.w-gbtn {
+  margin-top: 10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.w-gbtn .ic {
+  width: 16px;
+  height: 16px;
+}
+.w-kind {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+.w-kind .fld > span small {
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.w-kind .chips-sel button {
+  padding: 8px 14px;
+  font-size: 13.5px;
+}
+/* 새 여행 2단계: 어떻게 짤까요? */
+.how-p {
+  margin: 4px 2px 14px;
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.how-c {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 18px;
+  text-align: left;
+  border: 2px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+.how-c.on {
+  border-color: var(--pri);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--pri) 14%, transparent);
+}
+.how-i {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  color: var(--blue);
+  background: color-mix(in srgb, var(--blue) 12%, var(--surface));
+}
+.how-c.on .how-i {
+  color: var(--pri);
+  background: color-mix(in srgb, var(--pri) 12%, var(--surface));
+}
+.how-i .ic {
+  width: 26px;
+  height: 26px;
+}
+.how-b {
+  flex: 1;
+  min-width: 0;
+}
+.how-b > b {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 17.5px;
+  font-weight: 800;
+}
+.how-b > small {
+  display: block;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.how-l {
+  display: grid;
+  gap: 5px;
+  margin-top: 10px;
+}
+.how-l span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.how-l .ic {
+  width: 15px;
+  height: 15px;
+  color: var(--ok);
+}
+.how-n {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--pri);
+  background: color-mix(in srgb, var(--pri) 10%, var(--surface));
+}
+.how-r {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+}
+.how-c.on .how-r {
+  border-color: var(--pri);
+  background: var(--pri);
+  color: #fff;
+}
+.how-r .ic {
+  width: 15px;
+  height: 15px;
+}
+/* 가고 싶은 곳으로 짜기 화면 */
+.wplan {
+  display: grid;
+  gap: 10px;
+}
+.w-row.wp {
+  align-items: flex-start;
+}
+.w-row.wp > .ct {
+  margin-top: 2px;
+}
+.w-star {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin: 4px -4px 0 -4px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  color: var(--line);
+  cursor: pointer;
+}
+.w-star .ic {
+  width: 21px;
+  height: 21px;
+}
+.w-star.on {
+  color: #e8a317;
+}
+.w-star.on .ic path {
+  fill: currentColor;
+}
+.w-fix {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.w-fix select {
+  max-width: 100%;
+  padding: 5px 8px;
+  border-radius: 10px;
+  border: 1.5px dashed var(--line);
+  background: var(--surface);
+  color: var(--ink-3);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+}
+.w-fix select.set {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--blue) 40%, transparent);
+  color: var(--blue);
+  background: color-mix(in srgb, var(--blue) 8%, var(--surface));
+}
+.w-adds {
+  margin-top: 4px;
+}
+.w-tog {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--surface);
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  cursor: pointer;
+}
+.w-tog > span {
+  flex: 1;
+}
+.w-tog b {
+  display: block;
+  font-size: 14px;
+}
+.w-tog small {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.w-sw {
+  flex: none;
+  position: relative;
+  width: 46px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--line);
+  transition: background 0.15s;
+}
+.w-sw::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left 0.15s;
+}
+.w-sw.on {
+  background: var(--pri);
+}
+.w-sw.on::after {
+  left: 21px;
+}
+/* 시트: 추천 장소 담기 */
+.w-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 10px;
+  padding: 0 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink-3);
+}
+.w-search .ic {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+.w-search input {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 14.5px;
+  color: var(--ink);
+  outline: none;
+}
+.w-chips {
+  display: flex;
+  gap: 6px;
+  margin: 0 -18px 8px;
+  padding: 0 18px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.w-chips::-webkit-scrollbar {
+  display: none;
+}
+.w-chips button {
+  flex: none;
+  padding: 7px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.w-chips button.on {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+}
+.w-chips.soft button.on {
+  background: color-mix(in srgb, var(--pri) 10%, var(--surface));
+  border-color: color-mix(in srgb, var(--pri) 40%, transparent);
+  color: var(--pri);
+}
+.s-wpick .w-list {
+  margin-top: 6px;
+}
+.w-none {
+  padding: 18px 8px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+/* 계획 화면 위 결과 알림 */
+.w-banner .w-bd {
+  display: inline-block;
+  margin: 4px 10px 0 0;
+  white-space: nowrap;
+}
+.w-banner .btn.wide {
+  width: 100%;
+  margin-top: 10px;
+}
+
 </style>
 </head>
 <body>
@@ -10707,6 +11382,10 @@ function fareUnknown(f) {
 // 출발한다고 보고, 역·정류장에 닿는 시각 이후 가장 빠른 차를 잡아요. 막차가 지나면 lastGone = true.
 const LINE_HW = { kuko: 5, hako: 7, nana: 7 }; // 지하철 노선별 배차 간격(분, 낮 기준)
 const SERVICE = { subway: [330, 1450], bus: [390, 1420], train: [330, 1440], ferry: [480, 1050] }; // 첫차~막차(분)
+// 화면 글자 (한국어, 일본어). 일본어 장치(i18n.js)가 없는 곳(깃허브 점검 tools/check.js)에서는 한국어로
+function LL(ko, ja) {
+  return typeof L === 'function' ? L(ko, ja) : ko;
+}
 // 노선별 첫차·막차 (분, 타는 곳에서 출발하는 시각). 2026년 10월 시간표 기준 대략값 — 바뀌면 여기만 고쳐요
 // out: 후쿠오카 → 그 지역 / back: 그 지역 → 후쿠오카
 const SVC_ROUTE = {
@@ -10721,13 +11400,13 @@ function svcOf(o) {
   if (!o) return null;
   if (o.airBus) {
     const r = SVC_ROUTE.airbus;
-    return { w: o.airBus.out ? r.out : r.back, pre: o.airBus.out ? 0 : Math.max(0, o.min - 23), n: L(...r.n) };
+    return { w: o.airBus.out ? r.out : r.back, pre: o.airBus.out ? 0 : Math.max(0, o.min - 23), n: LL(...r.n) };
   }
   const g = (o.gparts || []).find(x => x.vkey);
   const r = g && SVC_ROUTE[g.vkey];
-  if (r) return { w: g.out ? r.out : r.back, pre: o.pre || 0, n: L(...r.n) };
+  if (r) return { w: g.out ? r.out : r.back, pre: o.pre || 0, n: LL(...r.n) };
   const nm = { subway: ['지하철', '地下鉄'], train: ['전철', '電車'], bus: ['버스', 'バス'] }[o.mode];
-  if (nm && SERVICE[o.mode]) return { w: SERVICE[o.mode], pre: o.pre || 0, n: L(...nm) };
+  if (nm && SERVICE[o.mode]) return { w: SERVICE[o.mode], pre: o.pre || 0, n: LL(...nm) };
   return null;
 }
 // 출발 시각 t 기준 첫차·막차 확인 (계획 짤 때)
@@ -10749,7 +11428,7 @@ function svcGoneOf(o, s) {
     svcGone: true,
     svcName: s.n,
     svcLast: s.w[1],
-    offNote: L(`막차가 끝났어요 · ${s.n} 막차 약 ${fmt(s.w[1] % 1440)}`, `最終便が終わりました · ${s.n}の最終 約${fmt(s.w[1] % 1440)}`)
+    offNote: LL(`막차가 끝났어요 · ${s.n} 막차 약 ${fmt(s.w[1] % 1440)}`, `最終便が終わりました · ${s.n}の最終 約${fmt(s.w[1] % 1440)}`)
   };
 }
 // 교통편 이름으로 배차 간격(분) 추정
@@ -11384,8 +12063,8 @@ function inSeason(s, date) {
 }
 let WD = ['일', '월', '화', '수', '목', '금', '토'];
 
-// ★ 새 계획 만들기: 날짜·숙소·고른 동네로 날마다 일정을 채워요
-function createPlan(set, areaIds) {
+// 새 계획의 뼈대: 날짜별 하루(시작·마무리 시각), 첫날 짐 맡기기, 숙소
+function planShell(set, areaIds) {
   const dates = datesBetween(set.start, set.end);
   const N = dates.length;
   const plan = {
@@ -11418,6 +12097,11 @@ function createPlan(set, areaIds) {
   plan.set.stays = normStays(set.stays, N - 1, set.hotel);
   if (!plan.set.stays.length) delete plan.set.stays;
   syncMoveItems(plan);
+  return plan;
+}
+// ★ 새 계획 만들기: 날짜·숙소·고른 동네로 날마다 일정을 채워요
+function createPlan(set, areaIds) {
+  const plan = planShell(set, areaIds);
   const alloc = allocate(
     plan,
     areaIds.map(id => AREA[id])
@@ -11440,6 +12124,256 @@ function createPlan(set, areaIds) {
   rebalance(plan);
   plan.days.forEach((d, i) => cleanModes(plan, i));
   return plan;
+}
+// ★ 가고 싶은 곳으로 계획 만들기 (직접 고르기)
+// entries: [{ w: 가고 싶은 곳 한 곳, must: 꼭 갈 곳, day: 고정한 날(0부터) 또는 null, at: 고정한 시각(분) 또는 null }]
+// opt.fill: 남는 시간을 앱 추천(근처 맛집·명소)으로 채울지
+// 순서: ① 같은 동네끼리 묶어 날짜에 나누기(먼 곳은 하루 따로, 날짜 고정은 그날)
+//       ② 식당은 점심·저녁, 예약 시간은 그 시각에  ③ (켰으면) 빈 시간 채우기
+//       ④ 날마다 이동이 가장 짧은 순서로 + 문 여는 시간·식사·막차 맞추기  ⑤ 넘치면 꼭 갈 곳이 아닌 곳부터 보류함
+function areaNear(pt) {
+  return AREAS.slice().sort((a, b) => km(a, pt) - km(b, pt))[0];
+}
+function wishPt(w) {
+  return w.sid ? SPOT[w.sid] : w;
+}
+function wishItem(e) {
+  const w = e.w;
+  let it;
+  if (w.sid) it = mkItem(w.sid, 'wish');
+  else
+    it = {
+      uid: uid(),
+      n: w.n,
+      custom: true,
+      cat: w.c || 'free',
+      stay: w.stay || 60,
+      lat: w.lat,
+      lng: w.lng,
+      z: w.z || areaNear(w).z,
+      wh: 'pin',
+      src: 'wish'
+    };
+  it.wid = w.id;
+  if (e.must) it.must = true;
+  if (e.day != null) it.fixDay = e.day;
+  if (e.at != null) it.at = e.at;
+  return it;
+}
+function createPlanWish(set, entries, opt = {}) {
+  const plan = planShell(set, []);
+  plan.mode = 'wish';
+  const N = plan.days.length,
+    caps = plan.days.map((d, i) => dayCap(plan, i)),
+    avg = caps.reduce((a, b) => a + b, 0) / N;
+  const cost = x => x.it.stay + 15;
+  const xs = entries
+    .filter(e => e.w && (!e.w.sid || SPOT[e.w.sid]))
+    .map(e => ({ it: wishItem(e), aid: e.w.sid ? SPOT[e.w.sid].a : e.w.a || areaNear(e.w).id, day: e.day }));
+  const fixedBy = plan.days.map(() => []),
+    free = [];
+  xs.forEach(x => (x.day != null && x.day >= 0 && x.day < N ? fixedBy[x.day] : free).push(x));
+  // ① 같은 동네끼리 묶기. 시내 동네가 하루에 다 못 볼 만큼 많으면 가까운 순서로 나눠요
+  const byA = {};
+  free.forEach(x => (byA[x.aid] = byA[x.aid] || []).push(x));
+  const groups = [];
+  Object.keys(byA).forEach(aid => {
+    const a = AREA[aid],
+      lim = Math.max(180, avg * 0.7);
+    let rest = byA[aid].slice(),
+      cur = a,
+      chunk = [],
+      sum = 0;
+    while (rest.length) {
+      rest.sort((p, q) => km(cur, itemPt(plan, p.it)) - km(cur, itemPt(plan, q.it)));
+      const x = rest.shift();
+      if (chunk.length && a.z === 'city' && sum + cost(x) > lim) {
+        groups.push({ ...a, min: sum, xs: chunk });
+        chunk = [];
+        sum = 0;
+      }
+      chunk.push(x);
+      sum += cost(x);
+      cur = itemPt(plan, x.it);
+    }
+    if (chunk.length) groups.push({ ...a, min: sum, xs: chunk });
+  });
+  // 날짜를 고정한 곳은 먼저 그날에
+  const init = { asg: plan.days.map(() => []), load: plan.days.map(() => 0) };
+  fixedBy.forEach((ys, i) => {
+    const by = {};
+    ys.forEach(y => (by[y.aid] = by[y.aid] || []).push(y));
+    Object.keys(by).forEach(aid => {
+      const g = { ...AREA[aid], min: by[aid].reduce((t, y) => t + cost(y), 0) };
+      init.asg[i].push(g);
+      init.load[i] += g.min + 2 * accessMin(g.z);
+    });
+  });
+  const alloc = allocate(plan, groups, init);
+  plan.days.forEach((day, i) => {
+    const mine = [...fixedBy[i], ...alloc[i].filter(g => g.xs).flatMap(g => g.xs)];
+    day.areas = [...new Set(mine.map(x => x.aid))];
+    mine.forEach(x => day.items.push(x.it));
+  });
+  // ② 식사 정하기 ③ 빈 시간 채우기 ④ 순서·시간 ⑤ 넘치면 보류함
+  plan.days.forEach((day, i) => {
+    const s0 = toMin(day.start.time),
+      e0 = toMin(day.end.time),
+      canL = s0 <= 750 && e0 >= 810,
+      canD = e0 >= 1170,
+      has = {};
+    const wishes = day.items.filter(it => it.src === 'wish');
+    const isFood = it => (it.sid ? !!SPOT[it.sid].meal : it.cat === 'food');
+    const night = it => !!(it.sid && (SPOT[it.sid].b === 'n' || SPOT[it.sid].pd));
+    // 저녁 전에 문 닫는 곳은 저녁으로, 점심 뒤에 여는 곳·밤에만 하는 곳은 점심으로 넣지 않아요
+    const okD = it => !(it.sid && SPOT[it.sid].to && toMin(SPOT[it.sid].to) < 1110);
+    const okL = it => !(it.sid && (SPOT[it.sid].b === 'n' || (SPOT[it.sid].from && toMin(SPOT[it.sid].from) > 780)));
+    wishes
+      .filter(it => isFood(it) && it.at != null)
+      .forEach(it => {
+        const w = mealWin(it.at);
+        if (w && !has[w]) {
+          it.meal = w;
+          has[w] = true;
+        }
+      });
+    wishes
+      .filter(it => isFood(it) && it.at == null)
+      .sort((a, b) => night(b) - night(a))
+      .forEach(it => {
+        if (night(it) && canD && !has.D && okD(it)) it.meal = has.D = 'D';
+        else if (canL && !has.L && okL(it)) it.meal = has.L = 'L';
+        else if (canD && !has.D && okD(it)) it.meal = has.D = 'D';
+      });
+    const cafe = wishes.find(
+      it => !it.meal && (it.sid ? ['cafe', 'sweet'].includes(SPOT[it.sid].menu) : it.cat === 'cafe')
+    );
+    if (cafe && s0 <= 840 && e0 >= 1080) cafe.meal = has.S = 'S';
+    if (opt.fill) {
+      let areas = (day.areas || []).map(id => AREA[id]);
+      if (!areas.length) {
+        // 담은 곳이 없는 날: 그날 숙소에서 가까운 시내 동네로
+        const ref = N > 1 ? hotelPt(nightHotel(plan, Math.min(i, N - 2))) : AREA.hakata;
+        const near = AREAS.filter(a => a.kind === 'city').sort((a, b) => km(a, ref) - km(b, ref))[0];
+        areas = [near];
+        day.areas = [near.id];
+      }
+      const used = wishes.reduce((t, it) => t + it.stay + 12, 0);
+      pickSpots(plan, i, areas, { used, has, fill: true }).forEach(p => {
+        if (p.gen) day.items.push(snackItem(p.gen));
+        else {
+          const it = mkItem(p.s.id, 'auto');
+          if (p.meal) it.meal = p.meal;
+          day.items.push(it);
+        }
+      });
+    }
+    reorderDay(plan, i, leadingFixed(day));
+    // 그 동네 장소를 다 넣었는데도 빈 시간이 길면 (예약 시각까지 기다리는 시간 포함) 가까운 시내 동네에서 더 채워요
+    for (let round = 0; opt.fill && round < 2; round++) {
+      if ((day.areas || []).some(id => AREA[id].z !== 'city')) break;
+      const c = computeDay(plan, i);
+      let idle = 0;
+      c.rows.forEach((r, k) => {
+        if (r.it.at == null) return;
+        const prev = k ? c.rows[k - 1].dep : c.start;
+        idle += Math.max(0, r.arr - (prev + r.leg.min));
+      });
+      if (c.deadline - c.endArr + idle < 100) break;
+      const mine = new Set(day.areas),
+        ref = day.areas.length ? AREA[day.areas[0]] : AREA.hakata,
+        city = AREAS.filter(a => a.kind === 'city' && !mine.has(a.id)),
+        free = city.filter(a => !plan.days.some(d => (d.areas || []).includes(a.id)));
+      const next = (free.length ? free : city).sort((a, b) => km(a, ref) - km(b, ref))[0];
+      if (!next) break;
+      day.areas.push(next.id);
+      const used = day.items.reduce((t, it) => t + it.stay + 12, 0); // 기다리는 시간은 비어 있는 시간으로 쳐요
+      const add = pickSpots(plan, i, [next], { used, has: { L: true, D: true, S: true }, fill: true });
+      if (!add.length) break;
+      add.forEach(p => {
+        if (!p.gen) day.items.push(mkItem(p.s.id, 'auto'));
+      });
+      reorderDay(plan, i, leadingFixed(day));
+    }
+    trimDay(plan, i, leadingFixed(day));
+    snackFit(plan, i);
+  });
+  moveMusts(plan);
+  rebalance(plan);
+  plan.days.forEach((d, i) => cleanModes(plan, i));
+  // 날마다 실제로 들르는 동네만 남겨요 (일차 카드에 보이는 동네 이름)
+  plan.days.forEach(d => {
+    d.areas = (d.areas || []).filter(id =>
+      d.items.some(it => (it.sid ? SPOT[it.sid].a === id : it.src === 'wish' && areaNear(it).id === id))
+    );
+  });
+  plan.areas = [...new Set(plan.days.flatMap(d => d.areas || []))];
+  return plan;
+}
+// 꼭 갈 곳(★)이 많아 시간이 넘치는 날: 날짜를 고정하지 않은 ★를 여유 있는 다른 날로 옮겨 봐요
+// (옮긴 날이 넘치면 그날의 ★ 아닌 곳을 보류함으로. 그래도 넘치면 되돌려요)
+function moveMusts(plan) {
+  for (let i = 0; i < plan.days.length; i++) {
+    for (let guard = 0; guard < 6 && computeDay(plan, i).over > 20; guard++) {
+      const day = plan.days[i],
+        cand = day.items.filter(it => it.must && it.fixDay == null && it.at == null).sort((a, b) => b.stay - a.stay);
+      let moved = false;
+      for (const it of cand) {
+        const pt = itemPt(plan, it);
+        const order = plan.days
+          .map((d, j) => ({ j, c: computeDay(plan, j) }))
+          .filter(x => x.j !== i && x.c.deadline - x.c.endArr > it.stay + 20)
+          .sort((a, b) => {
+            const near = j => Math.min(9, ...plan.days[j].items.map(o => km(itemPt(plan, o), pt)));
+            return near(a.j) - near(b.j) || b.c.deadline - b.c.endArr - (a.c.deadline - a.c.endArr);
+          });
+        for (const { j } of order) {
+          const snapI = clone(day),
+            snapJ = clone(plan.days[j]),
+            snapP = clone(plan.parked);
+          day.items = day.items.filter(x => x !== it);
+          plan.days[j].items.push(it);
+          reorderDay(plan, j, leadingFixed(plan.days[j]));
+          trimDay(plan, j, leadingFixed(plan.days[j]));
+          if (computeDay(plan, j).over <= 10 && plan.days[j].items.includes(it)) {
+            reorderDay(plan, i, leadingFixed(day));
+            const a = it.sid ? SPOT[it.sid].a : areaNear(pt).id;
+            if (!(plan.days[j].areas || []).includes(a)) (plan.days[j].areas = plan.days[j].areas || []).push(a);
+            moved = true;
+            break;
+          }
+          plan.days[i] = snapI;
+          plan.days[j] = snapJ;
+          plan.parked = snapP;
+        }
+        if (moved) break;
+      }
+      if (!moved) break;
+    }
+  }
+}
+// 가고 싶은 곳으로 짠 결과 요약 (계획 화면 위 알림)
+function wishSummary(plan) {
+  const days = plan.days.map((d, i) => {
+    const w = d.items.filter(it => it.src === 'wish');
+    return {
+      i,
+      n: w.length,
+      fill: d.items.filter(it => it.src === 'auto' && !it.fixed && !it.place).length,
+      areas: (d.areas || []).filter(id => AREA[id]),
+      over: computeDay(plan, i).over
+    };
+  });
+  const all = plan.days.flatMap(d => d.items.filter(it => it.src === 'wish'));
+  return {
+    n: all.length + plan.parked.filter(p => p.src === 'wish').length,
+    placed: all.length,
+    must: all.filter(it => it.must).length,
+    fixed: all.filter(it => it.at != null).map(it => ({ n: itemName(plan, it), at: it.at, di: plan.days.findIndex(d => d.items.includes(it)) })),
+    fill: days.reduce((t, d) => t + d.fill, 0),
+    parked: plan.parked.map(p => ({ n: itemName(plan, p), reason: p.reason, wish: p.src === 'wish' })),
+    days
+  };
 }
 // 간식이 점심·저녁과 너무 붙으면(1시간 30분 안) 빼요. 플래너가 아는 카페면 간식 표시만 떼고 그대로 들러요
 function snackFit(plan, di) {
@@ -11473,11 +12407,12 @@ function leadingFixed(day) {
 }
 
 // 고른 동네를 날짜에 나누기 (숙소에서 가까운 동네를 그날로)
-function allocate(plan, areas) {
+// init: 이미 날짜가 정해진 것(가고 싶은 곳에서 날짜를 고정한 곳)이 있으면 { asg: 날마다 동네, load: 날마다 쓴 분 }
+function allocate(plan, areas, init) {
   const N = plan.days.length,
     caps = plan.days.map((d, i) => dayCap(plan, i));
-  const asg = plan.days.map(() => []),
-    load = caps.map(() => 0);
+  const asg = init ? init.asg.map(x => x.slice()) : plan.days.map(() => []),
+    load = init ? init.load.slice() : caps.map(() => 0);
   const need = a => a.min + 2 * accessMin(a.z);
   const edge = i => N > 2 && (i === 0 || i === N - 1);
   const hp = plan.days.map((d, i) => (i < N - 1 ? hotelPt(nightHotel(plan, i)) : null)); // 숙소로 돌아오는 날만 숙소와 가까운 동네를 우선
@@ -11515,15 +12450,18 @@ function allocate(plan, areas) {
 }
 
 // 하루에 넣을 장소·식당 고르기
-function pickSpots(plan, i, areas) {
+// opt (가고 싶은 곳으로 짤 때 빈 시간 채우기): used = 이미 넣은 곳이 쓰는 분, has = 이미 정해진 식사 {L, D, S}, fill = 남는 시간만큼만
+function pickSpots(plan, i, areas, opt = {}) {
   const day = plan.days[i];
   const s0 = toMin(day.start.time),
-    e0 = toMin(day.end.time);
-  let budget = dayCap(plan, i);
+    e0 = toMin(day.end.time),
+    has = opt.has || {};
+  let budget = dayCap(plan, i) - (opt.used || 0);
   areas.forEach(a => {
     if (a.z !== 'city') budget -= 2 * accessMin(a.z);
   });
   const taken = new Set(plan.days.flatMap(d => d.items.map(it => it.sid)).filter(Boolean));
+  if (opt.fill) plan.parked.forEach(p => p.sid && taken.add(p.sid)); // 보류함에 간 곳을 다른 날 다시 고르지 않게
   const ok = s =>
     !taken.has(s.id) &&
     inSeason(s, day.date) &&
@@ -11537,8 +12475,8 @@ function pickSpots(plan, i, areas) {
     taken.add(s.id);
     budget -= s.s + 12;
   };
-  const needL = s0 <= 750 && e0 >= 810,
-    needD = e0 >= 1170;
+  const needL = !has.L && s0 <= 750 && e0 >= 810,
+    needD = !has.D && e0 >= 1170;
   const hasOuter = areas.some(a => a.z !== 'city');
   const meals = SPOTS.filter(s => s.meal && ok(s));
   const near = (pool, ref) => pool.slice().sort((x, y) => km(x, ref) - km(y, ref));
@@ -11599,7 +12537,7 @@ function pickSpots(plan, i, areas) {
     if (s) takeMeal(s, 'D');
   }
   // 간식 시간 (오후 3~4시): 하루가 길고 여유가 있으면 그 동네 카페·디저트, 없으면 「카페·디저트 타임」 칸
-  const needS = s0 <= 840 && e0 >= 1080 && budget >= 200;
+  const needS = !has.S && s0 <= 840 && e0 >= 1080 && budget >= 200;
   if (needS) {
     const snack = SPOTS.filter(
       s =>
@@ -11627,7 +12565,7 @@ function pickSpots(plan, i, areas) {
       .sort((x, y) => y.p - x.p)
       .forEach(s => {
         const c = s.s + 12;
-        if (used === 0 || used + c <= share + 10) {
+        if ((used === 0 && !opt.fill) || used + c <= share + 10) {
           take(s);
           used += c;
         }
@@ -11643,6 +12581,7 @@ function timePen(c, arr, ctx) {
   const sp = c.sp,
     it = c.it;
   let p = 0;
+  if (it.at != null && arr > it.at) p += (arr - it.at) * 20; // 예약 시간보다 늦으면 아주 크게 (거의 꼭 지켜요)
   if (it.meal === 'L') p += outside(arr, 690, 810) * 1.2;
   else if (it.meal === 'D') p += outside(arr, 1080, 1200) * 1.2;
   else if (it.meal === 'S') p += outside(arr, 870, 990) * 0.8;
@@ -11668,6 +12607,11 @@ function seqEval(ctx, seq) {
   for (const c of seq) {
     const m = bestOpt(cur, c.pt).min;
     t += m;
+    // 예약 시간보다 일찍 도착하면 그때까지 기다려요 (기다리는 시간은 조금 벌점)
+    if (c.it.at != null && t < c.it.at) {
+      cost += (c.it.at - t) * 0.5;
+      t = c.it.at;
+    }
     cost += m + timePen(c, t, ctx);
     t += c.it.stay;
     cur = c.pt;
@@ -11749,6 +12693,7 @@ function computeDay(plan, di) {
       key = ck + '>' + it.uid,
       leg = chooseLeg(cur, p, day.modes[key], day.date, t, live);
     let arr = t + leg.min;
+    if (it.at != null && arr < it.at) arr = it.at; // 예약 시간까지 기다려요
     if (it.arrAct != null) {
       arr = it.arrAct;
       live = true;
@@ -11760,6 +12705,8 @@ function computeDay(plan, di) {
       live = true;
     } // '지금 출발'로 넣은 실제 출발 시각
     const warn = [];
+    if (it.at != null && it.arrAct == null && arr > it.at + 5)
+      warn.push(LL(`예약 시간 ${fmt(it.at)}보다 늦게 도착해요`, `予約時間 ${fmt(it.at)} より遅れて着きます`));
     const s = it.sid && SPOT[it.sid];
     if (s) {
       if (s.cl && s.cl.includes(wd)) warn.push(`${WD[wd]}요일은 휴관일 수 있어요`);
@@ -11807,8 +12754,10 @@ function mealsUsedBefore(plan, di, n) {
   return { used, c };
 }
 // 장소 우선순위 점수
+// 가고 싶은 곳(wish)은 앱이 고른 곳보다 늦게 빠지고, 꼭 갈 곳(must)은 빠지지 않아요
 function pri(it) {
-  return it.sid ? SPOT[it.sid].p : it.snack ? 1 : 3;
+  const b = it.sid ? SPOT[it.sid].p : it.snack ? 1 : 3;
+  return it.must ? 99 : it.src === 'wish' ? b + 10 : b;
 }
 
 // fixedCount 이후의 일정을 다시 짠다 (strict: 문 닫는 시간을 더 엄격하게)
@@ -11821,6 +12770,10 @@ function reorderDay(plan, di, fixedCount, strict) {
   const open = new Set();
   if (!used.L && t <= 810 && c.deadline >= 720) open.add('L');
   if (!used.D && c.deadline >= 1110) open.add('D');
+  // 직접 넣은 식당(가고 싶은 곳)이 맡은 식사 시간대는 비워 두지 않아요
+  rest.forEach(it => {
+    if (!it.sid && it.meal) open.delete(it.meal);
+  });
   const parked = [];
   const meals = rest
     .filter(it => it.sid && SPOT[it.sid].meal)
@@ -11891,7 +12844,12 @@ function trimDay(plan, di, fixedCount, strict) {
     const day = plan.days[di];
     const cand = day.items
       .map((it, idx) => ({ it, idx }))
-      .filter(x => x.idx >= fixedCount && x.it.src === 'auto' && !x.it.fixed);
+      .filter(
+        x =>
+          x.idx >= fixedCount &&
+          (x.it.src === 'auto' || (x.it.src === 'wish' && !x.it.must && x.it.fixDay == null && x.it.at == null)) &&
+          !x.it.fixed
+      );
     if (!cand.length) break;
     const nonMeal = cand.filter(x => !(x.it.sid && SPOT[x.it.sid].meal));
     const pool = nonMeal.length ? nonMeal : cand;
@@ -11918,6 +12876,7 @@ function dropClosed(plan, di, fixedCount) {
       return (
         i >= fixedCount &&
         !x.it.fixed &&
+        !x.it.must &&
         x.it.arrAct == null &&
         x.it.leave == null &&
         s &&
@@ -11954,6 +12913,7 @@ function cleanModes(plan, di) {
 // 시간이 모자라 보류된 곳을 여유 있는 다른 날로 옮겨 본다
 function rebalance(plan) {
   for (const p of plan.parked.filter(x => x.reason.startsWith('시간') && x.sid)) {
+    if (p.fixDay != null || plan.days.some(d => d.items.some(x => x.sid === p.sid))) continue;
     const slack = j => {
       const c = computeDay(plan, j);
       return c.deadline - c.endArr;
@@ -12323,7 +13283,9 @@ if (typeof module !== 'undefined')
     hotelPt,
     hotelLabel,
     syncMoveItems,
-    dayHotel
+    dayHotel,
+    createPlanWish,
+    wishSummary
   };
 
 // ======================================================================
@@ -13346,7 +14308,8 @@ const JA = {
 "(문 닫는 시간이 지나서)": "（閉店時間を過ぎるため）",
 "(식사 시간대와 맞지 않아)": "（食事の時間帯と合わないため）",
 "(식사가 이미 계획돼 있어서)": "（食事がすでに予定に入っているため）",
-"장소를 눌러 ‘지금 도착’·‘지금 출발’을 고르면 실제 시각에 맞춰 이후 시각과 다음 {@}·열차를 다시 계산해요.": "スポットをタップして「今到着」「今出発」を選ぶと、実際の時刻に合わせて以降の時刻と次の{@}・列車を再計算します。"
+"장소를 눌러 ‘지금 도착’·‘지금 출발’을 고르면 실제 시각에 맞춰 이후 시각과 다음 {@}·열차를 다시 계산해요.": "スポットをタップして「今到着」「今出発」を選ぶと、実際の時刻に合わせて以降の時刻と次の{@}・列車を再計算します。",
+"추천 장소 담기": "おすすめから入れる"
 };
 
 // ======================================================================
@@ -13616,7 +14579,8 @@ const S = {
   hintOff: lsGet('fk-hint-off', false),
   photoBroken: false,
   areaBroken: {},
-  face: lsGet('fk-face', false)
+  face: lsGet('fk-face', false),
+  wish: [] // 가고 싶은 곳 (wish.js 에서 불러와요)
 };
 // 새 여행 만들기 기본값 (시간·숙소)
 function defaultDraft() {
@@ -13688,6 +14652,7 @@ function appbar({ back, title, right = '', sub = '' }) {
     ${title ? `<div class="ab-t">${title}${sub ? `<small>${sub}</small>` : ''}</div>` : '<span class="ab-sp"></span>'}<div class="ab-r">${langBtn()}${right}</div></header>`;
 }
 // 새 여행 만들기 단계 표시줄
+// 1 날짜·숙소 → 2 어떻게 짤까요 → 3 동네 고르기 / 가고 싶은 곳 → (계획)
 function progress(n) {
   return `<div class="prog" role="progressbar" aria-valuemin="1" aria-valuemax="3" aria-valuenow="${n}" aria-label="3단계 중 ${n}단계">${[1, 2, 3].map(i => `<i class="${i <= n ? 'on' : ''}"></i>`).join('')}</div>`;
 }
@@ -13804,7 +14769,7 @@ function datesV() {
       ${airNoteV()}
     </section>
   </main>
-  <div class="cta"><button class="btn pri big" data-act="toAreas" ${D.start && D.end ? '' : 'disabled'}>다음 · 가고 싶은 곳 고르기</button></div>`
+  <div class="cta"><button class="btn pri big" data-act="toHow" ${D.start && D.end ? '' : 'disabled'}>${L('다음 · 짜는 방법 고르기', '次へ · 作り方を選ぶ')}</button></div>`
   );
 }
 
@@ -13862,8 +14827,8 @@ function areasV() {
     ['당일치기 (지도 밖)', 'trip']
   ];
   return (
-    appbar({ back: 'toDates', title: '가고 싶은 곳', sub: `${mds(D.start)} – ${mds(D.end)} · ${nights(cap.N)}` }) +
-    progress(2) +
+    appbar({ back: 'toHow', title: L('가고 싶은 동네', '行きたいエリア'), sub: `${mds(D.start)} – ${mds(D.end)} · ${nights(cap.N)}` }) +
+    progress(3) +
     `<main class="scr flow">
     <section class="map-card">
       <div class="rmap" id="rmap"></div>
@@ -14014,6 +14979,7 @@ function bannerV() {
     bar = liveBar(S.plan, S.di);
   if (!b) return bar;
   if (b.sync) return bar + liveBannerV(b);
+  if (b.wish) return bar + wishBannerV(b.wish);
   const r = b.res,
     L = [];
   if (r.added && r.added.length)
@@ -14075,14 +15041,16 @@ function schedTab() {
     <p class="sub">시간이 모자라거나 직접 뺀 곳이에요. 원하는 날에 다시 넣을 수 있어요.</p>
     <ul>${p.parked.map(x => `<li><span class="pk-t"><b>${esc(itemName(p, x))}</b><small>${esc(x.reason)}${x.fromDay != null ? ` · 원래 ${x.fromDay + 1}일차` : ''}</small></span><button class="btn soft sm" data-act="unpark" data-uid="${x.uid}">${S.di + 1}일차에 넣기</button><button class="ib sm" data-act="delParked" data-uid="${x.uid}" aria-label="${esc(itemName(p, x))} 삭제">${ic('trash')}</button></li>`).join('')}</ul></details>`
     : '';
-  return `<section class="daycard">
+  // 가고 싶은 곳으로 짠 결과 알림은 맨 위에
+  const wishTop = !!(S.banner && S.banner.wish);
+  return `${wishTop ? bannerV() : ''}<section class="daycard">
       <div class="dc-h"><div><h2>${S.di + 1}일차</h2><small>${md(day.date)} · ${(day.areas || []).map(a => AREA[a].n).join(' · ') || '자유 일정'}</small></div>
       <button class="dc-re" data-act="replanDay" aria-label="이 날 다시 짜기">${ic('shuffle')}<span>다시 짜기</span></button></div>
       ${dayHotelRow(p, S.di)}
       <div class="stats"><div><small>출발</small><b>${fmt(c.start)}</b></div><div><small>마무리</small><b class="${c.over > 0 ? 'bad-t' : ''}">${fmt(c.endArr)}</b></div><div><small>걷기</small><b>${c.walkKm.toFixed(1)}km</b></div><button data-act="tab" data-t="fare"><small>교통비</small><b>${df.approx ? '약 ' : ''}${yen(df.raw)}</b></button></div>
     </section>
     ${S.hintOff ? '' : `<div class="hint">${ic('walk')}<span>이동 칸을 누르면 <b>지하철·택시 요금</b>을 비교해 바꿀 수 있어요. 걷기로 바꾸면 길 위 맛집·명소를 추천하고 이후 일정을 다시 짜요.</span><button class="ib xs" data-act="hideHint" aria-label="안내 닫기">${ic('close')}</button></div>`}
-    ${bannerV()}
+    ${wishTop ? '' : bannerV()}
     ${tl}
     ${status}
     <div class="day-act"><button class="btn soft wide" data-act="addOpen">${ic('plus')}장소 추가</button></div>
@@ -14399,7 +15367,18 @@ function render() {
   const y = window.scrollY,
     shEl = document.querySelector('.sheet'),
     shY = shEl ? shEl.scrollTop : 0;
-  const v = S.view === 'home' ? homeV() : S.view === 'dates' ? datesV() : S.view === 'areas' ? areasV() : planV();
+  const v =
+    S.view === 'home'
+      ? homeV()
+      : S.view === 'dates'
+        ? datesV()
+        : S.view === 'how'
+          ? howV()
+          : S.view === 'wplan'
+            ? wplanV()
+            : S.view === 'areas'
+              ? areasV()
+              : planV();
   $app.innerHTML = `<div class="shell v-${S.view}">${v}${sheetV()}<div class="toasts" id="toasts" aria-live="polite"></div></div>`;
   document.body.classList.toggle('locked', !!S.sheet);
   const sh = document.querySelector('.sheet');
@@ -15606,7 +16585,7 @@ function areaSheetV(sh) {
     <ul class="ar-top">${top
       .map(
         s =>
-          `<li><button class="ar-tc" data-act="spotSheet" data-id="${s.id}">${catTile(s.c)}<span class="ar-tt"><b>${esc(s.n)}</b><small>${esc(firstSentence(s.d))}</small></span><span class="ar-time">${dur(s.s)}</span></button></li>`
+          `<li><button class="ar-tc" data-act="spotSheet" data-id="${s.id}">${catTile(s.c)}<span class="ar-tt"><b>${esc(s.n)}</b><small>${esc(firstSentence(s.d))}</small></span><span class="ar-time">${dur(s.s)}</span></button>${wishPlusBtn(s.id)}</li>`
       )
       .join('')}</ul>
     ${
@@ -15628,12 +16607,12 @@ function areaSheetV(sh) {
     <ul class="ar-list">${shown
       .map(
         s =>
-          `<li><button class="arl-b" data-act="spotSheet" data-id="${s.id}"><i class="arl-dot c-${s.c}"></i><span class="arl-n">${esc(s.n)}</span><span class="arl-m"><span>${CATS[s.c].n}</span> · <span>${dur(s.s)}</span></span>${ic('next', 'chev')}</button></li>`
+          `<li><button class="arl-b" data-act="spotSheet" data-id="${s.id}"><i class="arl-dot c-${s.c}"></i><span class="arl-n">${esc(s.n)}</span><span class="arl-m"><span>${CATS[s.c].n}</span> · <span>${dur(s.s)}</span></span>${ic('next', 'chev')}</button>${wishPlusBtn(s.id)}</li>`
       )
       .join('')}</ul>`
         : ''
     }
-    <p class="ar-tip">${L('이름을 누르면 설명·가는 법·일본어 이름이 나와요', '名前を押すと説明・行き方・日本語名が出ます')}</p>
+    <p class="ar-tip">${L('＋를 누르면 「가고 싶은 곳」에 담겨요 · 이름을 누르면 설명·가는 법·일본어 이름이 나와요', '＋を押すと「行きたい所」に入ります · 名前を押すと説明・行き方・日本語名が出ます')}</p>
     ${ph ? `<p class="ph-cr">${L('사진', '写真')} <a href="https://unsplash.com/photos/${AREA_PHOTOS[a.id][1]}" target="_blank" rel="noopener">${AREA_PHOTOS[a.id][0]}</a> · Unsplash</p>` : ''}
     <div class="sh-foot"><button class="btn soft" data-act="closeSheet">닫기</button><button class="btn pri" data-act="planArea" data-id="${a.id}">${L('이 동네로 계획 세우기', 'このエリアで計画を作る')}</button></div>`
   );
@@ -16486,8 +17465,10 @@ function draftHotelCard() {
 }
 // 숙소 위치 고르기 — 지도에 핀 꽂기 · 이름으로 찾기 · 좌표 붙여넣기 · 동네만
 function hpickSheetV(sh) {
-  const c = stayCtx(sh.ctx),
-    st = c.get(),
+  // ctx 'wish' = 동네 탭·가고 싶은 곳의 「직접 장소 추가」 (같은 지도·찾기 화면을 써요)
+  const W = sh.ctx === 'wish',
+    c = W ? null : stayCtx(sh.ctx),
+    st = c ? c.get() : [],
     x = st[sh.k] || st[0],
     h = sh.h,
     tab = sh.tab || 'find',
@@ -16498,7 +17479,9 @@ function hpickSheetV(sh) {
     ? ns
       ? L(`${ns.st.n}역까지 걸어서 ${wmin(ns.d)}분`, `${ns.st.j}駅まで徒歩${wmin(ns.d)}分`)
       : L('가까운 지하철역이 없어요 · 버스·택시로 계산해요', '近くに地下鉄駅がありません · バス・タクシーで計算します')
-    : L(`지금은 「${hotelWhereT(h)} 근처」로 대략 계산해요`, `今は「${hotelWhereT(h)}周辺」でおおまかに計算しています`);
+    : W && !sh.picked
+      ? L('이름으로 찾거나, 지도를 눌러 핀을 꽂아 주세요', '名前で探すか、地図をタップしてピンを置いてください')
+      : L(`지금은 「${hotelWhereT(h)} 근처」로 대략 계산해요`, `今は「${hotelWhereT(h)}周辺」でおおまかに計算しています`);
   const tabBtn = (t, label) =>
     `<button role="tab" class="${tab === t ? 'on' : ''}" aria-selected="${tab === t}" data-act="hpTab" data-t="${t}">${label}</button>`;
   let body = '';
@@ -16507,20 +17490,25 @@ function hpickSheetV(sh) {
     if (sh.busy) res = `<p class="hp-msg">${ic('search')}${L('찾는 중…', '検索中…')}</p>`;
     else if (sh.err) res = `<p class="hp-msg bad">${esc(sh.err)}</p>`;
     else if (sh.res && !sh.res.length)
-      res = `<p class="hp-msg">${L('못 찾았어요. 일본어·영어 이름으로 다시 찾거나, 위 지도에서 숙소 자리를 직접 눌러 주세요.', '見つかりませんでした。日本語・英語の名前で探すか、上の地図で宿の場所を直接タップしてください。')}</p>`;
+      res = W
+        ? `<p class="hp-msg">${ic('search')}${L(`「${esc(sh.q || '')}」(으)로는 못 찾았어요.`, `「${esc(sh.q || '')}」では見つかりませんでした。`)}</p>`
+        : `<p class="hp-msg">${L('못 찾았어요. 일본어·영어 이름으로 다시 찾거나, 위 지도에서 숙소 자리를 직접 눌러 주세요.', '見つかりませんでした。日本語・英語の名前で探すか、上の地図で宿の場所を直接タップしてください。')}</p>`;
     else if (sh.res)
       res = `<ul class="hp-res">${sh.res
         .map(
           (r, i) =>
-            `<li><button class="${pin && +h.lat === r.lat && +h.lng === r.lng ? 'on' : ''}" data-act="hpRes" data-i="${i}">${ic('pin')}<span><b>${esc(r.name)}</b><small>${esc(r.addr)}</small></span>${pin && +h.lat === r.lat && +h.lng === r.lng ? ic('check', 'ok') : ''}</button></li>`
+            `<li><button class="${pin && +h.lat === r.lat && +h.lng === r.lng ? 'on' : ''}" data-act="hpRes" data-i="${i}">${ic(r.sid ? 'star' : 'pin')}<span><b>${esc(r.name)}${r.sid ? `<i class="w-app">${L('앱 추천', 'アプリのおすすめ')}</i>` : ''}</b><small>${esc(r.addr)}</small></span>${pin && +h.lat === r.lat && +h.lng === r.lng ? ic('check', 'ok') : ''}</button></li>`
         )
         .join('')}</ul>`;
-    body = `<div class="hp-find"><input id="hQ" type="search" enterkeyhint="search" autocomplete="off" value="${esc(sh.q ?? '')}" placeholder="${L('예: Dormy Inn Hakata, ドーミーイン博多', '例: ドーミーイン博多、Dormy Inn')}"><button class="btn pri" data-act="hpFind">${L('찾기', '検索')}</button></div>
+    body = W
+      ? `<div class="hp-find"><input id="hQ" type="search" enterkeyhint="search" autocomplete="off" value="${esc(sh.q ?? '')}" placeholder="${L('예: 一蘭 博多, Ichiran Hakata', '例: 一蘭 博多、Ichiran Hakata')}"><button class="btn pri" data-act="hpFind">${L('찾기', '検索')}</button></div>
+      <p class="fine hp-fine">${L('앱에 있는 장소를 먼저 보여 주고, 그다음 OpenStreetMap에서 찾아요 · 인터넷이 필요해요', 'アプリ内の場所を先に表示し、次にOpenStreetMapで探します · インターネットが必要です')}</p>${res}${wishCautionV((sh.res && !sh.res.length) || !!sh.err)}`
+      : `<div class="hp-find"><input id="hQ" type="search" enterkeyhint="search" autocomplete="off" value="${esc(sh.q ?? '')}" placeholder="${L('예: Dormy Inn Hakata, ドーミーイン博多', '例: ドーミーイン博多、Dormy Inn')}"><button class="btn pri" data-act="hpFind">${L('찾기', '検索')}</button></div>
       <p class="fine hp-fine">${L('예약 확인서에 적힌 일본어·영어 호텔 이름으로 찾으면 잘 나와요. 인터넷이 필요해요.', '予約確認書の日本語・英語のホテル名で探すと見つかりやすいです。インターネットが必要です。')}</p>${res}`;
   } else if (tab === 'paste') {
     body = `<div class="hp-find"><input id="hPaste" type="text" inputmode="decimal" autocomplete="off" value="${esc(sh.paste ?? '')}" placeholder="33.5905, 130.4207"><button class="btn pri" data-act="hpPaste">${L('적용', '適用')}</button></div>
       <ol class="hp-how">
-        <li>${L('구글 지도에서 숙소를 찾아 그 자리를 꾹 눌러요', 'Googleマップで宿を探し、その場所を長押しします')}</li>
+        <li>${W ? L('구글 지도 앱에서 가게를 찾아 그 자리를 꾹 눌러요', 'Googleマップでお店を探し、その場所を長押しします') : L('구글 지도에서 숙소를 찾아 그 자리를 꾹 눌러요', 'Googleマップで宿を探し、その場所を長押しします')}</li>
         <li>${L('위에 나온 숫자 좌표(33.59…, 130.41…)를 복사해요', '上に出る数字の座標(33.59…, 130.41…)をコピーします')}</li>
         <li>${L('여기에 붙여 넣고 「적용」을 눌러요. 주소창의 긴 링크도 돼요', 'ここに貼り付けて「適用」。アドレスバーの長いリンクでもOK')}</li>
       </ol>`;
@@ -16546,21 +17534,24 @@ function hpickSheetV(sh) {
       <h3 class="sec"><span>${L('다른 역 근처', 'ほかの駅の近く')}</span></h3>${lines}`;
   }
   return (
-    shHead(
-      L('숙소 위치', '宿の場所'),
-      `${L(`${sh.k + 1}번째 숙소`, `${sh.k + 1}番目の宿`)} · ${mds(nightDate(c.start, x.n0))} – ${mds(nightDate(c.start, x.n1 + 1))}`
-    ) +
-    `<label class="fld hp-name"><span>${L('숙소 이름', '宿の名前')}</span><input id="hName" type="text" maxlength="40" value="${esc(sh.nm ?? h.name ?? '')}" placeholder="${L('예: 도미인 하카타 기온', '例: ドーミーイン博多祇園')}" autocomplete="off"></label>
+    (W
+      ? shHead(L('직접 장소 추가', '場所を直接追加'), L('찾은 곳은 「가고 싶은 곳」에 담겨요', '見つけた場所は「行きたい所」に入ります'))
+      : shHead(
+          L('숙소 위치', '宿の場所'),
+          `${L(`${sh.k + 1}번째 숙소`, `${sh.k + 1}番目の宿`)} · ${mds(nightDate(c.start, x.n0))} – ${mds(nightDate(c.start, x.n1 + 1))}`
+        )) +
+    `<label class="fld hp-name"><span>${W ? L('장소 이름', '場所の名前') : L('숙소 이름', '宿の名前')}</span><input id="hName" type="text" maxlength="40" value="${esc(sh.nm ?? h.name ?? '')}" placeholder="${W ? L('예: 친구가 추천한 이자카야', '例: 友だちおすすめの居酒屋') : L('예: 도미인 하카타 기온', '例: ドーミーイン博多祇園')}" autocomplete="off"></label>
     <div class="hp-map-wrap">
       <div class="hp-map" id="hpmap" role="application" aria-label="${L('숙소 위치 지도 · 눌러서 핀 꽂기', '宿の場所の地図 · タップでピンを置く')}"></div>
       <div class="hp-zoom"><button class="ib sm" data-act="hpZoom" data-n="1" aria-label="${L('확대', '拡大')}">${ic('plus')}</button><button class="ib sm" data-act="hpZoom" data-n="-1" aria-label="${L('축소', '縮小')}">${ic('minus')}</button></div>
       ${hpMode(sh) === 'svg' ? `<p class="hp-off">${L('인터넷이 없어 간단한 지도로 보여요', 'オフラインのため簡易地図で表示しています')}</p>` : ''}
-      <p class="hp-tip">${pin ? L('다른 곳을 누르면 핀이 옮겨져요', '別の場所をタップするとピンが移動します') : L('숙소 자리를 눌러 핀을 꽂아요', '宿の場所をタップしてピンを置きます')}</p>
+      <p class="hp-tip">${pin ? L('다른 곳을 누르면 핀이 옮겨져요', '別の場所をタップするとピンが移動します') : W ? L('장소 자리를 눌러 핀을 꽂아요', '場所をタップしてピンを置きます') : L('숙소 자리를 눌러 핀을 꽂아요', '宿の場所をタップしてピンを置きます')}</p>
     </div>
-    <div class="hp-now${pin ? ' ok' : ''}">${ic(pin ? 'check' : 'pin')}<span><b>${pin ? L('정확한 위치로 정했어요', '正確な場所に設定しました') : L('아직 대략적인 위치예요', 'まだおおまかな場所です')}</b><small>${nowSub}</small></span></div>
-    <div class="hp-tabs" role="tablist">${tabBtn('find', L('이름으로 찾기', '名前で探す'))}${tabBtn('paste', L('좌표·링크', '座標・リンク'))}${tabBtn('area', L('동네만 고르기', 'エリアだけ'))}</div>
+    <div class="hp-now${pin ? ' ok' : ''}">${ic(pin ? 'check' : 'pin')}<span><b>${pin ? L('정확한 위치로 정했어요', '正確な場所に設定しました') : W && !sh.picked ? L('아직 위치를 안 정했어요', 'まだ場所が決まっていません') : W ? L('동네로 정했어요', 'エリアで設定しました') : L('아직 대략적인 위치예요', 'まだおおまかな場所です')}</b><small>${nowSub}</small></span></div>
+    <div class="hp-tabs" role="tablist">${tabBtn('find', L('이름으로 찾기', '名前で探す'))}${tabBtn('paste', W ? L('구글 좌표', 'Google座標') : L('좌표·링크', '座標・リンク'))}${tabBtn('area', L('동네만 고르기', 'エリアだけ'))}</div>
     <div class="hp-body">${body}</div>
-    <div class="sh-foot"><button class="btn pri" data-act="hpSave">${ic('check')}${L('이 숙소로 정하기', 'この宿に決める')}</button></div>`
+    ${W ? wishKindV(sh) : ''}
+    <div class="sh-foot"><button class="btn pri" data-act="hpSave">${W ? `${ic('plus')}${L('가고 싶은 곳에 담기', '行きたい所に入れる')}` : `${ic('check')}${L('이 숙소로 정하기', 'この宿に決める')}`}</button></div>`
   );
 }
 // 숙소 위치 지도 (실제 축척 · 끌어서 이동 · 눌러서 핀)
@@ -17182,7 +18173,7 @@ async function hpSearch(q) {
         .filter(p => p && p !== ja && !/^\d{3}-\d{4}$/.test(p) && p !== '日本')
         .reverse()
         .join('');
-      return { lat: +(+x.lat).toFixed(6), lng: +(+x.lon).toFixed(6), name: LANG === 'ja' ? ja : ko, ja, addr };
+      return { lat: +(+x.lat).toFixed(6), lng: +(+x.lon).toFixed(6), name: LANG === 'ja' ? ja : ko, ja, addr, kind: osmKind(x) };
     })
     .filter(x => x.name && isFinite(x.lat));
 }
@@ -17235,6 +18226,7 @@ Object.assign(A, {
     hpKeep();
     const [t, v] = d.v.split(':');
     S.sheet.h = t === 'k' ? { k: v } : { st: v };
+    S.sheet.picked = true;
     S.sheet.view = null;
     S.sheet.tv = null;
     S.sheet.recenter = 14;
@@ -17277,13 +18269,16 @@ Object.assign(A, {
     Object.assign(sh, { busy: true, err: '', res: null });
     S.keepSheetScroll = true;
     render();
+    // 직접 장소 추가: 앱에 있는 장소(한국어 이름으로도 찾아져요)를 먼저
+    const local = sh.ctx === 'wish' ? wishLocal(q) : [];
     try {
       const res = await hpSearch(q);
       if (S.sheet !== sh) return;
-      sh.res = res;
+      sh.res = [...local, ...res.filter(r => !local.some(l => km(l, r) < 0.05))];
     } catch (e) {
       if (S.sheet !== sh) return;
-      sh.err = L(
+      if (local.length) sh.res = local;
+      else sh.err = L(
         '지금은 찾을 수 없어요. 인터넷 연결을 확인하거나, 좌표 붙여넣기·지도에서 직접 찍기를 써 주세요.',
         '今は検索できません。接続を確認するか、座標の貼り付け・地図で直接タップを使ってください。'
       );
@@ -17299,8 +18294,20 @@ Object.assign(A, {
       r = sh.res && sh.res[Number(d.i)];
     if (!r) return;
     sh.h = { lat: r.lat, lng: r.lng, addr: r.ja && r.addr ? r.addr : undefined };
-    if (!sh.h.addr) delete sh.h.addr;
-    if (!(sh.nm || '').trim()) sh.nm = r.name;
+    if (!sh.h.addr || r.sid) delete sh.h.addr;
+    // 이름 칸이 비었거나, 앞에서 고른 결과 이름 그대로면 새로 고른 이름으로
+    if (!(sh.nm || '').trim() || (sh.ctx === 'wish' && sh.nm === sh.autoNm)) {
+      sh.nm = r.name;
+      sh.autoNm = r.name;
+    }
+    if (sh.ctx === 'wish') {
+      sh.sid = r.sid || null;
+      const k = r.sid ? SPOT[r.sid].c : r.kind;
+      if (k && !sh.kindSet) {
+        sh.kind = k;
+        sh.stay = r.sid ? SPOT[r.sid].s : WISH_STAY[k] || 60;
+      }
+    }
     sh.view = { lat: r.lat, lng: r.lng, span: 1.4 };
     sh.tv = { lat: r.lat, lng: r.lng, z: 17 };
     sh.recenter = 16;
@@ -17345,6 +18352,7 @@ Object.assign(A, {
   },
   hpSave() {
     hpKeep();
+    if (S.sheet && S.sheet.ctx === 'wish') return wishSheetSave(S.sheet);
     const sh = S.sheet,
       name = (sh.nm || '').trim().slice(0, 40);
     const h = { ...sh.h };
@@ -18239,7 +19247,11 @@ function navBack() {
     A.goHome();
     return;
   }
-  if (S.view === 'areas') {
+  if (S.view === 'areas' || S.view === 'wplan') {
+    A.toHow();
+    return;
+  }
+  if (S.view === 'how') {
     A.toDates();
     return;
   }
@@ -19323,9 +20335,9 @@ function h3BandSVG() {
 <rect y="155" width="390" height="15" style="fill:var(--bg)"/>
 </svg>`;
 }
-function h3BandV(t, s) {
-  return `<header class="h3-band">${S.photoBroken ? h3BandSVG() : h3Bg()}<span class="h3-bshade"></span>
-    <div class="h3-bt"><h1>${t}</h1>${s ? `<p>${s}</p>` : ''}</div><span class="h3-bl">${langBtn(true)}</span></header>`;
+function h3BandV(t, s, extra) {
+  return `<header class="h3-band${extra ? ' has-btn' : ''}">${S.photoBroken ? h3BandSVG() : h3Bg()}<span class="h3-bshade"></span>
+    <div class="h3-bt"><h1>${t}</h1>${s ? `<p>${s}</p>` : ''}</div><span class="h3-bl">${langBtn(true)}</span>${extra || ''}</header>`;
 }
 
 // 여행 준비 탭
@@ -19351,7 +20363,7 @@ function h3AreasV() {
       ['outer', L('근교', '近郊')],
       ['trip', L('당일치기', '日帰り')]
     ];
-  const list = AREAS.filter(a => (a.kind || 'city') === seg);
+  const list = seg === 'wish' ? [] : AREAS.filter(a => (a.kind || 'city') === seg);
   const card = a => {
     const n = SPOTS.filter(s => s.a === a.id).length,
       [c1, c2] = AREA_TONE[a.id] || ['#F0703A', '#B92E1C'],
@@ -19363,15 +20375,18 @@ function h3AreasV() {
       <span class="h3-ab"><b>${a.n}</b><small>${esc(a.sub)}</small><em>${span} · ${L(`${n}곳`, `${n}か所`)}</em></span>
     </button>`;
   };
-  return `${h3BandV(L('동네', 'エリア'), L(`후쿠오카 동네 ${AREAS.length}곳 · 눌러서 명소 보기`, `福岡のエリア${AREAS.length}か所 · タップで見どころ`))}
-  <main class="h3-page">
-    <div class="h3-seg" role="tablist">${segs
+  // 사진 오른쪽 「＋ 직접 장소 추가」, 탭 맨 끝 「가고 싶은 곳」 (wish.js)
+  const addBtn = `<button class="h3-bandbtn" data-act="wishAdd">${ic('plus')}${L('직접 장소 추가', '場所を追加')}</button>`;
+  // 폭이 좁으면 앞의 「후쿠오카」를 숨겨서 한 줄에 맞춰요 (style.css 의 .h3-band.has-btn .bopt)
+  return `${h3BandV(L('동네', 'エリア'), L(`<span class="bopt">후쿠오카 </span>동네 ${AREAS.length}곳 · 눌러서 명소 보기`, `<span class="bopt">福岡の</span>エリア${AREAS.length}か所 · タップで見どころ`), addBtn)}
+  <main class="h3-page${seg === 'wish' ? ' w-page' : ''}">
+    <div class="h3-seg w4" role="tablist">${segs
       .map(([k, t]) => {
         const n = AREAS.filter(a => (a.kind || 'city') === k).length;
         return `<button role="tab" aria-selected="${seg === k}" class="${seg === k ? 'on' : ''}" data-act="aseg" data-k="${k}">${t} ${n}</button>`;
       })
-      .join('')}</div>
-    <div class="h3-alist">${list.map(card).join('')}</div>
+      .join('')}<button role="tab" aria-selected="${seg === 'wish'}" class="${seg === 'wish' ? 'on' : ''}" data-act="aseg" data-k="wish">${L('가고 싶은 곳', '行きたい所')} ${S.wish.length}</button></div>
+    ${seg === 'wish' ? wishTabV() : `<div class="h3-alist">${list.map(card).join('')}</div>`}
   </main>`;
 }
 
@@ -19519,6 +20534,556 @@ Object.assign(A, {
     S.sheet = { type: 'xfer', m: 'out', pick: 'all', openIn: true };
     prepLink(S.sheet);
     render();
+  }
+});
+
+// ======================================================================
+// wish.js · 가고 싶은 곳 (직접 고르기)
+// - 동네 탭: 「＋ 직접 장소 추가」 버튼, 「가고 싶은 곳」 탭(담은 곳 모아 보기)
+// - 동네 둘러보기 시트: 명소 옆 ＋로 담기
+// - 직접 장소 추가: 숙소 위치 시트(stays.js)를 ctx 'wish' 로 같이 써요 (지도·이름으로 찾기·구글 좌표·동네)
+// - 새 여행: 날짜 다음에 「어떻게 짤까요?」(자동 / 가고 싶은 곳으로) → 가고 싶은 곳으로 짜기 화면
+// - 계획 만들기 계산은 engine.js 의 createPlanWish
+// 가고 싶은 곳은 계획과 따로 이 폰에 저장돼요 (localStorage 'fk-wish'). 계획을 지워도 남아요.
+// 한 곳의 모양: 앱 장소 { id, sid } · 직접 넣은 곳 { id, n, c(종류), stay, lat, lng, z, a(동네), ap(대략 위치면 1) }
+// 고치는 법: docs/수정가이드.md
+// ======================================================================
+const WISH_KEY = 'fk-wish';
+// 종류별 기본 머무는 시간(분)
+const WISH_STAY = { food: 60, cafe: 45, sight: 60, shop: 60, nature: 60, onsen: 90, free: 60 };
+function wishLoad() {
+  const v = lsGet(WISH_KEY, []);
+  return Array.isArray(v)
+    ? v.filter(w => w && w.id && (w.sid ? SPOT[w.sid] : isFinite(w.lat) && isFinite(w.lng) && w.n))
+    : [];
+}
+function wishSave() {
+  lsSet(WISH_KEY, S.wish);
+}
+S.wish = wishLoad();
+function wishId() {
+  return 'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+function wishHas(sid) {
+  return S.wish.some(w => w.sid === sid);
+}
+function wishName(w) {
+  return w.sid ? SPOT[w.sid].n : w.n;
+}
+// 일본어 화면용 이름 (앱 장소는 일본어 이름, 직접 넣은 곳은 적은 그대로)
+function wishNameT(w) {
+  return w.sid && LANG === 'ja' ? SPOT[w.sid].j || SPOT[w.sid].n : wishName(w);
+}
+function wishArea(w) {
+  return w.sid ? SPOT[w.sid].a : w.a && AREA[w.a] ? w.a : areaNear(w).id;
+}
+function wishKind(w) {
+  return w.sid ? SPOT[w.sid].c : w.c || 'free';
+}
+function wishStay(w) {
+  return w.sid ? SPOT[w.sid].s : w.stay || 60;
+}
+function wishKinds() {
+  return [
+    ['food', L('식사', '食事')],
+    ['cafe', L('카페', 'カフェ')],
+    ['sight', L('구경', '観光')],
+    ['shop', L('쇼핑', 'ショッピング')],
+    ['free', L('기타', 'その他')]
+  ];
+}
+function wishKindName(k) {
+  const m = Object.fromEntries(wishKinds());
+  return m[k] || (CATS[k] ? CATS[k].n : m.free);
+}
+function areaNameT(id) {
+  return L(AREA[id].n, AREA_JA[id] || AREA[id].n);
+}
+// 한 줄 설명: 앱 장소는 「맛집 · 40분」, 직접 넣은 곳은 「텐진 근처 · 식사 · 1시간 30분」
+// (글자 조각마다 따로 감싸야 일본어 화면에서 하나씩 바뀌어요)
+function wishMeta(w) {
+  if (w.sid) return `<span>${CATS[SPOT[w.sid].c].n}</span> · <span>${dur(SPOT[w.sid].s)}</span>`;
+  const near = L(`${areaNameT(wishArea(w))} ${w.ap ? '쯤' : '근처'}`, `${areaNameT(wishArea(w))}${w.ap ? 'あたり' : '周辺'}`);
+  return `<span>${esc(near)}</span> · <span>${wishKindName(w.c)}</span> · <span>${dur(w.stay)}</span>`;
+}
+// 동네별로 묶기 (동네 순서는 AREAS 순서)
+function wishGroups(list) {
+  const by = {};
+  list.forEach(w => (by[wishArea(w)] = by[wishArea(w)] || []).push(w));
+  return AREAS.filter(a => by[a.id]).map(a => ({ a, ws: by[a.id] }));
+}
+// 동네 둘러보기·추천 목록의 ＋/✓ 버튼
+function wishPlusBtn(sid) {
+  const on = wishHas(sid),
+    n = SPOT[sid].n;
+  return `<button class="w-plus${on ? ' on' : ''}" data-act="wishToggle" data-sid="${sid}" aria-pressed="${on}" aria-label="${esc(on ? L(`${n} 가고 싶은 곳에서 빼기`, `${SPOT[sid].j || n}を行きたい所から外す`) : L(`${n} 가고 싶은 곳에 담기`, `${SPOT[sid].j || n}を行きたい所に入れる`))}">${ic(on ? 'check' : 'plus')}</button>`;
+}
+
+// ---- 동네 탭: 「가고 싶은 곳」 ----
+function wishRowV(w, tail) {
+  const name = esc(wishName(w)),
+    head = w.sid
+      ? `<button class="w-t" data-act="spotSheet" data-id="${w.sid}"><b>${name}</b><small>${wishMeta(w)}</small></button>`
+      : `<span class="w-t"><b><span data-notr>${name}</span><i class="w-u">${L('직접 추가', '直接追加')}</i></b><small>${wishMeta(w)}</small></span>`;
+  return `<li class="w-row">${catTile(wishKind(w))}${head}${tail}</li>`;
+}
+function wishDelBtn(w) {
+  return `<button class="w-x" data-act="wishDel" data-id="${w.id}" aria-label="${esc(L(`${wishName(w)} 빼기`, `${wishNameT(w)}を外す`))}">${ic('close')}</button>`;
+}
+function wishTabV() {
+  const W = S.wish;
+  const add = `<button class="w-addline" data-act="wishAdd">${ic('plus')}${L('직접 장소 추가', '場所を直接追加')}</button>`;
+  if (!W.length)
+    return `<div class="w-empty">${ic('star')}<b>${L('아직 담은 곳이 없어요', 'まだ何も入っていません')}</b><small>${L('동네를 눌러 명소 옆 ＋로 담거나, 목록에 없는 곳은 직접 추가해요. 담은 곳으로 계획을 짤 수 있어요.', 'エリアを押して見どころの＋で入れるか、リストにない場所は直接追加します。入れた場所で計画を作れます。')}</small></div>${add}`;
+  return `<div class="w-top">${ic('star')}<span>${L(`<b>가고 싶은 곳 ${W.length}곳</b> · 계획을 짤 때 이곳들을 먼저 넣고, 동선·시간을 맞춰 짜요.`, `<b>行きたい所 ${W.length}か所</b> · 計画を作るときにここを先に入れ、ルートと時間を合わせます。`)}</span></div>
+    ${wishGroups(W)
+      .map(
+        g =>
+          `<div class="w-grp">${ic('pin')}${esc(areaNameT(g.a.id))} <i>${L(`${g.ws.length}곳`, `${g.ws.length}か所`)}</i></div><ul class="w-list">${g.ws.map(w => wishRowV(w, wishDelBtn(w))).join('')}</ul>`
+      )
+      .join('')}
+    ${add}
+    <div class="w-cta"><button class="btn pri big" data-act="wishPlan">${ic('shuffle')}${L(`이 장소들로 계획 짜기 · ${W.length}곳`, `この場所で計画を作る · ${W.length}か所`)}</button></div>`;
+}
+
+// ---- 직접 장소 추가 시트 (stays.js 의 hpickSheetV 가 ctx 'wish' 일 때 부르는 조각) ----
+function wishCautionV(hot) {
+  return `<div class="w-caution${hot ? ' hot' : ''}"><h4>${ic('alert')}${L('이름으로 안 나오면 이렇게 해 주세요', '名前で出ないときは')}</h4><ol>
+    <li><b>${L('한국어 이름으로는 작은 가게가 잘 안 나와요.', '韓国語の名前では小さなお店はほとんど出ません。')}</b> ${L('일본어·영어 이름으로 다시 찾아 보세요.', '日本語・英語の名前でもう一度探してください。')}<small>${L('구글 지도에서 가게를 열면 일본어 이름이 보여요', 'Googleマップでお店を開くと日本語名が見られます')}</small></li>
+    <li><b>${L('그래도 안 나오면 「구글 좌표」 탭에서 구글 지도 좌표로 등록해 주세요.', 'それでも出なければ「Google座標」タブでGoogleマップの座標を登録してください。')}</b></li></ol>
+    <button class="w-gbtn" data-act="hpTab" data-t="paste">${ic('pin')}${L('구글 좌표로 등록하기', 'Google座標で登録する')}${ic('next')}</button></div>`;
+}
+function wishKindV(sh) {
+  const k = sh.kind || 'food',
+    st = sh.stay || WISH_STAY[k] || 60,
+    mins = [...new Set([30, 45, 60, 90, 120, 180, st])].sort((a, b) => a - b);
+  return `<div class="w-kind"><div class="fld"><span>${L('종류', '種類')} <small>${L('· 식사면 점심·저녁 시간에 맞춰 넣어요', '· 食事ならお昼・夕食の時間に入れます')}</small></span>
+      <div class="chips-sel">${wishKinds()
+        .map(([v, t]) => `<button class="${k === v ? 'on' : ''}" data-act="wKind" data-k="${v}" aria-pressed="${k === v}">${t}</button>`)
+        .join('')}</div></div>
+    <label class="fld"><span>${L('머무는 시간', '滞在時間')}</span><select data-change="wStay">${mins.map(m => `<option value="${m}"${m === st ? ' selected' : ''}>${dur(m)}</option>`).join('')}</select></label></div>`;
+}
+// 앱에 있는 장소 중 이름이 맞는 곳 (한국어·일본어 이름 모두, 띄어 쓴 낱말이 다 들어 있으면)
+function wishNorm(t) {
+  return String(t || '')
+    .toLowerCase()
+    .replace(/[\s·・\-_.,()（）]/g, '');
+}
+function wishLocal(q) {
+  const toks = String(q || '')
+    .split(/\s+/)
+    .map(wishNorm)
+    .filter(Boolean);
+  if (!toks.length) return [];
+  return SPOTS.filter(s => {
+    const hay = wishNorm(s.n) + '|' + wishNorm(s.j) + '|' + wishNorm(AREA[s.a].n) + '|' + wishNorm(AREA_JA[s.a]);
+    return toks.every(t => hay.includes(t)) && toks.some(t => wishNorm(s.n).includes(t) || wishNorm(s.j).includes(t));
+  })
+    .sort((a, b) => (b.p || 3) - (a.p || 3))
+    .slice(0, 5)
+    .map(s => ({
+      lat: s.lat,
+      lng: s.lng,
+      name: LANG === 'ja' ? s.j || s.n : s.n,
+      ja: s.j,
+      addr: L(`앱에 있는 장소 · ${AREA[s.a].n}`, `アプリ内の場所 · ${AREA_JA[s.a] || AREA[s.a].n}`),
+      sid: s.id
+    }));
+}
+// OpenStreetMap 결과의 종류 → 식사·카페·쇼핑·구경
+function osmKind(x) {
+  const c = x.category,
+    t = x.type;
+  if (['restaurant', 'fast_food', 'food_court', 'bar', 'pub', 'biergarten'].includes(t)) return 'food';
+  if (['cafe', 'ice_cream'].includes(t)) return 'cafe';
+  if (c === 'shop' || ['mall', 'department_store', 'marketplace'].includes(t)) return 'shop';
+  if (
+    ['tourism', 'historic', 'leisure'].includes(c) ||
+    ['place_of_worship', 'museum', 'attraction', 'viewpoint', 'park', 'theatre'].includes(t)
+  )
+    return 'sight';
+  return null;
+}
+function wishSheetSave(sh) {
+  const name = (sh.nm || '').trim().slice(0, 40),
+    h = sh.h,
+    pin = hotelPin(h);
+  if (!name) {
+    toast(L('장소 이름을 적어 주세요.', '場所の名前を入力してください。'));
+    const el = document.getElementById('hName');
+    if (el) el.focus();
+    return;
+  }
+  if (!pin && !sh.picked) {
+    toast(
+      L(
+        '위치를 정해 주세요. 이름으로 찾거나, 지도를 누르거나, 구글 좌표·동네로 정할 수 있어요.',
+        '場所を決めてください。名前で探す・地図をタップ・Google座標・エリアで決められます。'
+      )
+    );
+    return;
+  }
+  const pt = hotelPt(h),
+    a = areaNear(pt);
+  let w;
+  const same = sh.sid && pin && Math.abs(+h.lat - SPOT[sh.sid].lat) < 1e-5 && Math.abs(+h.lng - SPOT[sh.sid].lng) < 1e-5;
+  if (same) {
+    if (wishHas(sh.sid)) {
+      toast(L('이미 가고 싶은 곳에 있어요.', 'すでに行きたい所に入っています。'));
+      return wishSheetClose(sh);
+    }
+    w = { id: wishId(), sid: sh.sid };
+  } else {
+    const k = sh.kind || 'food';
+    w = {
+      id: wishId(),
+      n: name,
+      c: k,
+      stay: Number(sh.stay) || WISH_STAY[k] || 60,
+      lat: +(+pt.lat).toFixed(6),
+      lng: +(+pt.lng).toFixed(6),
+      z: a.z,
+      a: a.id
+    };
+    if (!pin) w.ap = 1;
+  }
+  S.wish.push(w);
+  wishSave();
+  wishSheetClose(sh);
+  toast(L(`가고 싶은 곳에 담았어요 · ${wishName(w)}`, `行きたい所に入れました · ${wishNameT(w)}`));
+}
+function wishSheetClose(sh) {
+  S.sheet = sh.backSh ? { ...sh.backSh } : null;
+  if (sh.from === 'areas') S.aseg = 'wish';
+  S.keepSheetScroll = !!sh.backSh;
+  render();
+}
+
+// ---- 새 여행: 어떻게 짤까요? (자동 / 가고 싶은 곳으로) ----
+function draftSet(D) {
+  return {
+    start: D.start,
+    end: D.end,
+    hotel: D.hotel,
+    stays: D.stays,
+    arrive: D.arrive,
+    depart: D.depart,
+    dayStart: D.dayStart,
+    dayEnd: D.dayEnd
+  };
+}
+function draftSub() {
+  const D = S.draft;
+  return `${mds(D.start)} – ${mds(D.end)} · ${nights(draftCaps().N)}`;
+}
+function howV() {
+  const D = S.draft,
+    how = D.how || (S.wish.length ? 'wish' : 'auto'),
+    n = S.wish.length;
+  const card = (v, icon, t, sub, pts, extra) =>
+    `<button class="how-c${how === v ? ' on' : ''}" data-act="howPick" data-v="${v}" aria-pressed="${how === v}"><span class="how-i">${ic(icon)}</span>
+      <span class="how-b"><b>${t}</b><small>${sub}</small><span class="how-l">${pts.map(p => `<span>${ic('check')}${p}</span>`).join('')}</span>${extra || ''}</span>
+      <span class="how-r">${how === v ? ic('check') : ''}</span></button>`;
+  return (
+    appbar({ back: 'toDates', title: L('어떻게 짤까요?', 'どう作りますか?'), sub: draftSub() }) +
+    progress(2) +
+    `<main class="scr flow">
+    <p class="how-p">${L('어느 쪽이든 이동 시간·문 여는 시간·식사 시간·막차까지 계산해서 짜요.', 'どちらでも移動時間・営業時間・食事の時間・終電まで計算して作ります。')}</p>
+    ${card('auto', 'spark', L('자동으로 짜기', '自動で作る'), L('동네만 고르면 장소·순서·시간을 앱이 다 짜요.', 'エリアを選ぶだけで、場所・順番・時間をアプリが作ります。'), [L('처음 가는 후쿠오카라 잘 모를 때', '初めての福岡でよくわからないとき'), L('고르는 시간 없이 빨리', '選ぶ時間なしですぐに')])}
+    ${card(
+      'wish',
+      'pen',
+      L('가고 싶은 곳으로 짜기', '行きたい所で作る'),
+      L('담아 둔 곳을 날짜에 나누고, 가장 좋은 동선·시간으로 짜요.', '入れておいた場所を日ごとに分け、いちばん良いルートと時間で作ります。'),
+      [
+        L('앱 추천 장소 + 내가 찾은 곳', 'アプリのおすすめ + 自分で見つけた場所'),
+        L('꼭 갈 곳 ★ · 예약한 곳은 날짜·시간 고정', '必ず行く所★ · 予約した所は日時を固定')
+      ],
+      `<em class="how-n">${n ? L(`가고 싶은 곳 ${n}곳이 담겨 있어요`, `行きたい所が${n}か所入っています`) : L('다음 화면에서 담을 수 있어요', '次の画面で入れられます')}</em>`
+    )}
+  </main>
+  <div class="cta"><button class="btn pri big" data-act="howNext">${how === 'wish' ? L('다음 · 가고 싶은 곳 확인', '次へ · 行きたい所を確認') : L('다음 · 동네 고르기', '次へ · エリアを選ぶ')}</button></div>`
+  );
+}
+// 가고 싶은 곳이 일정에 얼마나 차는지 (하루 쓸 수 있는 시간 합 대비)
+function wishCaps() {
+  const D = S.draft,
+    shell = planShell(draftSet(D), []),
+    total = shell.days.reduce((t, d, i) => t + dayCap(shell, i), 0);
+  const zones = new Set();
+  let need = 0;
+  S.wish.forEach(w => {
+    need += wishStay(w) + 15;
+    const z = w.sid ? SPOT[w.sid].z : w.z || 'city';
+    if (z !== 'city') zones.add(z);
+  });
+  zones.forEach(z => (need += 2 * accessMin(z)));
+  return { total, need, days: shell.days };
+}
+const WISH_TIMES = (() => {
+  const r = [];
+  for (let m = 7 * 60; m <= 23 * 60; m += 30) r.push(m);
+  return r;
+})();
+function wplanV() {
+  const D = S.draft,
+    ws = D.wset || (D.wset = {}),
+    W = S.wish,
+    cap = wishCaps(),
+    pct = cap.total ? Math.round((cap.need / cap.total) * 100) : 0,
+    fill = D.fill !== false;
+  const msg = !W.length
+    ? L('가고 싶은 곳을 담아 주세요', '行きたい所を入れてください')
+    : pct <= 70
+      ? fill
+        ? L('여유 있어요 · 빈 시간은 추천으로 채워요', '余裕あり · 空き時間はおすすめで埋めます')
+        : L('여유 있어요 · 더 담아도 돼요', '余裕あり · もっと入れてもOK')
+      : pct <= 100
+        ? L('일정에 딱 맞아요', 'ちょうどいい量です')
+        : L('빠듯해요 · ★ 아닌 곳은 보류함으로 갈 수 있어요', 'きつめ · ★以外は保留箱に入ることがあります');
+  const dayOpts = cur =>
+    `<option value="">${L('아무 날', 'いつでも')}</option>` +
+    cap.days
+      .map((d, k) => `<option value="${k}"${cur === k ? ' selected' : ''}>${L(`${k + 1}일차`, `${k + 1}日目`)} · ${mds(d.date)}</option>`)
+      .join('');
+  const atOpts = cur =>
+    `<option value="">${L('시간 아무 때', '時間はいつでも')}</option>` +
+    WISH_TIMES.map(m => `<option value="${m}"${cur === m ? ' selected' : ''}>${fmt(m)}</option>`).join('');
+  const row = w => {
+    const o = ws[w.id] || {},
+      day = o.day != null && o.day < cap.days.length ? o.day : null;
+    const tail = `<button class="w-x" data-act="wishDel" data-id="${w.id}" aria-label="${esc(L(`${wishName(w)} 빼기`, `${wishNameT(w)}を外す`))}">${ic('close')}</button>`;
+    return `<li class="w-row wp">
+      <button class="w-star${o.must ? ' on' : ''}" data-act="wMust" data-id="${w.id}" aria-pressed="${!!o.must}" aria-label="${esc(L(`${wishName(w)} 꼭 갈 곳`, `${wishNameT(w)} 必ず行く所`))}">${ic('star')}</button>
+      ${catTile(wishKind(w))}
+      <span class="w-t"><b>${w.sid ? esc(wishName(w)) : `<span data-notr>${esc(wishName(w))}</span><i class="w-u">${L('직접 추가', '直接追加')}</i>`}</b><small>${wishMeta(w)}</small>
+        <span class="w-fix"><select data-change="wDay" data-id="${w.id}" aria-label="${L('날짜 고정', '日付の固定')}" class="${day != null ? 'set' : ''}">${dayOpts(day)}</select>${day != null ? `<select data-change="wAt" data-id="${w.id}" aria-label="${L('시간 고정', '時間の固定')}" class="${o.at != null ? 'set' : ''}">${atOpts(o.at)}</select>` : ''}</span></span>
+      ${tail}</li>`;
+  };
+  const list = W.length
+    ? `<p class="w-hint">${ic('star')}<span>${L('★ 꼭 갈 곳은 시간이 모자라도 빼지 않아요 · 날짜를 안 고르면 앱이 가까운 곳끼리 묶어요', '★必ず行く所は時間が足りなくても外しません · 日付を選ばなければ近い所どうしでまとめます')}</span></p>
+      ${wishGroups(W)
+        .map(g => `<div class="w-grp">${ic('pin')}${esc(areaNameT(g.a.id))} <i>${L(`${g.ws.length}곳`, `${g.ws.length}か所`)}</i></div><ul class="w-list">${g.ws.map(row).join('')}</ul>`)
+        .join('')}`
+    : `<div class="w-empty">${ic('star')}<b>${L('아직 담은 곳이 없어요', 'まだ何も入っていません')}</b><small>${L('추천 장소에서 고르거나, 목록에 없는 곳은 직접 추가해요.', 'おすすめから選ぶか、リストにない場所は直接追加します。')}</small></div>`;
+  return (
+    appbar({ back: 'toHow', title: L(`가고 싶은 곳 ${W.length}곳`, `行きたい所 ${W.length}か所`), sub: draftSub() }) +
+    progress(3) +
+    `<main class="scr flow wplan">
+    ${list}
+    <div class="row2 w-adds"><button class="btn soft" data-act="wpickSheet">${ic('star')}${L('추천 장소 담기', 'おすすめから入れる')}</button><button class="btn soft" data-act="wishAdd">${ic('pin')}${L('직접 장소 추가', '場所を直接追加')}</button></div>
+    <button class="w-tog" data-act="wFill" role="switch" aria-checked="${fill}"><span><b>${L('빈 시간은 추천 장소로 채우기', '空き時間はおすすめで埋める')}</b><small>${L('담은 곳 사이에 시간이 남으면 근처 맛집·명소를 넣어요', '入れた場所の間に時間が余れば、近くのお店・見どころを入れます')}</small></span><i class="w-sw${fill ? ' on' : ''}"></i></button>
+  </main>
+  <div class="cta">
+    <div class="meter"><div class="m-t"><b>${L(`${W.length}곳`, `${W.length}か所`)}</b><span class="${pct > 100 ? 'warn-t' : ''}">${msg}</span></div>
+    <div class="bar"><i style="width:${Math.min(100, pct)}%" class="${pct > 100 ? 'over' : ''}"></i></div></div>
+    <button class="btn pri big" data-act="generateWish" ${W.length ? '' : 'disabled'}>${ic('shuffle')}${L('최적 동선으로 계획 짜기', '最適ルートで計画を作る')}</button>
+  </div>`
+  );
+}
+
+// ---- 시트: 추천 장소 담기 (동네·종류로 거르고 이름으로 찾기) ----
+function wpListHTML(sh) {
+  const toks = String(sh.q || '')
+    .split(/\s+/)
+    .map(wishNorm)
+    .filter(Boolean);
+  const list = SPOTS.filter(
+    s =>
+      (sh.a === 'all' || s.a === sh.a) &&
+      (sh.c === 'all' || s.c === sh.c) &&
+      (!toks.length ||
+        toks.every(t =>
+          (wishNorm(s.n) + '|' + wishNorm(s.j) + '|' + wishNorm(AREA[s.a].n) + '|' + wishNorm(s.d)).includes(t)
+        ))
+  ).sort((x, y) => (y.p || 3) - (x.p || 3));
+  if (!list.length)
+    return `<li class="w-none">${L('맞는 장소가 없어요. 목록에 없는 곳은 「직접 장소 추가」로 넣어 주세요.', '合う場所がありません。リストにない場所は「場所を直接追加」で入れてください。')}</li>`;
+  return list
+    .map(
+      s =>
+        `<li class="w-row${wishHas(s.id) ? ' in' : ''}">${catTile(s.c)}<button class="w-t" data-act="spotSheet" data-id="${s.id}"><b>${esc(s.n)}</b><small><span>${esc(areaNameT(s.a))}</span> · <span>${CATS[s.c].n}</span> · <span>${dur(s.s)}</span></small></button>${wishPlusBtn(s.id)}</li>`
+    )
+    .join('');
+}
+function wpickSheetV(sh) {
+  const chip = (act, v, t, on) => `<button class="${on ? 'on' : ''}" data-act="${act}" data-v="${v}" aria-pressed="${on}">${t}</button>`;
+  return (
+    shHead(L('추천 장소 담기', 'おすすめから入れる'), L('＋를 누르면 「가고 싶은 곳」에 담겨요', '＋を押すと「行きたい所」に入ります')) +
+    `<div class="w-search">${ic('search')}<input id="wpQ" type="search" data-input="wpQ" value="${esc(sh.q || '')}" placeholder="${L('장소 이름·메뉴로 찾기 (예: 라멘, 오호리)', '名前・メニューで探す(例: ラーメン、大濠)')}" autocomplete="off"></div>
+    <div class="w-chips">${chip('wpArea', 'all', L('전체', 'すべて'), sh.a === 'all')}${AREAS.map(a => chip('wpArea', a.id, esc(shortArea(areaNameT(a.id))), sh.a === a.id)).join('')}</div>
+    <div class="w-chips soft">${chip('wpCat', 'all', L('전체', 'すべて'), sh.c === 'all')}${Object.keys(CATS)
+      .map(c => chip('wpCat', c, CATS[c].n, sh.c === c))
+      .join('')}</div>
+    <ul class="w-list" id="wpList">${wpListHTML(sh)}</ul>
+    <div class="sh-foot"><button class="btn soft" data-act="wishAdd">${ic('pin')}${L('직접 장소 추가', '場所を直接追加')}</button><button class="btn pri" data-act="closeSheet">${L(`완료 · ${S.wish.length}곳`, `完了 · ${S.wish.length}か所`)}</button></div>`
+  );
+}
+SHEETS.wpick = wpickSheetV;
+SHEET_LABEL.wpick = '추천 장소 담기';
+
+// ---- 계획 화면 위 알림: 가고 싶은 곳으로 짠 결과 ----
+function wishBannerV(w) {
+  const N = S.plan.days.length,
+    li = [];
+  const dayTxt = d =>
+    `<span class="w-bd"><b>${L(`${d.i + 1}일차`, `${d.i + 1}日目`)}</b> ${d.areas.length ? d.areas.map(id => esc(shortArea(areaNameT(id)))).join('·') : '—'} ${L(`${d.n}곳`, `${d.n}か所`)}${d.fill ? L(` +추천 ${d.fill}`, ` +おすすめ${d.fill}`) : ''}</span>`;
+  li.push(`<li><i class="dot d-ok"></i><span><b>${L('날짜 나누기', '日ごとに分ける')}</b> ${L('가까운 곳끼리 같은 날로', '近い所どうしを同じ日に')}<br>${w.days.map(dayTxt).join('')}</span></li>`);
+  li.push(
+    `<li><i class="dot"></i><span><b>${L('순서·시간', '順番・時間')}</b> ${L('하루마다 이동이 가장 짧은 순서로, 문 여는 시간·식사·막차에 맞췄어요', '日ごとに移動がいちばん短い順にし、営業時間・食事・終電に合わせました')}</span></li>`
+  );
+  if (w.must) li.push(`<li><i class="dot d-ok"></i><span><b>${L('꼭 갈 곳', '必ず行く所')}</b> ${L(`★ ${w.must}곳은 모두 넣었어요`, `★${w.must}か所はすべて入れました`)}</span></li>`);
+  w.fixed.forEach(f =>
+    li.push(`<li><i class="dot d-ok"></i><span><b>${L('고정', '固定')}</b> ${esc(f.n)} · ${L(`${f.di + 1}일차`, `${f.di + 1}日目`)} ${fmt(f.at)}</span></li>`)
+  );
+  if (w.fill) li.push(`<li><i class="dot"></i><span><b>${L('추천으로 채움', 'おすすめで追加')}</b> ${L(`빈 시간에 ${w.fill}곳`, `空き時間に${w.fill}か所`)}</span></li>`);
+  if (w.parked.length)
+    li.push(
+      `<li><i class="dot d-warn"></i><span><b>${L('보류함으로', '保留箱へ')}</b> ${w.parked.map(x => `<span>${esc(x.n)}</span> <small>(${esc(x.reason.replace(' 보류', ''))})</small>`).join(', ')}</span></li>`
+    );
+  w.days
+    .filter(d => d.over > 10)
+    .forEach(d =>
+      li.push(
+        `<li><i class="dot d-warn"></i><span><b>${L(`${d.i + 1}일차`, `${d.i + 1}日目`)}</b> <span class="bad-t">${L(`꼭 갈 곳이 많아 마무리보다 ${d.over}분 늦어요`, `必ず行く所が多く、終了予定より${d.over}分遅れます`)}</span></span></li>`
+      )
+    );
+  return `<div class="banner w-banner" role="status"><div class="bn-h">${ic('spark')}<b>${L(`가고 싶은 곳 ${w.placed}곳으로 ${N}일 계획을 짰어요`, `行きたい所${w.placed}か所で${N}日の計画を作りました`)}</b></div><ul>${li.join('')}</ul>
+    <button class="btn soft wide" data-act="closeBanner">${L('확인', 'OK')}</button></div>`;
+}
+
+Object.assign(A, {
+  // 동네 둘러보기·추천 목록의 ＋: 앱 장소 담기/빼기
+  wishToggle(d) {
+    const i = S.wish.findIndex(w => w.sid === d.sid);
+    if (i >= 0) S.wish.splice(i, 1);
+    else S.wish.push({ id: wishId(), sid: d.sid });
+    wishSave();
+    S.keepSheetScroll = true;
+    render();
+  },
+  wishDel(d) {
+    const i = S.wish.findIndex(w => w.id === d.id);
+    if (i < 0) return;
+    const [w] = S.wish.splice(i, 1);
+    if (S.draft && S.draft.wset) delete S.draft.wset[w.id];
+    wishSave();
+    S.keepSheetScroll = true;
+    render();
+    toast(L(`뺐어요 · ${wishName(w)}`, `外しました · ${wishNameT(w)}`));
+  },
+  // 직접 장소 추가 시트 열기 (지도는 하카타 쪽에서 시작)
+  wishAdd() {
+    const back = S.sheet && S.sheet.type === 'wpick' ? { ...S.sheet } : null;
+    S.sheet = {
+      type: 'hpick',
+      ctx: 'wish',
+      h: { k: 'hakata' },
+      tab: 'find',
+      kind: 'food',
+      stay: WISH_STAY.food,
+      from: S.view === 'home' ? 'areas' : S.view,
+      back: back ? 'wpick' : null,
+      backSh: back
+    };
+    render();
+  },
+  wKind(d) {
+    hpKeep();
+    const sh = S.sheet;
+    sh.kind = d.k;
+    sh.kindSet = true;
+    sh.stay = WISH_STAY[d.k] || 60;
+    S.keepSheetScroll = true;
+    render();
+  },
+  // 동네 탭 「이 장소들로 계획 짜기」 → 새 여행 (가고 싶은 곳으로 짜기를 골라 둔 채)
+  wishPlan() {
+    A.newPlan();
+    if (S.draft) S.draft.how = 'wish';
+  },
+  toHow() {
+    if (S.draft && S.draft.start && S.draft.end) go('how');
+  },
+  howPick(d) {
+    S.draft.how = d.v;
+    render();
+  },
+  howNext() {
+    const how = S.draft.how || (S.wish.length ? 'wish' : 'auto');
+    S.draft.how = how;
+    go(how === 'wish' ? 'wplan' : 'areas');
+  },
+  wMust(d) {
+    const ws = S.draft.wset || (S.draft.wset = {}),
+      o = ws[d.id] || (ws[d.id] = {});
+    o.must = !o.must;
+    render();
+  },
+  wFill() {
+    S.draft.fill = S.draft.fill === false;
+    render();
+  },
+  wpickSheet() {
+    S.sheet = { type: 'wpick', a: 'all', c: 'all', q: '' };
+    render();
+  },
+  wpArea(d) {
+    S.sheet.a = d.v;
+    S.keepSheetScroll = true;
+    render();
+  },
+  wpCat(d) {
+    S.sheet.c = d.v;
+    S.keepSheetScroll = true;
+    render();
+  },
+  generateWish() {
+    const D = S.draft,
+      ws = D.wset || {};
+    if (!S.wish.length) return;
+    const entries = S.wish.map(w => {
+      const o = ws[w.id] || {};
+      return { w, must: !!o.must, day: o.day != null ? o.day : null, at: o.day != null && o.at != null ? o.at : null };
+    });
+    S.plan = createPlanWish(draftSet(D), entries, { fill: D.fill !== false });
+    S.saved = false;
+    S.isNew = true;
+    S.di = 0;
+    S.tab = 'sched';
+    S.sel = null;
+    S.undo = [];
+    S.banner = { wish: wishSummary(S.plan) };
+    go('plan');
+    toast(L('일정을 만들었어요. 마음에 들면 저장하세요.', '日程を作りました。気に入ったら保存してください。'));
+  }
+});
+
+$app.addEventListener('change', e => {
+  const t = e.target,
+    k = t.dataset.change;
+  if (k === 'wStay' && S.sheet && S.sheet.ctx === 'wish') {
+    hpKeep();
+    S.sheet.stay = Number(t.value);
+  } else if (k === 'wDay' || k === 'wAt') {
+    const ws = S.draft.wset || (S.draft.wset = {}),
+      o = ws[t.dataset.id] || (ws[t.dataset.id] = {});
+    if (k === 'wDay') {
+      if (t.value === '') {
+        delete o.day;
+        delete o.at;
+      } else o.day = Number(t.value);
+    } else if (t.value === '') delete o.at;
+    else o.at = Number(t.value);
+    render();
+  }
+});
+$app.addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.input === 'wpQ' && S.sheet && S.sheet.type === 'wpick') {
+    S.sheet.q = t.value;
+    const l = document.getElementById('wpList');
+    if (l) l.innerHTML = wpListHTML(S.sheet);
   }
 });
 
