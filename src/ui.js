@@ -508,6 +508,7 @@ function areasV() {
   </main>
   <div class="cta">
     <div class="meter"><div class="m-t"><b>${D.areas.length}곳 선택</b><span class="${pct > 100 || cap.trips > cap.N ? 'warn-t' : ''}">${msg}</span></div>
+    ${D.areas.length ? `<div class="selchips">${D.areas.map(id => `<button class="selchip" data-act="toggleArea" data-id="${id}" aria-label="${esc(L(`${AREA[id].n} 빼기`, `${AREA_JA[id] || AREA[id].n}を外す`))}">${esc(shortArea(L(AREA[id].n, AREA_JA[id] || AREA[id].n)))}<i aria-hidden="true">×</i></button>`).join('')}</div>` : ''}
     <div class="bar"><i style="width:${Math.min(100, pct)}%" class="${pct > 100 ? 'over' : ''}"></i></div></div>
     <button class="btn pri big" data-act="generate" ${D.areas.length ? '' : 'disabled'}>세부 계획 만들기</button>
   </div>`
@@ -553,12 +554,12 @@ function itemRow(p, r, i, N) {
         ? '<span class="tag">직접 추가</span>'
         : ''
   ].join('');
-  return `<li class="stop${sel ? ' sel' : ''}" id="it-${it.uid}">
+  return `<li class="stop${sel ? ' sel' : ''}${it.meal ? ' meal' : ''}" id="it-${it.uid}">
     <div class="tm"><b>${fmt(r.arr)}</b><span>${fmt(r.dep)}</span></div>
     <div class="sc">
       <div class="sc-row"><button class="sc-hit" data-act="sel" data-uid="${it.uid}" aria-expanded="${sel}">
         ${s ? catTile(s.c) : catTile(it.cat || (it.place === 'hotel' ? 'bed' : 'free'))}
-        <span class="sc-t"><b>${esc(itemName(p, it))}</b><small>${s ? `${CATS[s.c].n} · ` : ''}${dur(it.stay)} 머묾${s && s.j ? ` · <span lang="ja">${esc(s.j)}</span>` : ''}${whereLabel(it) ? ` · ${esc(whereLabel(it))}` : ''}</small></span>
+        <span class="sc-t"><b>${esc(itemName(p, it))}</b><small>${s ? `${CATS[s.c].n} · ` : ''}${dur(it.stay)} 머묾${s && s.j ? `<span class="sc-ja"> · <span lang="ja">${esc(s.j)}</span></span>` : ''}${whereLabel(it) ? ` · ${esc(whereLabel(it))}` : ''}</small></span>
         <span class="num">${i + 1}</span>
       </button>${N2 > 1 ? `<button type="button" class="drag-h" data-uid="${it.uid}" aria-label="${esc(L(`${itemName(p, it)} 순서 바꾸기 (끌거나 위아래 화살표)`, `${s ? s.j : trText(itemName(p, it))} の順番を変える(ドラッグか上下キー)`))}">${ic('grip')}</button>` : ''}</div>
       ${tags || liveTags(it) ? `<div class="tags">${tags}${liveTags(it)}</div>` : ''}
@@ -649,9 +650,20 @@ function schedTab() {
     df = dayFares(p, S.di);
   const slack = c.deadline - c.endArr,
     last = S.di === N - 1;
-  let tl = `<ol class="tl">`;
+  let tl = `<ol class="tl compact">`;
+  // 오전·점심·오후·저녁으로 묶어서 보여줘요
+  const secOf = r => (r.arr < 12 * 60 ? 0 : r.arr < 14 * 60 ? 1 : r.arr < 18 * 60 ? 2 : 3),
+    SEC = [L('오전', '午前'), L('점심', '昼'), L('오후', '午後'), L('저녁', '夜')],
+    secN = [0, 0, 0, 0];
+  c.rows.forEach(r => secN[secOf(r)]++);
+  let secNow = -1;
   tl += `<li class="anc"><div class="tm"><b>${fmt(c.start)}</b></div><button class="anc-c" data-act="dayTime">${ic(day.start.kind === 'airport' ? 'plane' : 'home')}<span>${anchorLabel(day.start, false)}</span>${ic('clock', 'chev')}</button><button class="nowbtn" data-act="startNow">${ic('clock')}지금 출발</button></li>`;
   c.rows.forEach((r, i) => {
+    const sc = secOf(r);
+    if (sc !== secNow) {
+      secNow = sc;
+      tl += `<li class="tl-sec"><span></span><b>${SEC[sc]}<em>${L(`${secN[sc]}곳`, `${secN[sc]}か所`)}</em></b></li>`;
+    }
     tl += legRow(r.leg, i) + itemRow(p, r, i, N) + reAskRow(r.it, c);
   });
   if (!c.rows.length)

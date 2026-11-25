@@ -88,7 +88,7 @@ function liveBar(p, di) {
   const day = p.days[di],
     has = !!day.live || day.items.some(i => i.arrAct != null || i.leave != null);
   if (day.date !== today() && !has)
-    return `<div class="livebar soft">${ic('clock')}<span><b>여행 중에 늦어졌다면</b><small>장소마다 ‘지금 도착’·‘지금 출발’을 누르면 실제 시각에 맞춰 이후 시각과 다음 지하철·열차를 다시 계산해요.</small></span></div>`;
+    return `<div class="livebar soft">${ic('clock')}<span><b>여행 중에 늦어졌다면</b><small>장소를 눌러 ‘지금 도착’·‘지금 출발’을 고르면 실제 시각에 맞춰 이후 시각과 다음 지하철·열차를 다시 계산해요.</small></span></div>`;
   return `<div class="livebar">${ic('clock')}<span><b>지금 ${fmt(nowMin())}</b><small>${has ? '실제 시각에 맞춘 일정이에요. 지하철·열차는 ‘다음 차’ 기준(배차 간격 추정)이에요.' : '늦어졌다면 지금 시각으로 맞춰 보세요. 이후 지하철·열차를 ‘가장 빠른 다음 차’로 다시 계산해요.'}</small></span>${has ? '<button class="btn soft sm" data-act="clearLive">맞춘 시각 지우기</button>' : '<button class="btn pri sm" data-act="startNow">지금 출발</button>'}</div>`;
 }
 

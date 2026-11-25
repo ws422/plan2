@@ -291,6 +291,7 @@ function rgFail() {
   if (RGV_FAIL) return;
   RGV_FAIL = true;
   rgDrop();
+  dmDrop();
   render();
 }
 function rgVector(el) {
@@ -649,6 +650,8 @@ function anchorPin(P, pt, icon, label) {
 }
 // ★ 계획의 지도 탭 (그날 동선)
 function drawDay(el) {
+  if (rgMode() === 'vector') return dmVector(el);
+  el.classList.remove('vector');
   const W = el.clientWidth,
     H = el.clientHeight;
   if (!W || !H) return;
@@ -686,6 +689,411 @@ function drawDay(el) {
     h += `<g class="npin${on ? ' on' : ''}${r.it.src === 'walk' ? ' walkp' : ''}" data-act="mapPick" data-uid="${r.it.uid}" transform="translate(${f1(x)},${f1(y)})" tabindex="0" role="button" aria-label="${i + 1}. ${esc(itemName(p, r.it))}"><circle r="${on ? 15 : 12}"/><text y="4.5">${i + 1}</text>${on ? `<text class="npin-l" y="-22">${esc(itemName(p, r.it))}</text>` : ''}</g>`;
   });
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${S.di + 1}일차 동선 지도">${h}</svg>${note}`;
+}
+// ======================================================================
+// ★ 지도 탭 진짜 지도 (MapLibre). 동선은 지도 위 선으로, 번호 핀·이름표는 앱이 위에 그려요.
+//    그날 갈 곳 위주로 맞추고, 화면 밖 장소·공항·숙소는 가장자리 이름표로 보여 줘요.
+// ======================================================================
+let DMV = null;
+function dmDrop() {
+  if (!DMV) return;
+  try {
+    if (DMV.map) DMV.map.remove();
+  } catch (_) {}
+  DMV = null;
+}
+function dmVector(el) {
+  const key = `${hpDark() ? 'd' : 'l'}${LANG}`;
+  if (DMV && DMV.key !== key) dmDrop();
+  if (!DMV) {
+    const box = document.createElement('div'),
+      gl = document.createElement('div'),
+      ov = document.createElement('div');
+    box.className = 'rg-vmap';
+    gl.className = 'rg-gl';
+    ov.className = 'rg-ov';
+    box.append(gl, ov);
+    DMV = { key, box, gl, ov, map: null, sig: '' };
+    loadMapLibre().then(dmInit).catch(rgFail);
+  }
+  el.classList.add('vector');
+  if (DMV.box.parentNode !== el) {
+    el.innerHTML = '';
+    el.appendChild(DMV.box);
+  }
+  if (DMV.map) {
+    DMV.map.resize();
+    dmSync();
+  }
+}
+function dmInit(gl) {
+  const R = DMV;
+  if (!R || R.map) return;
+  let map;
+  try {
+    map = new gl.Map({
+      container: R.gl,
+      style: HP_STYLE,
+      center: [130.4, 33.59],
+      zoom: 13,
+      minZoom: 8,
+      maxZoom: 18,
+      dragRotate: false,
+      pitchWithRotate: false,
+      touchPitch: false,
+      attributionControl: { compact: true },
+      fadeDuration: 0
+    });
+  } catch (e) {
+    rgFail();
+    return;
+  }
+  map.touchZoomRotate.disableRotation();
+  R.map = map;
+  map.on('load', () => {
+    if (DMV !== R) return;
+    R.loaded = true;
+    try {
+      hpVecStyle(map);
+      hpVecOverlay(map);
+      if (map.getLayer('fk-st-label')) map.setLayerZoomRange('fk-st-label', 15, 24);
+      // 오늘 동선: 지하철·열차는 실선, 버스·택시는 끊은 선, 걷기는 점선
+      const C = hpPalette();
+      map.addSource('dm-route', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+      map.addLayer({
+        id: 'dm-halo',
+        type: 'line',
+        source: 'dm-route',
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': C.halo, 'line-width': 9, 'line-opacity': 0.9 }
+      });
+      map.addLayer({
+        id: 'dm-solid',
+        type: 'line',
+        source: 'dm-route',
+        filter: ['==', ['get', 'k'], 'solid'],
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': ['get', 'c'], 'line-width': 5 }
+      });
+      map.addLayer({
+        id: 'dm-dash',
+        type: 'line',
+        source: 'dm-route',
+        filter: ['==', ['get', 'k'], 'dash'],
+        layout: { 'line-join': 'round' },
+        paint: { 'line-color': ['get', 'c'], 'line-width': 4.5, 'line-dasharray': [2.2, 1.2] }
+      });
+      map.addLayer({
+        id: 'dm-dot',
+        type: 'line',
+        source: 'dm-route',
+        filter: ['==', ['get', 'k'], 'dot'],
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': ['get', 'c'], 'line-width': 5, 'line-dasharray': [0.01, 1.7] }
+      });
+    } catch (e) {
+      console.warn('day map style', e);
+    }
+    dmSync();
+  });
+  setTimeout(() => {
+    if (DMV === R && !R.loaded) rgFail();
+  }, 10000);
+  map.on('move', dmOverlay);
+  map.on('resize', dmOverlay);
+}
+// 오늘 데이터 → 지도 (날짜·일정이 바뀌면 화면을 다시 맞춰요)
+function dmSync() {
+  const R = DMV;
+  if (!R || !R.map || !S.plan) return;
+  const map = R.map,
+    c = computeDay(S.plan, S.di),
+    rows = c.rows;
+  R.c = c;
+  if (R.loaded && map.getSource('dm-route')) {
+    const feats = [];
+    [...rows.map(r => r.leg), c.endLeg].forEach(l =>
+      (l.segs || []).forEach(sg => {
+        if (!sg.pts || sg.pts.length < 2) return;
+        const color = sg.mode === 'subway' && sg.line ? LINES[sg.line].color : MODE[sg.mode].color,
+          k = sg.mode === 'walk' ? 'dot' : sg.mode === 'bus' || sg.mode === 'taxi' ? 'dash' : 'solid';
+        feats.push({
+          type: 'Feature',
+          properties: { c: color, k },
+          geometry: { type: 'LineString', coordinates: sg.pts.map(p => [p.lng, p.lat]) }
+        });
+      })
+    );
+    map.getSource('dm-route').setData({ type: 'FeatureCollection', features: feats });
+  }
+  const sig = `${S.di}|${rows.map(r => r.it.uid).join(',')}`;
+  if (sig !== R.sig) {
+    R.sig = sig;
+    R.lastSel = null;
+    // 대부분 장소가 모인 곳에 맞추기 (멀리 떨어진 곳은 가장자리 이름표로)
+    const med = a => a.slice().sort((x, y) => x - y)[a.length >> 1];
+    let pts = rows.map(r => r.p);
+    if (pts.length) {
+      const mc = { lat: med(pts.map(p => p.lat)), lng: med(pts.map(p => p.lng)) },
+        near = pts.filter(p => km(p, mc) <= 1.8);
+      if (near.length >= Math.min(3, pts.length)) pts = near;
+    } else pts = [c.startPt, c.endPt];
+    const lats = pts.map(p => p.lat),
+      lngs = pts.map(p => p.lng),
+      pad = { top: 64, bottom: 118, left: 44, right: 44 };
+    map.resize();
+    const cam = map.cameraForBounds(
+      [
+        [Math.min(...lngs) - 0.0015, Math.min(...lats) - 0.001],
+        [Math.max(...lngs) + 0.0015, Math.max(...lats) + 0.001]
+      ],
+      { padding: pad, maxZoom: 16 }
+    );
+    if (cam) map.jumpTo(cam);
+  }
+  // 아래 카드에서 고른 곳이 화면 밖이면 그쪽으로
+  if (S.mapSel && S.mapSel !== R.lastSel) {
+    const r = rows.find(x => x.it.uid === S.mapSel);
+    if (r) {
+      const q = map.project([r.p.lng, r.p.lat]),
+        W = R.box.clientWidth,
+        H = R.box.clientHeight;
+      if (q.x < 30 || q.x > W - 30 || q.y < 60 || q.y > H - 120)
+        map.easeTo({ center: [r.p.lng, r.p.lat], duration: 500 });
+    }
+  }
+  R.lastSel = S.mapSel;
+  dmOverlay();
+}
+// 묶인 이름표를 누르면 그 장소들이 다 보이게
+A.dmGo = d => {
+  const R = DMV;
+  if (!R || !R.map || !R.c) return;
+  const ids = String(d.uids || '').split(','),
+    pts = R.c.rows.filter(r => ids.includes(r.it.uid)).map(r => r.p);
+  if (!pts.length) return;
+  const lats = pts.map(p => p.lat),
+    lngs = pts.map(p => p.lng);
+  R.map.fitBounds(
+    [
+      [Math.min(...lngs) - 0.0015, Math.min(...lats) - 0.001],
+      [Math.max(...lngs) + 0.0015, Math.max(...lats) + 0.001]
+    ],
+    { padding: { top: 64, bottom: 118, left: 44, right: 44 }, maxZoom: 16, duration: 600 }
+  );
+};
+function dmOverlay() {
+  const R = DMV;
+  if (!R || !R.map || !R.c || !S.plan) return;
+  const map = R.map,
+    c = R.c,
+    p = S.plan,
+    day = c.day,
+    W = R.box.clientWidth,
+    H = R.box.clientHeight;
+  if (!W || !H) return;
+  const TOP = 52,
+    BOT = H - 104,
+    inView = q => q.x > 14 && q.x < W - 14 && q.y > TOP && q.y < BOT,
+    short = t => (t.length > 10 ? t.slice(0, 9) + '…' : t),
+    chips = [],
+    pins = [];
+  let h = '';
+  // 출발·도착 (숙소·공항)
+  const anchors = [
+    [
+      c.startPt,
+      day.start.kind === 'airport' ? 'plane' : 'home',
+      day.start.kind === 'airport' ? L('공항', '空港') : L('숙소', '宿')
+    ]
+  ];
+  if (km(c.startPt, c.endPt) > 0.05)
+    anchors.push([
+      c.endPt,
+      day.end.kind === 'airport' ? 'plane' : 'home',
+      day.end.kind === 'airport' ? L('공항', '空港') : L('숙소', '宿')
+    ]);
+  const ancG = [];
+  anchors.forEach(([pt, icn, nm]) => {
+    const q = map.project([pt.lng, pt.lat]);
+    if (inView(q)) ancG.push({ q, icn, nm });
+    else chips.push({ q, nm, w: textEm(nm) * 12 + 36 });
+  });
+  c.rows.forEach((r, i) => {
+    const q = map.project([r.p.lng, r.p.lat]),
+      nm = itemName(p, r.it);
+    if (inView(q)) pins.push({ i, r, nm, ox: q.x, oy: q.y, x: q.x, y: q.y, on: S.mapSel === r.it.uid });
+    else {
+      // 화면 밖에서 서로 가까운 곳들은 이름표 하나로 묶어요
+      const g = chips.find(x => x.rs && x.rs.some(o => km(o.p, r.p) < 1.5));
+      if (g) (g.rs.push(r), g.ix.push(i));
+      else chips.push({ q, rs: [r], ix: [i] });
+    }
+  });
+  chips.forEach(cp => {
+    if (!cp.rs) return;
+    const one = cp.rs.length === 1,
+      t = one
+        ? `${cp.ix[0] + 1} · ${short(itemName(p, cp.rs[0].it))}`
+        : (() => {
+            const n = cp.ix.map(i => i + 1),
+              run = n.every((v, k) => !k || v === n[k - 1] + 1),
+              lab = run ? `${n[0]}~${n[n.length - 1]}` : n.join('·');
+            return L(`${lab}번 · ${n.length}곳`, `${lab.replace(/·/g, '・')} · ${n.length}か所`);
+          })();
+    cp.nm = t;
+    cp.w = textEm(t) * 12 + 36;
+    cp.on = cp.rs.some(r => r.it.uid === S.mapSel);
+    cp.act = one
+      ? `data-act="mapPick" data-uid="${cp.rs[0].it.uid}"`
+      : `data-act="dmGo" data-uids="${cp.rs.map(r => r.it.uid).join(',')}"`;
+  });
+  // 겹치는 번호 핀은 살짝 펼치기 (원래 자리는 작은 점 + 선)
+  for (let it = 0; it < 60; it++) {
+    let moved = false;
+    for (let a = 0; a < pins.length; a++)
+      for (let b = a + 1; b < pins.length; b++) {
+        const A2 = pins[a],
+          B2 = pins[b];
+        let dx = B2.x - A2.x,
+          dy = B2.y - A2.y,
+          d = Math.hypot(dx, dy);
+        if (d < 27) {
+          if (d < 0.01) {
+            dx = Math.cos(b);
+            dy = Math.sin(b);
+            d = 1;
+          }
+          const m = (27 - d) / 2;
+          A2.x -= (dx / d) * m;
+          A2.y -= (dy / d) * m;
+          B2.x += (dx / d) * m;
+          B2.y += (dy / d) * m;
+          moved = true;
+        }
+      }
+    pins.forEach(q => {
+      q.x += (q.ox - q.x) * 0.05;
+      q.y += (q.oy - q.y) * 0.05;
+    });
+    if (!moved) break;
+  }
+  // 가장자리 이름표
+  const cx = W / 2,
+    cy = (TOP + BOT) / 2,
+    used = [];
+  chips.forEach(cp => {
+    const dx = cp.q.x - cx,
+      dy = cp.q.y - cy,
+      t = Math.min(
+        Math.abs(dx) > 1e-6 ? (W / 2 - 8 - cp.w / 2) / Math.abs(dx) : 1e9,
+        Math.abs(dy) > 1e-6 ? ((BOT - TOP) / 2 - 16) / Math.abs(dy) : 1e9
+      );
+    cp.x = clamp(cx + dx * t, 8 + cp.w / 2, W - 8 - cp.w / 2);
+    cp.y = clamp(cy + dy * t, TOP + 13, BOT - 13);
+    cp.h = 26;
+    cp.ang = (Math.atan2(dy, dx) * 180) / Math.PI;
+    const hw = W / 2 - 8 - cp.w / 2;
+    cp.side = Math.abs(cp.x - cx) >= hw - 0.5 ? (cp.x < cx ? 'L' : 'R') : cp.y < cy ? 'T' : 'B';
+    used.push(cp);
+  });
+  // 같은 테두리끼리 겹치지 않게 줄 세우기
+  const spread = (list, pos, size, lo, hi) => {
+    list.sort((a, b) => a[pos] - b[pos]);
+    for (let i = 0; i < list.length; i++) {
+      const q = list[i],
+        min = i ? list[i - 1][pos] + (list[i - 1][size] + q[size]) / 2 + 4 : lo + q[size] / 2;
+      q[pos] = Math.max(q[pos], min);
+    }
+    for (let i = list.length - 1; i >= 0; i--) {
+      const q = list[i],
+        max = i < list.length - 1 ? list[i + 1][pos] - (list[i + 1][size] + q[size]) / 2 - 4 : hi - q[size] / 2;
+      q[pos] = Math.min(q[pos], max);
+    }
+  };
+  spread(
+    used.filter(q => q.side === 'L'),
+    'y',
+    'h',
+    TOP,
+    BOT
+  );
+  spread(
+    used.filter(q => q.side === 'R'),
+    'y',
+    'h',
+    TOP,
+    BOT
+  );
+  spread(
+    used.filter(q => q.side === 'T'),
+    'x',
+    'w',
+    8,
+    W - 8
+  );
+  spread(
+    used.filter(q => q.side === 'B'),
+    'x',
+    'w',
+    8,
+    W - 8
+  );
+  // 위·아래 줄 이름표가 양옆 줄과 겹치면 안쪽으로
+  used.forEach(q => {
+    if (q.side !== 'T' && q.side !== 'B') return;
+    const hit = used.some(
+      o => (o.side === 'L' || o.side === 'R') && Math.abs(o.x - q.x) < (o.w + q.w) / 2 + 4 && Math.abs(o.y - q.y) < 30
+    );
+    if (hit) q.y += q.side === 'T' ? 32 : -32;
+  });
+  // 이름표: 자리가 있을 때만 (고른 곳은 항상)
+  const obstacles = [
+    ...pins.map(q => ({ x0: q.x - 13, x1: q.x + 13, y0: q.y - 13, y1: q.y + 13 })),
+    ...ancG.map(a => ({ x0: a.q.x - 14, x1: a.q.x + 14, y0: a.q.y - 14, y1: a.q.y + 14 })),
+    ...used.map(u => ({ x0: u.x - u.w / 2, x1: u.x + u.w / 2, y0: u.y - 13, y1: u.y + 13 }))
+  ];
+  const items = pins.map(q => {
+    const t = short(q.nm);
+    return {
+      q,
+      t,
+      x: q.x,
+      y: q.y,
+      r: q.on ? 15 : 12,
+      w: textEm(t) * (q.on ? 13 : 11.5) + 6,
+      hgt: q.on ? 16 : 14,
+      gap: 3
+    };
+  });
+  placeLabels([...items.filter(i => i.q.on), ...items.filter(i => !i.q.on)], obstacles, {
+    x0: 2,
+    x1: W - 2,
+    y0: TOP - 4,
+    y1: BOT
+  });
+  pins.forEach(q => {
+    if (Math.hypot(q.x - q.ox, q.y - q.oy) > 5)
+      h += `<path class="np-lead" d="M${f1(q.ox)},${f1(q.oy)}L${f1(q.x)},${f1(q.y)}"/><circle class="np-dot" cx="${f1(q.ox)}" cy="${f1(q.oy)}" r="3"/>`;
+  });
+  ancG.forEach(a => {
+    h += `<g class="anc-pin" transform="translate(${f1(a.q.x)},${f1(a.q.y)})"><rect x="-13" y="-13" width="26" height="26" rx="7"/><svg x="-8" y="-8" width="16" height="16" viewBox="0 0 24 24" class="anc-ic">${ICON[a.icn]}</svg><title>${esc(a.nm)}</title></g>`;
+  });
+  items.forEach(it => {
+    const t = it.at;
+    if (t.cost > 0 && !it.q.on) return;
+    h += `<text class="np-lab${it.q.on ? ' on' : ''}" x="${f1(t.tx)}" y="${f1(t.ty)}" style="text-anchor:${t.ax}">${esc(it.t)}</text>`;
+  });
+  pins
+    .slice()
+    .sort((a, b) => a.on - b.on)
+    .forEach(q => {
+      h += `<g class="npin${q.on ? ' on' : ''}${q.r.it.src === 'walk' ? ' walkp' : ''}" data-act="mapPick" data-uid="${q.r.it.uid}" transform="translate(${f1(q.x)},${f1(q.y)})" tabindex="0" role="button" aria-label="${q.i + 1}. ${esc(q.nm)}"><circle r="${q.on ? 15 : 12}"/><text y="4.5">${q.i + 1}</text></g>`;
+    });
+  used.forEach(cp => {
+    h += `<g class="rg-chip${cp.on ? ' on' : ''}"${cp.act ? ` ${cp.act} role="button" tabindex="0"` : ''} aria-label="${esc(cp.nm)}" transform="translate(${f1(cp.x)},${f1(cp.y)})"><rect x="${f1(-cp.w / 2)}" y="-13" width="${f1(cp.w)}" height="26" rx="13"/><text x="${f1(-cp.w / 2 + 11)}" y="4.3">${esc(cp.nm)}</text><g transform="translate(${f1(cp.w / 2 - 13)},0) rotate(${f1(cp.ang)})"><path class="rg-ar" d="M-4.5 0H4.5M0.5 -4L4.5 0L0.5 4"/></g></g>`;
+  });
+  R.ov.innerHTML = `<svg class="rg-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${h}</svg>`;
 }
 // 걷기 추천 지도
 function drawWalk(el) {
