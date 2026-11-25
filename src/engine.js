@@ -643,10 +643,20 @@ function dayHotel(plan, di) {
   return nightHotel(plan, Math.min(di, Math.max(0, plan.days.length - 2)));
 }
 // 숙소 → 지도 위 지점(좌표·이름)
+// h = { lat, lng } 이면 예약한 숙소의 정확한 위치(핀)예요
+function hotelPin(h) {
+  return !!h && h.lat != null && h.lng != null && isFinite(h.lat) && isFinite(h.lng);
+}
 function hotelPt(h) {
   h = h || {};
   let p;
-  if (h.st && STATIONS[h.st]) {
+  if (hotelPin(h)) {
+    const pt = { lat: +h.lat, lng: +h.lng },
+      ns = nearStation(pt),
+      ar = nearestArea(pt);
+    p = { ...pt, z: ar && ar.z ? ar.z : 'city', j: ns ? `${ns.st.j}駅周辺` : '福岡市内', n: '숙소', pin: true };
+    if (h.addr) p.addr = h.addr;
+  } else if (h.st && STATIONS[h.st]) {
     const s = STATIONS[h.st];
     p = { j: `${s.j}駅周辺`, n: `숙소 (${s.n}역 주변)`, lat: s.lat, lng: s.lng, z: 'city' };
   } else p = { ...(PLACES.hotel[h.k] || PLACES.hotel.hakata) };
@@ -662,6 +672,10 @@ function hotelPt(h) {
 // 숙소 위치 이름 (일본어)
 function hotelWhereJ(h) {
   h = h || {};
+  if (hotelPin(h)) {
+    const ns = nearStation(h);
+    return ns ? `${ns.st.j}駅` : '福岡市内';
+  }
   return h.st && STATIONS[h.st]
     ? `${STATIONS[h.st].j}駅`
     : ((PLACES.hotel[h.k] || PLACES.hotel.hakata).j || '').replace(/周辺$/, '');
@@ -669,6 +683,10 @@ function hotelWhereJ(h) {
 // 숙소 위치 이름 (한국어, 예: 하카타역)
 function hotelWhere(h) {
   h = h || {};
+  if (hotelPin(h)) {
+    const ns = nearStation(h);
+    return ns ? `${ns.st.n}역` : '후쿠오카 시내';
+  }
   return h.st && STATIONS[h.st] ? `${STATIONS[h.st].n}역` : HOTEL_LABEL[h.k] || HOTEL_LABEL.hakata;
 }
 // 숙소 이름 + 위치 (예: 도미인 · 기온역)
@@ -680,7 +698,13 @@ function hotelLabel(h) {
 function sameHotel(a, b) {
   a = a || {};
   b = b || {};
-  return (a.k || '') === (b.k || '') && (a.st || '') === (b.st || '') && (a.name || '') === (b.name || '');
+  return (
+    (a.k || '') === (b.k || '') &&
+    (a.st || '') === (b.st || '') &&
+    (a.name || '') === (b.name || '') &&
+    String(a.lat ?? '') === String(b.lat ?? '') &&
+    String(a.lng ?? '') === String(b.lng ?? '')
+  );
 }
 // 어떤 지점에서 가장 가까운 숙소 동네 프리셋
 function presetNear(pt) {

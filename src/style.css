@@ -5770,3 +5770,472 @@ body {
 .banner .btn.wide {
   margin-top: 8px;
 }
+
+/* ===== 숙소 위치 시트: 지도 핀 · 이름으로 찾기 · 좌표 ===== */
+.hp-map-wrap {
+  position: relative;
+  height: 220px;
+  margin: 14px 0 0;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--land);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.hp-map {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.hp-map svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.hp-zoom {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.hp-zoom .ib {
+  background: var(--surface);
+  box-shadow: var(--sh);
+}
+.hp-tip {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  margin: 0;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: var(--sh);
+  pointer-events: none;
+}
+.hpk path {
+  fill: var(--pri);
+  stroke: #fff;
+  stroke-width: 2.5;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.28));
+}
+.hpk circle {
+  fill: #fff;
+}
+.hpk-sh {
+  fill: rgba(0, 0, 0, 0.22);
+}
+.hpin-ap circle {
+  fill: color-mix(in srgb, var(--pri) 12%, transparent);
+  stroke: var(--pri);
+  stroke-width: 2;
+  stroke-dasharray: 5 5;
+}
+.hpin-ap circle.dot {
+  fill: var(--pri);
+  stroke: #fff;
+  stroke-dasharray: none;
+  stroke-width: 2;
+}
+.hp-now {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--warn-2);
+}
+.hp-now > .ic {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  color: var(--warn);
+}
+.hp-now span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.hp-now b {
+  font-size: 14.5px;
+}
+.hp-now small {
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.hp-now.ok {
+  background: var(--ok-2);
+}
+.hp-now.ok > .ic {
+  color: var(--ok);
+}
+.hp-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin: 16px 0 0;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+.hp-tabs button {
+  height: 38px;
+  border-radius: 11px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.hp-tabs button.on {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(21, 32, 58, 0.12);
+}
+.hp-body {
+  padding-top: 12px;
+  min-height: 150px;
+}
+.hp-find {
+  display: flex;
+  gap: 8px;
+}
+.hp-find input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+}
+.hp-find input:focus {
+  outline: none;
+  border-color: var(--pri);
+}
+.hp-find .btn {
+  flex: none;
+  height: 48px;
+  padding: 0 18px;
+  width: auto;
+}
+.hp-fine {
+  margin: 8px 2px 0;
+}
+.hp-msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 2px 0;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+.hp-msg .ic {
+  width: 16px;
+  height: 16px;
+}
+.hp-msg.bad {
+  color: var(--bad);
+}
+.hp-res {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.hp-res button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 11px 12px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+}
+.hp-res button > .ic:first-child {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  color: var(--pri);
+}
+.hp-res button span {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+.hp-res b {
+  font-size: 14.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hp-res small {
+  font-size: 12px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hp-res button.on {
+  border-color: var(--ok);
+  background: var(--ok-2);
+}
+.hp-res .ok {
+  width: 18px;
+  height: 18px;
+  color: var(--ok);
+  flex: none;
+}
+.hp-how {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+/* 숙소 위치: 실제 지도 타일 */
+.hp-map-wrap {
+  height: 280px;
+}
+.hp-map.tiles {
+  background: #eef0ea;
+  overflow: hidden;
+}
+:root[data-theme='dark'] .hp-map.tiles {
+  background: #262626;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .hp-map.tiles {
+    background: #262626;
+  }
+}
+.hp-layer {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.hp-tile {
+  position: absolute;
+  width: 256px;
+  height: 256px;
+  max-width: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+.hp-pin-svg {
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+}
+.hp-ap {
+  position: absolute;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--pri) 14%, transparent);
+  border: 2px dashed var(--pri);
+  pointer-events: none;
+}
+.hp-ap i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: var(--pri);
+  border: 2px solid #fff;
+}
+.hp-attr {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 2px 6px;
+  border-top-left-radius: 8px;
+  font-size: 10px;
+  line-height: 1.4;
+  color: #444;
+  background: rgba(255, 255, 255, 0.78);
+}
+.hp-attr a {
+  color: inherit;
+  text-decoration: none;
+}
+.hp-map.tiles ~ .hp-tip {
+  bottom: 22px;
+}
+.hp-off {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  margin: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--warn);
+  background: var(--warn-2);
+}
+.hp-map.tiles .hp-tile {
+  image-rendering: auto;
+}
+:root[data-theme='dark'] .hp-tile {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.88) saturate(0.7);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .hp-tile {
+    filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.88) saturate(0.7);
+  }
+}
+/* 숙소 위치: 벡터 지도 · 핀 크기 고정 */
+.hp-map .hp-pin-svg {
+  width: 32px;
+  height: 46px;
+}
+.hp-map.vector {
+  cursor: auto;
+  background: #f2f2ef;
+}
+.hp-map .hp-vmap,
+.hp-map .hp-vmap.maplibregl-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hp-vmap .maplibregl-canvas-container.maplibregl-interactive {
+  cursor: crosshair;
+}
+.hp-vmap .maplibregl-canvas-container.maplibregl-interactive:active {
+  cursor: grabbing;
+}
+.hp-vpin {
+  width: 32px;
+  height: 46px;
+  pointer-events: none;
+}
+.hp-vpin svg {
+  display: block;
+  width: 32px;
+  height: 46px;
+}
+.hp-vmap .hp-ap {
+  position: absolute;
+}
+.hp-vmap .maplibregl-ctrl-attrib {
+  font-size: 10px;
+}
+.hp-map.vector ~ .hp-tip {
+  bottom: 10px;
+}
+/* 지역 지도: 숙소 핀은 주홍색, 동네 이름표는 조금 작게 */
+.hpin-b {
+  fill: var(--pri);
+  stroke: #fff;
+  stroke-width: 2.2;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+}
+.hpin-ic {
+  stroke: #fff;
+}
+.hpin-t {
+  fill: var(--pri);
+  stroke: var(--land);
+  stroke-width: 4px;
+}
+.apin-t {
+  font-size: 13px;
+  stroke-width: 4.5px;
+}
+.apin.on .apin-t {
+  fill: var(--pri);
+}
+/* '가고 싶은 곳' 진짜 지도 */
+.rmap.vector {
+  position: relative;
+  touch-action: auto;
+}
+.rmap .rg-vmap,
+.rmap .rg-gl,
+.rmap .rg-gl.maplibregl-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.rmap .rg-ov {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.rmap .rg-ov svg.rg-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.rmap .rg-ov .apin,
+.rmap .rg-ov .rg-chip {
+  pointer-events: auto;
+  cursor: pointer;
+}
+.rmap .rg-ov .hpin-ic {
+  width: 15px;
+  height: 15px;
+}
+.rg-chip rect {
+  fill: var(--surface);
+  stroke: var(--line, rgba(0, 0, 0, 0.12));
+  stroke-width: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.18));
+}
+.rg-chip text {
+  font-size: 12px;
+  font-weight: 800;
+  fill: var(--ink);
+}
+.rg-chip .rg-ar {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.6;
+}
+.rg-chip.on rect {
+  fill: var(--pri);
+  stroke: var(--pri);
+}
+.rg-chip.on text {
+  fill: #fff;
+}
+.rg-chip.on .rg-ar {
+  stroke: #fff;
+  opacity: 1;
+}
+.map-card .map-ctl {
+  z-index: 3;
+}
+.rmap .maplibregl-ctrl-bottom-right {
+  z-index: 3;
+}

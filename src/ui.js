@@ -494,7 +494,7 @@ function areasV() {
     <section class="map-card">
       <div class="rmap" id="rmap"></div>
       <div class="map-ctl"><button class="ib sm" data-act="zoom" data-n="1" aria-label="확대">${ic('plus')}</button><button class="ib sm" data-act="zoom" data-n="-1" aria-label="축소">${ic('minus')}</button></div>
-      <p class="map-cap">시내는 크게, 외곽은 작게 그린 안내 지도 · 동그라미를 눌러 고르세요</p>
+      <p class="map-cap">${rgMode() === 'vector' ? L('동그라미를 눌러 고르세요 · 화면 밖 동네는 가장자리 이름표를 누르면 돼요', '丸をタップして選んでください・画面外のエリアは端の名札をタップ') : '시내는 크게, 외곽은 작게 그린 안내 지도 · 동그라미를 눌러 고르세요'}</p>
       ${hotelLegendV()}
     </section>
     ${groups
@@ -1090,6 +1090,7 @@ const A = {
     render();
   },
   zoom(d) {
+    if (rgLive()) return Number(d.n) > 0 ? RGV.map.zoomIn() : RGV.map.zoomOut();
     const base = S.mvBase;
     if (!base) return;
     const mv = S.mv || { ...base },

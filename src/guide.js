@@ -339,7 +339,7 @@ function jaSheet(sh) {
   } else if (!B.sid && (B.hotel || B.name === '숙소' || (B.j && /周辺/.test(B.j)))) {
     const hn = B.hn || '',
       readable = hn && !/[가-힣]/.test(hn);
-    big = readable ? hn : '宿泊先のホテル';
+    big = readable ? hn : B.addr ? B.addr : '宿泊先のホテル';
     phrase = readable ? `${hn}まで お願いします` : 'このホテルまで お願いします';
     ko =
       LANG === 'ja' && B.hwj

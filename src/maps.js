@@ -94,15 +94,82 @@ function geoSVG(P, k, o = {}) {
 }
 // 화면에 있는 지도 모두 그리기
 function drawMaps() {
+  if (HPV && (!S.sheet || S.sheet !== HPV.sh)) hpVecDrop();
   const r = document.getElementById('rmap');
   if (r) drawRegion(r, r.classList.contains('deco'));
   const d = document.getElementById('dmap');
   if (d) drawDay(d);
   const w = document.getElementById('wmap');
   if (w) drawWalk(w);
+  const hm = document.getElementById('hpmap');
+  if (hm) drawHpMap(hm);
 }
 // ★ 새 여행 2단계 지도 (동네 동그라미 + 내 숙소 핀)
+// 글자 폭 재기 (1px 글꼴 기준 폭을 기억해 둬요. 못 재면 대충 계산)
+const TEXT_EM = new Map();
+function textEm(t) {
+  t = String(t);
+  if (TEXT_EM.has(t)) return TEXT_EM.get(t);
+  let w = 0;
+  try {
+    const c = (textEm.c = textEm.c || document.createElement('canvas').getContext('2d'));
+    c.font = `800 100px ${getComputedStyle(document.body).fontFamily}`;
+    w = c.measureText(t).width / 100;
+  } catch (e) {}
+  if (!(w > 0)) for (const ch of t) w += /[　-鿿가-힯＀-￯]/.test(ch) ? 1 : /[·・\s]/.test(ch) ? 0.45 : 0.62;
+  TEXT_EM.set(t, w);
+  return w;
+}
+// 이름표 자리 정하기: 아래 → 위 → 오른쪽 → 왼쪽 → 대각선 순으로, 아무것과도 안 겹치는 첫 자리
+function placeLabels(items, obstacles, bounds) {
+  const boxes = obstacles.slice(),
+    hit = (a, b) => !(a.x1 <= b.x0 || b.x1 <= a.x0 || a.y1 <= b.y0 || b.y1 <= a.y0),
+    over = (a, b) =>
+      hit(a, b) ? (Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0)) * (Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0)) : 0;
+  const pad = items.length ? items[0].hgt * 0.12 : 0;
+  const tryAt = (it, w) => {
+    const { x, y, r, hgt, gap } = it;
+    const cands = [
+      { ax: 'middle', tx: x, ty: y + r + gap + hgt * 0.8 },
+      { ax: 'middle', tx: x, ty: y - r - gap - hgt * 0.2 },
+      { ax: 'start', tx: x + r + gap, ty: y + hgt * 0.32 },
+      { ax: 'end', tx: x - r - gap, ty: y + hgt * 0.32 },
+      { ax: 'start', tx: x + r * 0.7, ty: y + r + gap + hgt * 0.7 },
+      { ax: 'end', tx: x - r * 0.7, ty: y + r + gap + hgt * 0.7 },
+      { ax: 'start', tx: x + r * 0.7, ty: y - r - gap },
+      { ax: 'end', tx: x - r * 0.7, ty: y - r - gap }
+    ];
+    let best = null;
+    for (const c of cands) {
+      const x0 = c.ax === 'middle' ? c.tx - w / 2 : c.ax === 'start' ? c.tx : c.tx - w;
+      const b = { x0: x0 - pad, x1: x0 + w + pad, y0: c.ty - hgt * 0.8 - pad, y1: c.ty + hgt * 0.2 + pad };
+      let cost = boxes.reduce((t, o) => t + over(b, o), 0);
+      if (bounds && (b.x0 < bounds.x0 || b.x1 > bounds.x1 || b.y0 < bounds.y0 || b.y1 > bounds.y1))
+        cost += w * hgt * 0.5;
+      if (!best || cost < best.cost - 1e-6) best = { ...c, b, cost };
+      if (cost === 0) break;
+    }
+    return best;
+  };
+  items.forEach(it => {
+    let best = tryAt(it, it.w);
+    // 자리가 모자라면 짧은 이름(· 앞부분)으로 한 번 더
+    if (best.cost > 0 && it.w2) {
+      const b2 = tryAt(it, it.w2);
+      if (b2.cost < best.cost) ((best = b2), (it.short = true));
+    }
+    it.at = best;
+    boxes.push(best.b);
+  });
+}
+// 좁을 때 쓰는 짧은 동네 이름: '오호리공원·성터' → '오호리공원'
+function shortArea(n) {
+  const i = String(n).search(/[·・]/);
+  return i > 1 ? String(n).slice(0, i) : String(n);
+}
 function drawRegion(el, deco) {
+  if (!deco && rgMode() === 'vector') return rgVector(el);
+  el.classList.remove('vector');
   const W = el.clientWidth,
     H = el.clientHeight;
   if (!W || !H) return;
@@ -121,15 +188,76 @@ function drawRegion(el, deco) {
     const p = fish(sp.lat, sp.lng);
     h += `<circle class="sdot${sel.includes(sp.a) ? ' on' : ''}" cx="${f1(p[0])}" cy="${f1(p[1])}" r="${f1(2.6 * k)}"/>`;
   });
-  AREAS.filter(a => a.kind !== 'trip').forEach(a => {
-    const p = fish(a.lat, a.lng),
-      on = sel.includes(a.id);
-    const lab = `<text class="apin-t" y="${a.lab === 'up' ? -22 : 31}">${a.n}</text>`;
-    h += deco
-      ? `<g class="apin deco" transform="translate(${f1(p[0])},${f1(p[1])}) scale(${f1(k * 0.85)})"><circle r="9" class="apin-c"/>${lab}</g>`
-      : `<g class="apin${on ? ' on' : ''}" data-act="toggleArea" data-id="${a.id}" tabindex="0" role="button" aria-pressed="${on}" aria-label="${a.n}" transform="translate(${f1(p[0])},${f1(p[1])}) scale(${f1(k)})"><circle r="22" class="apin-hit"/><circle r="15" class="apin-c"/>${on ? '<path class="apin-k" d="M-6 0l4 4 8-9"/>' : '<circle r="4" class="apin-d"/>'}${lab}</g>`;
+  const areas = AREAS.filter(a => a.kind !== 'trip'),
+    sc = deco ? k * 0.85 : k,
+    R = (deco ? 9 : 13) * sc,
+    FS = 13 * sc;
+  // 숙소 핀 (이름표 자리 잡을 때 피해 가야 해요)
+  const hp = deco ? [] : draftHotelPinData(),
+    obstacles = [],
+    items = [];
+  areas.forEach(a => {
+    const p = fish(a.lat, a.lng);
+    obstacles.push({
+      x0: p[0] - R - 1.5 * sc,
+      x1: p[0] + R + 1.5 * sc,
+      y0: p[1] - R - 1.5 * sc,
+      y1: p[1] + R + 1.5 * sc
+    });
+    const nm = L(a.n, AREA_JA[a.id] || a.n),
+      sn = shortArea(nm);
+    items.push({
+      kind: 'a',
+      a,
+      nm,
+      x: p[0],
+      y: p[1],
+      r: R,
+      sn,
+      w2: sn !== nm ? textEm(sn) * FS + 5 * sc : 0,
+      w: textEm(nm) * FS + 5 * sc,
+      hgt: FS * 1.25,
+      gap: 4 * sc,
+      on: sel.includes(a.id)
+    });
   });
-  if (!deco) h += draftHotelPins(k);
+  hp.forEach(g => {
+    const p = fish(g.pt.lat, g.pt.lng);
+    g.p = p;
+    obstacles.push({ x0: p[0] - 12 * k, x1: p[0] + 12 * k, y0: p[1] - 31 * k, y1: p[1] + 2 * k });
+  });
+  // 숙소 이름표 먼저, 그다음 고른 동네, 나머지 순서
+  const hItems = hp.map(g => ({
+    kind: 'h',
+    g,
+    x: g.p[0],
+    y: g.p[1] - 19 * k,
+    r: 13 * k,
+    w: textEm(g.lab) * 12.5 * k + 5 * k,
+    hgt: 12.5 * k * 1.25,
+    gap: 3 * k
+  }));
+  const order = [...hItems, ...items.filter(i => i.on), ...items.filter(i => !i.on)];
+  const bounds = { x0: mv.x + 2 * k, x1: mv.x + mv.w - 2 * k, y0: mv.y + 2 * k, y1: mv.y + mv.h - 2 * k };
+  placeLabels(order, obstacles, bounds);
+  items.forEach(it => {
+    const a = it.a,
+      [x, y] = [it.x, it.y],
+      t = it.at,
+      lab = `<text class="apin-t" x="${f1((t.tx - x) / sc)}" y="${f1((t.ty - y) / sc)}" style="text-anchor:${t.ax}">${esc(it.short ? it.sn : it.nm)}</text>`;
+    h += deco
+      ? `<g class="apin deco" transform="translate(${f1(x)},${f1(y)}) scale(${f1(sc)})"><circle r="9" class="apin-c"/>${lab}</g>`
+      : `<g class="apin${it.on ? ' on' : ''}" data-act="toggleArea" data-id="${a.id}" tabindex="0" role="button" aria-pressed="${it.on}" aria-label="${a.n}" transform="translate(${f1(x)},${f1(y)}) scale(${f1(sc)})"><circle r="21" class="apin-hit"/><circle r="13" class="apin-c"/>${it.on ? '<path class="apin-k" d="M-5.4 0l3.6 3.6 7.2-8"/>' : '<circle r="3.6" class="apin-d"/>'}${lab}</g>`;
+  });
+  hItems.forEach(it => {
+    const g = it.g,
+      [x, y] = g.p,
+      t = it.at;
+    h += `<g class="hpin" transform="translate(${f1(x)},${f1(y)}) scale(${f1(k)})" aria-hidden="true">
+      <path class="hpin-b" d="M0 0C-4 -7 -12 -11 -12 -19a12 12 0 1 1 24 0c0 8 -8 12 -12 19z"/>
+      <svg x="-7.5" y="-26.5" width="15" height="15" viewBox="0 0 24 24" class="hpin-ic">${ICON.home}</svg>
+      <text class="hpin-t" x="${f1((t.tx - x) / k)}" y="${f1((t.ty - y) / k)}" style="text-anchor:${t.ax}">${esc(g.lab)}</text></g>`;
+  });
   el.innerHTML = `<svg viewBox="${f1(mv.x)} ${f1(mv.y)} ${f1(mv.w)} ${f1(mv.h)}" role="img" aria-label="후쿠오카 안내 지도"${deco ? '' : ' class="pan"'}>${h}</svg>`;
   if (!deco) enablePan(el.querySelector('svg'), W);
 }
@@ -139,10 +267,296 @@ function draftHotelStays() {
   if (!D || !D.start || !D.end) return [];
   return normStays(D.stays, draftNights(), D.hotel);
 }
-// 2단계 지도의 숙소 핀
-function draftHotelPins(k) {
+// ======================================================================
+// ★ '가고 싶은 곳' 진짜 지도 (MapLibre). 동그라미·이름표·숙소 핀은 앱이 직접 위에 그려요.
+//    화면 밖 동네(다자이후·이토시마 등)는 가장자리 이름표로 보여 줘요. 못 불러오면 안내 지도로.
+// ======================================================================
+let RGV = null,
+  RGV_FAIL = false;
+function rgMode() {
+  return RGV_FAIL || navigator.onLine === false ? 'svg' : 'vector';
+}
+function rgLive() {
+  const r = document.getElementById('rmap');
+  return !!(RGV && RGV.map && RGV.loaded && r && r.contains(RGV.box));
+}
+function rgDrop() {
+  if (!RGV) return;
+  try {
+    if (RGV.map) RGV.map.remove();
+  } catch (_) {}
+  RGV = null;
+}
+function rgFail() {
+  if (RGV_FAIL) return;
+  RGV_FAIL = true;
+  rgDrop();
+  render();
+}
+function rgVector(el) {
+  const key = `${hpDark() ? 'd' : 'l'}${LANG}`;
+  if (RGV && RGV.key !== key) rgDrop();
+  if (!RGV) {
+    const box = document.createElement('div'),
+      gl = document.createElement('div'),
+      ov = document.createElement('div');
+    box.className = 'rg-vmap';
+    gl.className = 'rg-gl';
+    ov.className = 'rg-ov';
+    box.append(gl, ov);
+    RGV = { key, box, gl, ov, map: null };
+    loadMapLibre().then(rgInit).catch(rgFail);
+  }
+  el.classList.add('vector');
+  if (RGV.box.parentNode !== el) {
+    el.innerHTML = '';
+    el.appendChild(RGV.box);
+  }
+  if (RGV.map) RGV.map.resize();
+  rgOverlay();
+}
+function rgInit(gl) {
+  const R = RGV;
+  if (!R || R.map) return;
+  const city = AREAS.filter(a => a.kind === 'city'),
+    lats = city.map(a => a.lat),
+    lngs = city.map(a => a.lng);
+  let map;
+  try {
+    map = new gl.Map({
+      container: R.gl,
+      style: HP_STYLE,
+      bounds: [
+        [Math.min(...lngs), Math.min(...lats)],
+        [Math.max(...lngs), Math.max(...lats)]
+      ],
+      fitBoundsOptions: { padding: { top: 46, bottom: 40, left: 64, right: 64 }, maxZoom: 14 },
+      minZoom: 8.5,
+      maxZoom: 17,
+      dragRotate: false,
+      pitchWithRotate: false,
+      touchPitch: false,
+      attributionControl: { compact: true },
+      fadeDuration: 0
+    });
+  } catch (e) {
+    rgFail();
+    return;
+  }
+  map.touchZoomRotate.disableRotation();
+  R.map = map;
+  R.fit = () => {
+    const pad = { top: 46, bottom: 40, left: 80, right: 56 },
+      b = [
+        [Math.min(...lngs), Math.min(...lats)],
+        [Math.max(...lngs), Math.max(...lats)]
+      ];
+    map.resize();
+    const cam = map.cameraForBounds(b, { padding: pad, maxZoom: 14 });
+    if (!cam) return;
+    // 너무 멀리 빼면 시내 동그라미가 뭉쳐요 → 조금만 더 뺄 수 있게
+    map.setMinZoom(Math.max(8.5, cam.zoom - 0.5));
+    const all = AREAS.filter(a => a.kind !== 'trip');
+    map.setMaxBounds([
+      [Math.min(...all.map(a => a.lng)) - 0.12, Math.min(...all.map(a => a.lat)) - 0.1],
+      [Math.max(...all.map(a => a.lng)) + 0.12, Math.max(...all.map(a => a.lat)) + 0.1]
+    ]);
+    map.jumpTo(cam);
+  };
+  map.on('load', () => {
+    if (RGV !== R) return;
+    R.loaded = true;
+    R.fit();
+    try {
+      hpVecStyle(map);
+      hpVecOverlay(map);
+      // 역 이름은 많이 확대했을 때만 (동네 이름이 먼저 보이게)
+      if (map.getLayer('fk-st-label')) map.setLayerZoomRange('fk-st-label', 14.5, 24);
+    } catch (e) {
+      console.warn('region style', e);
+    }
+    rgOverlay();
+  });
+  setTimeout(() => {
+    if (RGV === R && !R.loaded) rgFail();
+  }, 10000);
+  map.on('move', rgOverlay);
+  map.on('resize', rgOverlay);
+}
+// 지도 위 그림 (화면 픽셀 기준으로 매번 새로 그려요)
+function rgOverlay() {
+  const R = RGV;
+  if (!R || !R.map || !S.draft) return;
+  const map = R.map,
+    W = R.box.clientWidth,
+    H = R.box.clientHeight;
+  if (!W || !H) return;
+  const sel = S.draft.areas || [],
+    Rr = 13,
+    FS = 13,
+    M = 6,
+    obstacles = [],
+    items = [],
+    chips = [];
+  // 동네: 화면 안이면 동그라미, 밖이면 가장자리 이름표
+  AREAS.filter(a => a.kind !== 'trip').forEach(a => {
+    const p = map.project([a.lng, a.lat]),
+      on = sel.includes(a.id),
+      nm = L(a.n, AREA_JA[a.id] || a.n);
+    if (p.x >= Rr && p.x <= W - Rr && p.y >= Rr && p.y <= H - Rr) {
+      const sn = shortArea(nm);
+      obstacles.push({ x0: p.x - Rr - 1.5, x1: p.x + Rr + 1.5, y0: p.y - Rr - 1.5, y1: p.y + Rr + 1.5 });
+      items.push({
+        a,
+        nm,
+        sn,
+        on,
+        x: p.x,
+        y: p.y,
+        r: Rr,
+        w: textEm(nm) * FS + 5,
+        w2: sn !== nm ? textEm(sn) * FS + 5 : 0,
+        hgt: FS * 1.25,
+        gap: 4
+      });
+    } else chips.push({ a, nm, on, p, w: textEm(nm) * 12 + 34, h: 26 });
+  });
+  // 가장자리 이름표: 지도 가운데에서 그 동네 쪽으로 쭉 간 자리의 테두리에
+  const cx = W / 2,
+    cy = H / 2;
+  chips.forEach(c => {
+    const dx = c.p.x - cx,
+      dy = c.p.y - cy,
+      hw = W / 2 - M - c.w / 2,
+      hh = H / 2 - M - c.h / 2,
+      t = Math.min(Math.abs(dx) > 1e-6 ? hw / Math.abs(dx) : 1e9, Math.abs(dy) > 1e-6 ? hh / Math.abs(dy) : 1e9);
+    c.x = cx + dx * t;
+    c.y = cy + dy * t;
+    c.ang = (Math.atan2(dy, dx) * 180) / Math.PI;
+    c.side = Math.abs(c.x - cx) >= hw - 0.5 ? (c.x < cx ? 'L' : 'R') : c.y < cy ? 'T' : 'B';
+  });
+  // 같은 테두리끼리 겹치지 않게 줄 세우기 (오른쪽 위 확대 버튼 자리는 비워요)
+  const spread = (list, pos, size, lo, hi) => {
+    list.sort((a, b) => a[pos] - b[pos]);
+    for (let i = 0; i < list.length; i++) {
+      const c = list[i],
+        min = i ? list[i - 1][pos] + (list[i - 1][size] + c[size]) / 2 + 4 : lo + c[size] / 2;
+      c[pos] = Math.max(c[pos], min);
+    }
+    for (let i = list.length - 1; i >= 0; i--) {
+      const c = list[i],
+        max = i < list.length - 1 ? list[i + 1][pos] - (list[i + 1][size] + c[size]) / 2 - 4 : hi - c[size] / 2;
+      c[pos] = Math.min(c[pos], max);
+    }
+  };
+  spread(
+    chips.filter(c => c.side === 'L'),
+    'y',
+    'h',
+    M,
+    H - M
+  );
+  spread(
+    chips.filter(c => c.side === 'R'),
+    'y',
+    'h',
+    100,
+    H - M
+  );
+  spread(
+    chips.filter(c => c.side === 'T'),
+    'x',
+    'w',
+    M,
+    W - 60
+  );
+  spread(
+    chips.filter(c => c.side === 'B'),
+    'x',
+    'w',
+    M,
+    W - M
+  );
+  chips.forEach(c => {
+    c.x = clamp(c.x, M + c.w / 2, W - M - c.w / 2);
+    c.y = clamp(c.y, M + c.h / 2, H - M - c.h / 2);
+  });
+  // 이름표가 동그라미를 가리면 테두리를 따라 조금 옮겨요
+  const cbox = (c, x, y) => ({ x0: x - c.w / 2 - 2, x1: x + c.w / 2 + 2, y0: y - c.h / 2 - 2, y1: y + c.h / 2 + 2 }),
+    clash = (b, list) => list.some(o => !(b.x1 <= o.x0 || o.x1 <= b.x0 || b.y1 <= o.y0 || o.y1 <= b.y0));
+  const circles = obstacles.slice(),
+    done = [];
+  chips.forEach(c => {
+    const vert = c.side === 'L' || c.side === 'R',
+      step = vert ? c.h + 4 : c.w / 2 + 4;
+    for (const k of [0, 1, -1, 2, -2, 3, -3]) {
+      const x = vert ? c.x : clamp(c.x + k * step, M + c.w / 2, W - M - c.w / 2),
+        y = vert ? clamp(c.y + k * step, (c.side === 'R' ? 100 : M) + c.h / 2, H - M - c.h / 2) : c.y,
+        b = cbox(c, x, y);
+      if (!clash(b, circles) && !clash(b, done)) {
+        c.x = x;
+        c.y = y;
+        break;
+      }
+    }
+    done.push(cbox(c, c.x, c.y));
+  });
+  chips.forEach(c =>
+    obstacles.push({ x0: c.x - c.w / 2 - 2, x1: c.x + c.w / 2 + 2, y0: c.y - c.h / 2 - 2, y1: c.y + c.h / 2 + 2 })
+  );
+  // 숙소 핀
+  const hp = draftHotelPinData()
+    .map(g => {
+      const p = map.project([g.pt.lng, g.pt.lat]);
+      return { ...g, x: p.x, y: p.y };
+    })
+    .filter(g => g.x > 8 && g.x < W - 8 && g.y > 26 && g.y < H + 2);
+  hp.forEach(g => obstacles.push({ x0: g.x - 12, x1: g.x + 12, y0: g.y - 31, y1: g.y + 2 }));
+  // 지도 오른쪽 위 확대 버튼 자리도 피해요
+  obstacles.push({ x0: W - 54, x1: W, y0: 0, y1: 96 });
+  const hItems = hp.map(g => ({
+    g,
+    x: g.x,
+    y: g.y - 19,
+    r: 13,
+    w: textEm(g.lab) * 12.5 + 5,
+    hgt: 12.5 * 1.25,
+    gap: 3
+  }));
+  placeLabels([...hItems, ...items.filter(i => i.on), ...items.filter(i => !i.on)], obstacles, {
+    x0: 2,
+    x1: W - 2,
+    y0: 2,
+    y1: H - 2
+  });
+  let h = '';
+  items.forEach(it => {
+    const t = it.at,
+      a = it.a;
+    h += `<g class="apin${it.on ? ' on' : ''}" data-act="toggleArea" data-id="${a.id}" tabindex="0" role="button" aria-pressed="${it.on}" aria-label="${esc(it.nm)}" transform="translate(${f1(it.x)},${f1(it.y)})"><circle r="21" class="apin-hit"/><circle r="13" class="apin-c"/>${it.on ? '<path class="apin-k" d="M-5.4 0l3.6 3.6 7.2-8"/>' : '<circle r="3.6" class="apin-d"/>'}<text class="apin-t" x="${f1(t.tx - it.x)}" y="${f1(t.ty - it.y)}" style="text-anchor:${t.ax}">${esc(it.short ? it.sn : it.nm)}</text></g>`;
+  });
+  chips.forEach(c => {
+    // 화살표는 이름표 안쪽 끝에, 동네 방향으로
+    const ax = c.w / 2 - 13;
+    h += `<g class="rg-chip${c.on ? ' on' : ''}" data-act="toggleArea" data-id="${c.a.id}" tabindex="0" role="button" aria-pressed="${c.on}" aria-label="${esc(c.nm)}" transform="translate(${f1(c.x)},${f1(c.y)})">
+      <rect x="${f1(-c.w / 2)}" y="${f1(-c.h / 2)}" width="${f1(c.w)}" height="${c.h}" rx="${c.h / 2}"/>
+      <text x="${f1(-c.w / 2 + 11)}" y="4.3">${esc(c.nm)}</text>
+      <g transform="translate(${f1(ax)},0) rotate(${f1(c.ang)})"><path class="rg-ar" d="M-4.5 0H4.5M0.5 -4L4.5 0L0.5 4"/></g></g>`;
+  });
+  hItems.forEach(it => {
+    const g = it.g,
+      t = it.at;
+    h += `<g class="hpin" transform="translate(${f1(g.x)},${f1(g.y)})" aria-hidden="true">
+      <path class="hpin-b" d="M0 0C-4 -7 -12 -11 -12 -19a12 12 0 1 1 24 0c0 8 -8 12 -12 19z"/>
+      <svg x="-7.5" y="-26.5" width="15" height="15" viewBox="0 0 24 24" class="hpin-ic">${ICON.home}</svg>
+      <text class="hpin-t" x="${f1(t.tx - g.x)}" y="${f1(t.ty - g.y)}" style="text-anchor:${t.ax}">${esc(g.lab)}</text></g>`;
+  });
+  R.ov.innerHTML = `<svg class="rg-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${h}</svg>`;
+}
+// 2단계 지도의 숙소 핀 (같은 자리면 하나로 합쳐요)
+function draftHotelPinData() {
   const st = draftHotelStays();
-  if (!st.length) return '';
+  if (!st.length) return [];
   const multi = st.length > 1,
     groups = new Map();
   st.forEach((x, i) => {
@@ -151,16 +565,10 @@ function draftHotelPins(k) {
     if (!groups.has(key)) groups.set(key, { pt, n: [] });
     groups.get(key).n.push(i + 1);
   });
-  let h = '';
-  groups.forEach(g => {
-    const p = fish(g.pt.lat, g.pt.lng),
-      lab = multi ? L(`숙소 ${g.n.join('·')}`, `宿${g.n.join('・')}`) : L('내 숙소', '宿');
-    h += `<g class="hpin" transform="translate(${f1(p[0])},${f1(p[1])}) scale(${f1(k)})" aria-hidden="true">
-      <path class="hpin-b" d="M0 0C-4 -7 -12 -11 -12 -19a12 12 0 1 1 24 0c0 8 -8 12 -12 19z"/>
-      <svg x="-7.5" y="-26.5" width="15" height="15" viewBox="0 0 24 24" class="hpin-ic">${ICON.home}</svg>
-      <text class="hpin-t" x="15" y="-14">${esc(lab)}</text></g>`;
-  });
-  return h;
+  return [...groups.values()].map(g => ({
+    ...g,
+    lab: multi ? L(`숙소 ${g.n.join('·')}`, `宿${g.n.join('・')}`) : L('내 숙소', '宿')
+  }));
 }
 // 확대한 지도 손가락으로 끌기
 function enablePan(svg, W) {
