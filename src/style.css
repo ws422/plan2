@@ -1,6 +1,7 @@
 /* ==================================================================
    style.css · 디자인 (색·글꼴·간격·모양)
    맨 위 :root 의 --이름 값이 앱 전체 색이에요. 다크 모드 색은 그 아래 @media (prefers-color-scheme: dark) 에 있어요.
+   화면 밝기 버튼으로 고르면 <html data-theme="dark|light"> 가 붙어요. 어두운 색을 고칠 땐 :root[data-theme='dark'] 쪽도 같이 고쳐 주세요.
    고치는 법: docs/수정가이드.md
    ================================================================== */
 /* 후쿠오카 플래너 v3: 따뜻한 종이색 바탕 + 하카타만 남색 + 도리이 주홍 포인트. 홈 상단은 모모치 해변의 후쿠오카 타워 그림, 곳곳에 하카타오리(五色献上) 줄무늬 */
@@ -3856,6 +3857,9 @@ small {
   cursor: pointer;
   min-height: 52px;
 }
+:root[data-theme='dark'] .tl-ic {
+  color: color-mix(in srgb, var(--c) 60%, #fff);
+}
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) .tl-ic {
     color: color-mix(in srgb, var(--c) 60%, #fff);
@@ -4033,6 +4037,42 @@ html[lang='ja'] body {
 }
 .lang-btn span {
   font-family: 'Noto Sans JP', 'Gothic A1', sans-serif;
+}
+/* 화면 밝기 버튼 (언어 버튼 옆, 같은 높이의 동그란 버튼) */
+.theme-btn {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.theme-btn .ic {
+  width: 17px;
+  height: 17px;
+}
+.theme-btn.light {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.theme-btn.light .ic {
+  width: 19px;
+  height: 19px;
+}
+.h3-tr,
+.h3-bl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .lang-btn.light {
   height: 42px;

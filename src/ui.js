@@ -33,6 +33,8 @@ const ICON = {
   up: '<path d="M6 15l6-6 6 6"/>',
   down: '<path d="M6 9l6 6 6-6"/>',
   next: '<path d="M9 5l7 7-7 7"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/>',
+  moon: '<path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6z"/>',
   out: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
   undo: '<path d="M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3"/>',
   trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
@@ -158,6 +160,37 @@ function lsGet(k, d) {
   }
 }
 // 이 기기에 값 저장하기
+// ---- 화면 밝기 (밝은 화면 · 어두운 화면) ----
+// 'auto' = 휴대폰 설정을 따라가요. 버튼을 한 번 누르면 'light'/'dark' 로 고정되고 기억해요 (저장 이름 fk-theme)
+let THEME = (() => {
+  const t = lsGet('fk-theme', 'auto');
+  return t === 'light' || t === 'dark' ? t : 'auto';
+})();
+const SYS_DARK = window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null;
+function isDark() {
+  return THEME === 'dark' || (THEME === 'auto' && !!(SYS_DARK && SYS_DARK.matches));
+}
+function applyTheme() {
+  const r = document.documentElement;
+  if (THEME === 'auto') delete r.dataset.theme;
+  else r.dataset.theme = THEME;
+  // 휴대폰 맨 위 상태 표시줄 색도 같이 바꿔요
+  document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
+    const dk = THEME === 'auto' ? /dark/.test(m.media) : THEME === 'dark';
+    m.content = dk ? '#0E1424' : '#F7F3ED';
+  });
+}
+// 홈 화면(모든 탭) 언어 버튼 옆 작은 버튼: 지금 밝으면 달, 어두우면 해
+// 계획 화면 위쪽 줄은 제목 자리가 좁아서 넣지 않았어요. 고른 밝기는 모든 화면에 적용돼요
+function themeBtn(light) {
+  const d = isDark();
+  return `<button class="theme-btn${light ? ' light' : ''}" data-act="toggleTheme" aria-label="${d ? L('밝은 화면으로 바꾸기', '明るい画面にする') : L('어두운 화면으로 바꾸기', '暗い画面にする')}" title="${d ? L('밝은 화면', '明るい画面') : L('어두운 화면', '暗い画面')}">${ic(d ? 'sun' : 'moon')}</button>`;
+}
+// 휴대폰 설정이 바뀌면(자동일 때만) 버튼 모양을 다시 그려요
+if (SYS_DARK && SYS_DARK.addEventListener)
+  SYS_DARK.addEventListener('change', () => {
+    if (THEME === 'auto' && typeof render === 'function') render();
+  });
 function lsSet(k, v) {
   try {
     localStorage.setItem(k, JSON.stringify(v));

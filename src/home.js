@@ -313,7 +313,7 @@ function heroV(f) {
   return `<section class="hero t-${sc}${stock ? ' has-photo' : ''}">
     ${stock ? `<img class="hero-img stock" src="${hp.src}" alt="${esc(hp.altT)}">` : heroSVG()}
     <div class="hero-shade"></div>
-    <div class="hero-top"><span class="brand light">${logoSVG()}후쿠오카 플래너</span><span class="ht-r">${langBtn(true)}</span></div>
+    <div class="hero-top"><span class="brand light">${logoSVG()}후쿠오카 플래너</span><span class="ht-r">${themeBtn(true)}${langBtn(true)}</span></div>
     <div class="hero-txt">${txt}</div>
   </section>`;
 }
@@ -1203,6 +1203,15 @@ Object.assign(A, {
 if (IS_APP && navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
 
 Object.assign(A, {
+  toggleTheme() {
+    THEME = isDark() ? 'light' : 'dark';
+    lsSet('fk-theme', THEME);
+    applyTheme();
+    const y = window.scrollY;
+    S.keepSheetScroll = true;
+    render();
+    window.scrollTo(0, y);
+  },
   toggleLang() {
     LANG = LANG === 'ja' ? 'ko' : 'ja';
     lsSet('fk-lang', LANG);

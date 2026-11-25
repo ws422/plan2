@@ -75,7 +75,7 @@ function h3NavV(on) {
 // 「지금 이동 / 오늘 일정」(여행 전이면 「다가오는 여행 / 첫날 일정」) 카드가 나오고 제목은 한 줄로 줄어요
 function h3HomeV() {
   const p = h3Plan();
-  const top = `<header class="h3-top"><span class="h3-logo" data-notr${p ? '' : ' hidden'}><span class="j" lang="ja">福岡</span><b>${L('후쿠오카', 'ふくおか')}</b></span>${langBtn(true)}</header>`;
+  const top = `<header class="h3-top"><span class="h3-logo" data-notr${p ? '' : ' hidden'}><span class="j" lang="ja">福岡</span><b>${L('후쿠오카', 'ふくおか')}</b></span><span class="h3-tr">${themeBtn(true)}${langBtn(true)}</span></header>`;
   const hero = `<section class="h3-p1">
       <div class="h3-hero" data-notr>
         <div class="j" lang="ja">福岡</div>
@@ -305,7 +305,7 @@ function h3BandSVG() {
 }
 function h3BandV(t, s, extra) {
   return `<header class="h3-band${extra ? ' has-btn' : ''}">${S.photoBroken ? h3BandSVG() : h3Bg()}<span class="h3-bshade"></span>
-    <div class="h3-bt"><h1>${t}</h1>${s ? `<p>${s}</p>` : ''}</div><span class="h3-bl">${langBtn(true)}</span>${extra || ''}</header>`;
+    <div class="h3-bt"><h1>${t}</h1>${s ? `<p>${s}</p>` : ''}</div><span class="h3-bl">${themeBtn(true)}${langBtn(true)}</span>${extra || ''}</header>`;
 }
 
 // 여행 준비 탭
