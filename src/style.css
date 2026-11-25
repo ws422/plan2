@@ -6731,7 +6731,7 @@ body {
   line-height: 1.75;
 }
 .h3-feats {
-  margin: auto 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
   display: flex;
@@ -6740,7 +6740,8 @@ body {
   row-gap: 6px;
   font-size: 13.5px;
   font-weight: 700;
-  color: var(--ink-2);
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(10, 15, 30, 0.45);
 }
 .h3-feats li {
   display: flex;
@@ -6749,12 +6750,12 @@ body {
   padding: 0 10px;
 }
 .h3-feats li + li {
-  border-left: 1px solid var(--line);
+  border-left: 1px solid rgba(255, 255, 255, 0.4);
 }
 .h3-feats .ic {
   width: 16px;
   height: 16px;
-  color: var(--pri);
+  color: #ffb39f;
 }
 .h3-cards {
   margin-top: auto;
@@ -7526,4 +7527,148 @@ body {
   background: var(--surface);
   text-align: center;
   color: var(--ink-2);
+}
+/* 홈: 사진 배경 + 세로로 넘기는 두 화면 (첫 화면 = 큰 제목, 두 번째 = 카드) */
+.h3-bg {
+  position: fixed;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 520px;
+  overflow: hidden;
+  background: #1f2b4d;
+}
+.h3-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.h3-bg .h3-svg {
+  height: 100%;
+}
+.h3-shade,
+.h3-dim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.h3-shade {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 15, 30, 0.5) 0%,
+    rgba(10, 15, 30, 0.08) 38%,
+    rgba(10, 15, 30, 0) 55%,
+    rgba(10, 15, 30, 0.55) 100%
+  );
+}
+.h3-dim {
+  background: #0b1226;
+  opacity: 0;
+}
+.h3-home .h3-top {
+  position: fixed;
+  z-index: 5;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 520px;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+.h3-home .h3-top > * {
+  pointer-events: auto;
+}
+.h3-home .h3-logo {
+  opacity: 0;
+}
+.h3-pages {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+}
+.h3-pages::-webkit-scrollbar {
+  display: none;
+}
+.h3-p1,
+.h3-p2 {
+  box-sizing: border-box;
+  min-height: 100%;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+}
+.h3-p1 {
+  padding: calc(54px + env(safe-area-inset-top)) 18px calc(104px + env(safe-area-inset-bottom));
+}
+.h3-p1b {
+  margin-top: auto;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+}
+.h3-cue {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 0;
+  border: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.92);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-shadow: 0 1px 8px rgba(10, 15, 30, 0.5);
+  cursor: pointer;
+  animation: h3cue 1.8s ease-in-out infinite;
+}
+.h3-cue .ic {
+  width: 20px;
+  height: 20px;
+}
+@keyframes h3cue {
+  50% {
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .h3-cue {
+    animation: none;
+  }
+}
+.h3-p2 {
+  justify-content: flex-end;
+  padding: calc(70px + env(safe-area-inset-top)) 18px calc(124px + env(safe-area-inset-bottom));
+}
+.h3-p2 .h3-cards {
+  margin-top: 0;
+}
+/* 다른 탭 위쪽 띠: 같은 사진 */
+.h3-band .h3-photo {
+  position: absolute;
+  inset: 0;
+  object-position: center 40%;
+}
+.h3-bshade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 15, 30, 0.45), rgba(10, 15, 30, 0.2) 55%, rgba(10, 15, 30, 0.5));
+}
+.h3-band .h3-bt {
+  bottom: 22px;
+}
+.h3-p2 .h3-dots i {
+  background: rgba(255, 255, 255, 0.45);
+}
+.h3-p2 .h3-dots i.on {
+  background: #fff;
 }
