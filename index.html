@@ -6561,7 +6561,6 @@ body {
   --h3-light: 0;
   --h3-sunop: 0.85;
   --h3-cloudop: 0.7;
-  --h3-fab: #1f2b4d;
   position: relative;
   min-height: 100vh;
   min-height: 100dvh;
@@ -6604,7 +6603,6 @@ body {
     --h3-light: 1;
     --h3-sunop: 1;
     --h3-cloudop: 0.22;
-    --h3-fab: #d63a1f;
   }
 }
 :root[data-theme='dark'] .h3 {
@@ -6640,7 +6638,6 @@ body {
   --h3-light: 1;
   --h3-sunop: 1;
   --h3-cloudop: 0.22;
-  --h3-fab: #d63a1f;
 }
 .h3-stars {
   fill: #fff;
@@ -6719,7 +6716,7 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 0 18px calc(124px + env(safe-area-inset-bottom));
+  padding: 0 18px calc(92px + env(safe-area-inset-bottom));
 }
 .h3-hero {
   margin-top: 26px;
@@ -7215,7 +7212,7 @@ body {
   font-weight: 800;
   cursor: pointer;
 }
-/* 아래 5칸 메뉴: 흰 바탕에 ＋ 자리만 둥글게 파이고, 줄무늬가 그 자리를 감싸요 */
+/* 아래 4칸 메뉴: 흰 바탕 위쪽 가장자리에 줄무늬 한 줄 */
 .h3-nav {
   position: fixed;
   z-index: 30;
@@ -7225,18 +7222,19 @@ body {
   width: 100%;
   max-width: 520px;
   box-sizing: border-box;
-  height: calc(84px + env(safe-area-inset-bottom));
-  padding: 16px 0 env(safe-area-inset-bottom);
+  height: calc(68px + env(safe-area-inset-bottom));
+  padding: 11px 0 env(safe-area-inset-bottom);
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: start;
-  background: radial-gradient(circle at 50% 0, transparent 39px, var(--surface) 39.5px);
+  background: var(--surface);
 }
-.h3-nav::before,
-.h3-nav::after {
+.h3-nav::before {
   content: '';
   position: absolute;
   top: -2.25px;
+  left: 0;
+  right: 0;
   height: 4.5px;
   background: repeating-linear-gradient(
     90deg,
@@ -7247,23 +7245,7 @@ body {
     #2459c9 20px 25px
   );
 }
-.h3-nav::before {
-  left: 0;
-  right: calc(50% + 38px);
-}
-.h3-nav::after {
-  left: calc(50% + 38px);
-  right: 0;
-}
-.h3-arc {
-  position: absolute;
-  top: -2.25px;
-  left: calc(50% - 40px);
-  overflow: visible;
-  pointer-events: none;
-}
-.h3-ni,
-.h3-fab {
+.h3-ni {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -7285,30 +7267,49 @@ body {
   color: var(--pri);
   font-weight: 800;
 }
-.h3-fab {
-  position: relative;
-  z-index: 1;
-  margin-top: -46px;
-  gap: 12px;
-  font-weight: 800;
-  color: var(--ink);
-}
-.h3-fab > span {
-  width: 60px;
-  height: 60px;
-  border-radius: 30px;
-  background: var(--h3-fab);
+/* 새 여행 시작 버튼: 첫 화면(계획이 없을 때)과 내 여행 탭 */
+.h3-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   color: #fff;
-  display: grid;
-  place-items: center;
-  box-shadow: 0 6px 16px rgba(31, 43, 77, 0.28);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  text-shadow: 0 1px 6px rgba(10, 15, 30, 0.35);
+  cursor: pointer;
 }
-.h3-fab .ic {
-  width: 26px;
-  height: 26px;
+.h3-start .ic {
+  width: 18px;
+  height: 18px;
+}
+.h3-new {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  border: 1.5px dashed color-mix(in srgb, var(--pri) 55%, transparent);
+  border-radius: 18px;
+  background: none;
+  color: var(--pri);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.h3-new .ic {
+  width: 20px;
+  height: 20px;
 }
 .v-home .toasts {
-  bottom: calc(110px + env(safe-area-inset-bottom));
+  bottom: calc(84px + env(safe-area-inset-bottom));
 }
 /* 다른 탭: 위쪽 하늘 띠 */
 .h3-band {
@@ -7345,7 +7346,7 @@ body {
 }
 .h3-page {
   position: relative;
-  padding: 12px 16px calc(112px + env(safe-area-inset-bottom));
+  padding: 12px 16px calc(92px + env(safe-area-inset-bottom));
   display: grid;
   gap: 12px;
 }
@@ -7628,7 +7629,7 @@ body {
   flex-direction: column;
 }
 .h3-p1 {
-  padding: calc(54px + env(safe-area-inset-top)) 18px calc(104px + env(safe-area-inset-bottom));
+  padding: calc(54px + env(safe-area-inset-top)) 18px calc(96px + env(safe-area-inset-bottom));
 }
 .h3-p1b {
   margin-top: auto;
@@ -7667,7 +7668,7 @@ body {
 }
 .h3-p2 {
   justify-content: flex-end;
-  padding: calc(70px + env(safe-area-inset-top)) 18px calc(124px + env(safe-area-inset-bottom));
+  padding: calc(70px + env(safe-area-inset-top)) 18px calc(92px + env(safe-area-inset-bottom));
 }
 .h3-p2 .h3-cards {
   margin-top: 0;
@@ -7691,6 +7692,54 @@ body {
 }
 .h3-p2 .h3-dots i.on {
   background: #fff;
+}
+/* 계획 화면: 위쪽 탭(일정·지도·길안내·교통비) + 아래는 홈과 같은 5칸 메뉴 */
+.appbar.has-pt {
+  row-gap: 8px;
+}
+.ptabs {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+.ptabs button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 36px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.ptabs button .ic {
+  width: 16px;
+  height: 16px;
+}
+.ptabs button.on {
+  background: #1f2b4d;
+  color: #fff;
+}
+.v-plan .days {
+  top: calc(var(--ab-h, 115px) + env(safe-area-inset-top));
+}
+.v-plan .plan {
+  padding-bottom: calc(92px + env(safe-area-inset-bottom));
+}
+.v-plan .plan.t-map {
+  padding-bottom: 0;
+}
+.v-plan .dmap {
+  height: calc(100vh - var(--ab-h, 115px) - 84px - 80px - env(safe-area-inset-bottom));
+}
+.v-plan .toasts {
+  bottom: calc(84px + env(safe-area-inset-bottom));
 }
 
 </style>
@@ -13941,14 +13990,19 @@ function fareTab() {
     </div>`;
 }
 // 계획 화면 아래 탭 (일정·지도·길안내·교통비)
-function bottomNav() {
+// 계획 화면 위쪽 탭 (일정·지도·길안내·교통비)
+function planTabs() {
   const T = [
-    ['sched', 'list', '일정'],
-    ['map', 'map', '지도'],
-    ['guide', 'nav', '길안내'],
-    ['fare', 'wallet', '교통비']
+    ['sched', 'list', L('일정', '予定')],
+    ['map', 'map', L('지도', '地図')],
+    ['guide', 'nav', L('길안내', '道案内')],
+    ['fare', 'wallet', L('교통비', '交通費')]
   ];
-  return `<nav class="tabbar" aria-label="화면 전환">${T.map(([k, i, l]) => `<button class="${S.tab === k ? 'on' : ''}" data-act="tab" data-t="${k}" aria-pressed="${S.tab === k}">${ic(i)}<span>${l}</span></button>`).join('')}</nav>`;
+  return `<nav class="ptabs" aria-label="${L('계획 화면', '計画の画面')}">${T.map(([k, i, l]) => `<button class="${S.tab === k ? 'on' : ''}" data-act="tab" data-t="${k}" aria-pressed="${S.tab === k}">${ic(i)}<span>${l}</span></button>`).join('')}</nav>`;
+}
+// 계획 화면 아래 바: 홈과 같은 5칸 메뉴 (home3.js 의 h3NavV, 「내 여행」이 켜져 있어요)
+function bottomNav() {
+  return h3NavV('trips');
 }
 // ★ 화면: 계획 (위 제목 + 탭 내용)
 function planV() {
@@ -13961,7 +14015,9 @@ function planV() {
       title: `<button class="ab-title" data-act="rename">${esc(p.title)}${ic('pen')}</button>`,
       sub: `${mds(p.set.start)} – ${mds(p.set.end)} · ${nights(N)}`,
       right
-    }) +
+    })
+      .replace('<header class="appbar">', '<header class="appbar has-pt">')
+      .replace(/<\/header>$/, `${planTabs()}</header>`) +
     (S.isNew ? progress(3) : '') +
     `<main class="scr plan t-${S.tab}">${S.tab !== 'fare' ? dayPills() : ''}${S.tab === 'sched' ? schedTab() : S.tab === 'map' ? mapTab() : S.tab === 'guide' ? guideTab() : fareTab()}</main>` +
     bottomNav()
@@ -14158,6 +14214,12 @@ function go(view) {
   window.scrollTo(0, 0);
 }
 
+// 「저장하지 않고 나갈까요?」에서 고른 뒤 원래 가려던 곳으로 (새 여행 등)
+function afterLeave() {
+  const f = S.afterLeave;
+  S.afterLeave = null;
+  if (f && A[f]) A[f]();
+}
 // ---- 동작 ----
 const A = {
   goHome() {
@@ -14182,11 +14244,13 @@ const A = {
     S.plan = null;
     S.saved = true;
     go('home');
+    afterLeave();
   },
   saveLeave() {
     A.save();
     S.plan = null;
     go('home');
+    afterLeave();
   },
   saveGuide() {
     A.save(null, null, null, true);
@@ -14203,6 +14267,12 @@ const A = {
     if (el) window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - 140) });
   },
   newPlan() {
+    // 저장 안 한 계획을 보는 중이면 먼저 저장할지 물어요
+    if (S.view === 'plan' && !S.saved) {
+      S.afterLeave = 'newPlan';
+      A.goHome();
+      return;
+    }
     S.draft = defaultDraft();
     S.mv = null;
     go('dates');
@@ -14633,6 +14703,7 @@ const A = {
     render();
   },
   closeSheet() {
+    S.afterLeave = null;
     S.sheet = null;
     render();
   }
@@ -18775,23 +18846,13 @@ function h3Plan() {
   return sortedPlans().find(p => planStatus(p).k !== 'past') || null;
 }
 
-// ---- 아래 5칸 메뉴 ----
-function h3NavV() {
-  const t = S.htab || 'home',
+// ---- 아래 4칸 메뉴 (위쪽에 줄무늬 한 줄) ----
+function h3NavV(on) {
+  const t = on || S.htab || 'home',
     it = (k, i, l) =>
       `<button class="h3-ni${t === k ? ' on' : ''}" data-act="htab" data-t="${k}"${t === k ? ' aria-current="page"' : ''}>${ic(i)}<span>${l}</span></button>`;
-  const cols = ['#15203A', '#D63A1F', '#D9962B', '#6B3E8E', '#2459C9'];
-  const arc = cols
-    .map(
-      (c, i) =>
-        `<path d="M2 0A38 38 0 0 0 78 0" fill="none" stroke="${c}" stroke-width="4.5" stroke-dasharray="5 20" stroke-dashoffset="${-5 * i}"/>`
-    )
-    .join('');
   return `<nav class="h3-nav" aria-label="${L('메인 메뉴', 'メインメニュー')}">
-    <svg class="h3-arc" width="80" height="44" viewBox="0 -2.25 80 44" aria-hidden="true">${arc}</svg>
-    ${it('home', 'home', L('홈', 'ホーム'))}${it('prep', 'plane', L('여행 준비', '旅の準備'))}
-    <button class="h3-fab" data-act="newPlan"><span aria-hidden="true">${ic('plus')}</span>${L('새 여행', '新しい旅行')}</button>
-    ${it('areas', 'map', L('동네', 'エリア'))}${it('trips', 'list', L('내 여행', 'マイ旅行'))}
+    ${it('home', 'home', L('홈', 'ホーム'))}${it('prep', 'plane', L('여행 준비', '旅の準備'))}${it('areas', 'map', L('동네', 'エリア'))}${it('trips', 'list', L('내 여행', 'マイ旅行'))}
   </nav>`;
 }
 
@@ -18810,7 +18871,11 @@ function h3HomeV() {
       </div>
       <div class="h3-p1b">
         <ul class="h3-feats"><li>${ic('map')}${L('동선 자동', 'ルート自動')}</li><li>${ic('walk')}${L('걷는 길 추천', '歩く道のおすすめ')}</li><li>${ic('wallet')}${L('교통비·패스', '交通費・パス')}</li></ul>
-        ${p ? `<button class="h3-cue" data-act="h3Down">${L('위로 넘기면 내 여행', '上にスワイプでマイ旅行')}${ic('up')}</button>` : ''}
+        ${
+          p
+            ? `<button class="h3-cue" data-act="h3Down">${L('위로 넘기면 내 여행', '上にスワイプでマイ旅行')}${ic('up')}</button>`
+            : `<button class="h3-start" data-act="newPlan">${ic('plus')}${L('새 여행 계획 세우기', '新しい旅行計画を作る')}</button>`
+        }
       </div>
     </section>`;
   if (!p) return `${top}<main class="h3-pages" id="h3pages">${hero}</main>`;
@@ -19093,6 +19158,7 @@ function h3TripsV() {
   return `${h3BandV(L('내 여행', 'マイ旅行'), plans.length ? L(`계획 ${plans.length}개`, `計画 ${plans.length}件`) : '')}
   <main class="h3-page">
     ${big}
+    ${f ? `<button class="h3-new" data-act="newPlan">${ic('plus')}<span>${L('새 여행 계획 세우기', '新しい旅行計画を作る')}</span></button>` : ''}
     ${rest.length ? `<h2 class="h3-sec">${L('다른 계획', 'ほかの計画')}</h2><ul class="plist">${rest.map(planRow).join('')}</ul>` : ''}
     <button class="h3-recv" data-act="recvOpen">${ic('save')}<span>${L('공유받은 계획 불러오기', '受け取った計画を取り込む')}</span></button>
     <p class="store-note" id="storeNote">${storeNote()}</p>
@@ -19165,6 +19231,13 @@ function h3Paint(n) {
 
 Object.assign(A, {
   htab(d) {
+    // 계획 화면에서 누르면 그 탭으로 홈에 돌아가요 (저장 안 했으면 먼저 물어요)
+    if (S.view !== 'home') {
+      S.htab = d.t;
+      S.h3p2 = false;
+      A.goHome();
+      return;
+    }
     if (d.t === 'home' && S.htab === 'home' && S.h3p2) {
       h3GoPage(0);
       return;
