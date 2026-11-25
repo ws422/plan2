@@ -6751,7 +6751,7 @@ body {
   line-height: 1.75;
 }
 .h3-feats {
-  margin: auto 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
   display: flex;
@@ -6760,7 +6760,8 @@ body {
   row-gap: 6px;
   font-size: 13.5px;
   font-weight: 700;
-  color: var(--ink-2);
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(10, 15, 30, 0.45);
 }
 .h3-feats li {
   display: flex;
@@ -6769,12 +6770,12 @@ body {
   padding: 0 10px;
 }
 .h3-feats li + li {
-  border-left: 1px solid var(--line);
+  border-left: 1px solid rgba(255, 255, 255, 0.4);
 }
 .h3-feats .ic {
   width: 16px;
   height: 16px;
-  color: var(--pri);
+  color: #ffb39f;
 }
 .h3-cards {
   margin-top: auto;
@@ -7546,6 +7547,150 @@ body {
   background: var(--surface);
   text-align: center;
   color: var(--ink-2);
+}
+/* 홈: 사진 배경 + 세로로 넘기는 두 화면 (첫 화면 = 큰 제목, 두 번째 = 카드) */
+.h3-bg {
+  position: fixed;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 520px;
+  overflow: hidden;
+  background: #1f2b4d;
+}
+.h3-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.h3-bg .h3-svg {
+  height: 100%;
+}
+.h3-shade,
+.h3-dim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.h3-shade {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 15, 30, 0.5) 0%,
+    rgba(10, 15, 30, 0.08) 38%,
+    rgba(10, 15, 30, 0) 55%,
+    rgba(10, 15, 30, 0.55) 100%
+  );
+}
+.h3-dim {
+  background: #0b1226;
+  opacity: 0;
+}
+.h3-home .h3-top {
+  position: fixed;
+  z-index: 5;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 520px;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+.h3-home .h3-top > * {
+  pointer-events: auto;
+}
+.h3-home .h3-logo {
+  opacity: 0;
+}
+.h3-pages {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+}
+.h3-pages::-webkit-scrollbar {
+  display: none;
+}
+.h3-p1,
+.h3-p2 {
+  box-sizing: border-box;
+  min-height: 100%;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+}
+.h3-p1 {
+  padding: calc(54px + env(safe-area-inset-top)) 18px calc(104px + env(safe-area-inset-bottom));
+}
+.h3-p1b {
+  margin-top: auto;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+}
+.h3-cue {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 0;
+  border: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.92);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-shadow: 0 1px 8px rgba(10, 15, 30, 0.5);
+  cursor: pointer;
+  animation: h3cue 1.8s ease-in-out infinite;
+}
+.h3-cue .ic {
+  width: 20px;
+  height: 20px;
+}
+@keyframes h3cue {
+  50% {
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .h3-cue {
+    animation: none;
+  }
+}
+.h3-p2 {
+  justify-content: flex-end;
+  padding: calc(70px + env(safe-area-inset-top)) 18px calc(124px + env(safe-area-inset-bottom));
+}
+.h3-p2 .h3-cards {
+  margin-top: 0;
+}
+/* 다른 탭 위쪽 띠: 같은 사진 */
+.h3-band .h3-photo {
+  position: absolute;
+  inset: 0;
+  object-position: center 40%;
+}
+.h3-bshade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 15, 30, 0.45), rgba(10, 15, 30, 0.2) 55%, rgba(10, 15, 30, 0.5));
+}
+.h3-band .h3-bt {
+  bottom: 22px;
+}
+.h3-p2 .h3-dots i {
+  background: rgba(255, 255, 255, 0.45);
+}
+.h3-p2 .h3-dots i.on {
+  background: #fff;
 }
 
 </style>
@@ -17750,7 +17895,7 @@ Object.assign(A, {
 // 홈에서 누르면 원래대로 앱이 닫혀요.
 const NAV = { skip: 0, on: IS_APP && !!(window.history && history.pushState) };
 function navAtRoot() {
-  return S.view === 'home' && !S.sheet && (S.htab || 'home') === 'home';
+  return S.view === 'home' && !S.sheet && (S.htab || 'home') === 'home' && !S.h3p2;
 }
 function navSync() {
   if (!NAV.on || NAV.skip) return;
@@ -17777,6 +17922,11 @@ function navBack() {
       S.sheet = { type: sh.back };
       render();
     } else A.closeSheet();
+    return;
+  }
+  if (S.view === 'home' && (S.htab || 'home') === 'home' && S.h3p2) {
+    S.h3p2 = false;
+    h3GoPage(0);
     return;
   }
   if (S.view === 'home' && S.htab && S.htab !== 'home') {
@@ -18613,6 +18763,13 @@ function h3Scene(vb = '0 0 390 760', ratio = 'xMidYMin slice') {
 </svg>`;
 }
 
+// 배경: 전에 넣었던 상단 사진 (시간에 따라 낮/밤 사진). 사진을 못 불러오면 그림으로
+function h3Bg(cls = '') {
+  if (S.photoBroken) return h3Scene();
+  const hp = heroPhoto(heroScene());
+  return `<img class="hero-img stock h3-photo ${cls}" src="${hp.src}" alt="${esc(hp.altT)}">`;
+}
+
 // 지금 보여줄 계획 (여행 중이거나 다가오는 것). 다녀온 여행만 있으면 없음
 function h3Plan() {
   return sortedPlans().find(p => planStatus(p).k !== 'past') || null;
@@ -18639,19 +18796,24 @@ function h3NavV() {
 }
 
 // ---- 홈 탭 ----
+// 첫 화면: 사진 위에 큰 제목(福岡 후쿠오카 FUKUOKA)만. 계획이 있으면 위로 넘길 때 두 번째 화면에
+// 「지금 이동 / 오늘 일정」(여행 전이면 「다가오는 여행 / 첫날 일정」) 카드가 나오고 제목은 한 줄로 줄어요
 function h3HomeV() {
   const p = h3Plan();
-  const top = `<header class="h3-top">${p ? `<span class="h3-logo" data-notr><span class="j" lang="ja">福岡</span><b>${L('후쿠오카', 'ふくおか')}</b></span>` : '<span></span>'}${langBtn(true)}</header>`;
-  if (!p)
-    return `${top}<main class="h3-main">
-      <section class="h3-hero" data-notr>
+  const top = `<header class="h3-top"><span class="h3-logo" data-notr${p ? '' : ' hidden'}><span class="j" lang="ja">福岡</span><b>${L('후쿠오카', 'ふくおか')}</b></span>${langBtn(true)}</header>`;
+  const hero = `<section class="h3-p1">
+      <div class="h3-hero" data-notr>
         <div class="j" lang="ja">福岡</div>
         <h1>${L('후쿠오카', 'ふくおか')}</h1>
         <div class="en">FUKUOKA</div>
         <p lang="ja">海と屋台と、ラーメンの街。<br>アジアの玄関口へようこそ。</p>
-      </section>
-      <ul class="h3-feats"><li>${ic('map')}${L('동선 자동', 'ルート自動')}</li><li>${ic('walk')}${L('걷는 길 추천', '歩く道のおすすめ')}</li><li>${ic('wallet')}${L('교통비·패스', '交通費・パス')}</li></ul>
-    </main>`;
+      </div>
+      <div class="h3-p1b">
+        <ul class="h3-feats"><li>${ic('map')}${L('동선 자동', 'ルート自動')}</li><li>${ic('walk')}${L('걷는 길 추천', '歩く道のおすすめ')}</li><li>${ic('wallet')}${L('교통비·패스', '交通費・パス')}</li></ul>
+        ${p ? `<button class="h3-cue" data-act="h3Down">${L('위로 넘기면 내 여행', '上にスワイプでマイ旅行')}${ic('up')}</button>` : ''}
+      </div>
+    </section>`;
+  if (!p) return `${top}<main class="h3-pages" id="h3pages">${hero}</main>`;
   const st = planStatus(p),
     now = st.k === 'now';
   const labels = now
@@ -18659,15 +18821,17 @@ function h3HomeV() {
     : [L('다가오는 여행', '次の旅行'), L('첫날 일정', '1日目の予定')];
   const cards = now ? [h3MoveV(p, st), h3TodayV(p, st)] : [h3SoonV(p, st), h3FirstV(p)];
   const pg = S.hpage === 1 ? 1 : 0;
-  return `${top}<main class="h3-main">
-    <section class="h3-cards">
-      <div class="h3-tabs" data-l0="${esc(labels[0])}" data-l1="${esc(labels[1])}">
-        <button class="h3-tl" data-act="hPage" data-n="0"${pg ? '' : ' hidden'}>‹ ${labels[0]}</button>
-        <b class="h3-tc">${labels[pg]}</b>
-        <button class="h3-tr" data-act="hPage" data-n="1"${pg ? ' hidden' : ''}>${labels[1]} ›</button>
+  return `${top}<main class="h3-pages" id="h3pages">${hero}
+    <section class="h3-p2">
+      <div class="h3-cards">
+        <div class="h3-tabs" data-l0="${esc(labels[0])}" data-l1="${esc(labels[1])}">
+          <button class="h3-tl" data-act="hPage" data-n="0"${pg ? '' : ' hidden'}>‹ ${labels[0]}</button>
+          <b class="h3-tc">${labels[pg]}</b>
+          <button class="h3-tr" data-act="hPage" data-n="1"${pg ? ' hidden' : ''}>${labels[1]} ›</button>
+        </div>
+        <div class="h3-car" id="h3car">${cards.join('')}</div>
+        <div class="h3-dots" aria-hidden="true"><i class="${pg ? '' : 'on'}"></i><i class="${pg ? 'on' : ''}"></i></div>
       </div>
-      <div class="h3-car" id="h3car">${cards.join('')}</div>
-      <div class="h3-dots" aria-hidden="true"><i class="${pg ? '' : 'on'}"></i><i class="${pg ? 'on' : ''}"></i></div>
     </section>
   </main>`;
 }
@@ -18848,7 +19012,7 @@ function h3BandSVG() {
 </svg>`;
 }
 function h3BandV(t, s) {
-  return `<header class="h3-band">${h3BandSVG()}
+  return `<header class="h3-band">${S.photoBroken ? h3BandSVG() : h3Bg()}<span class="h3-bshade"></span>
     <div class="h3-bt"><h1>${t}</h1>${s ? `<p>${s}</p>` : ''}</div><span class="h3-bl">${langBtn(true)}</span></header>`;
 }
 
@@ -18932,6 +19096,7 @@ function h3TripsV() {
     ${rest.length ? `<h2 class="h3-sec">${L('다른 계획', 'ほかの計画')}</h2><ul class="plist">${rest.map(planRow).join('')}</ul>` : ''}
     <button class="h3-recv" data-act="recvOpen">${ic('save')}<span>${L('공유받은 계획 불러오기', '受け取った計画を取り込む')}</span></button>
     <p class="store-note" id="storeNote">${storeNote()}</p>
+    ${S.photoBroken ? '' : `<p class="credit">${L('배경 사진', '背景の写真')} <a href="${heroPhoto(heroScene()).url}" target="_blank" rel="noopener">${heroPhoto(heroScene()).by}</a> · Unsplash</p>`}
   </main>`;
 }
 
@@ -18939,11 +19104,36 @@ function h3TripsV() {
 function homeV() {
   const t = S.htab || 'home';
   const body = t === 'prep' ? h3PrepV() : t === 'areas' ? h3AreasV() : t === 'trips' ? h3TripsV() : h3HomeV();
-  return `<div class="h3 h3-${t}">${t === 'home' ? `<div class="h3-scene">${h3Scene()}</div>` : ''}${body}${h3NavV()}</div>`;
+  return `<div class="h3 h3-${t}${t === 'home' && S.h3p2 ? ' on-p2' : ''}">${t === 'home' ? `<div class="h3-bg">${h3Bg()}<span class="h3-shade"></span><span class="h3-dim"></span></div>` : ''}${body}${h3NavV()}</div>`;
 }
 
-// 카드 넘기기: 손가락으로 밀면 위 제목·점이 따라 바뀌어요 (render 가 끝날 때 불러요)
+// 넘기기 연결 (render 가 끝날 때 불러요)
+// - 세로: 첫 화면(큰 제목) ↔ 카드 화면. 넘길수록 사진이 살짝 어두워지고 큰 제목이 사라지며 한 줄 제목이 나타나요
+// - 가로: 카드 두 장. 손가락으로 밀면 위 제목·점이 따라 바뀌어요
 function h3Wire() {
+  const pages = document.getElementById('h3pages');
+  if (pages) {
+    const root = pages.closest('.h3'),
+      hero = pages.querySelector('.h3-hero'),
+      logo = root.querySelector('.h3-logo'),
+      dim = root.querySelector('.h3-dim');
+    const paint = () => {
+      const f = Math.min(1, pages.scrollTop / Math.max(1, pages.clientHeight));
+      if (hero) hero.style.opacity = String(Math.max(0, 1 - f * 1.8));
+      if (dim) dim.style.opacity = String(f * 0.5);
+      if (logo && !logo.hidden) logo.style.opacity = String(Math.max(0, f * 2 - 0.8));
+      const on = f > 0.5;
+      if (on !== !!S.h3p2) {
+        S.h3p2 = on;
+        root.classList.toggle('on-p2', on);
+        if (typeof navSync === 'function') navSync();
+      }
+    };
+    if (S.h3p2 && pages.querySelector('.h3-p2')) pages.scrollTop = pages.clientHeight;
+    else S.h3p2 = false;
+    paint();
+    pages.addEventListener('scroll', paint, { passive: true });
+  }
   const car = document.getElementById('h3car');
   if (!car) return;
   car.scrollLeft = (S.hpage === 1 ? 1 : 0) * car.clientWidth;
@@ -18959,6 +19149,11 @@ function h3Wire() {
     { passive: true }
   );
 }
+// 첫 화면으로 / 카드 화면으로
+function h3GoPage(n) {
+  const pages = document.getElementById('h3pages');
+  if (pages) pages.scrollTo({ top: n ? pages.clientHeight : 0, behavior: 'smooth' });
+}
 function h3Paint(n) {
   const tb = document.querySelector('.h3-tabs');
   if (!tb) return;
@@ -18970,10 +19165,18 @@ function h3Paint(n) {
 
 Object.assign(A, {
   htab(d) {
+    if (d.t === 'home' && S.htab === 'home' && S.h3p2) {
+      h3GoPage(0);
+      return;
+    }
     S.htab = d.t;
+    S.h3p2 = false;
     S.sheet = null;
     render();
     window.scrollTo(0, 0);
+  },
+  h3Down() {
+    h3GoPage(1);
   },
   hPage(d) {
     const car = document.getElementById('h3car'),
