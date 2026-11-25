@@ -7813,6 +7813,24 @@ body {
   flex: none;
   color: var(--bad);
 }
+/* 홈 두 번째 화면: 카드 아래 「새 계획 추가하기」 */
+.h3-p2 .h3-add {
+  align-self: center;
+  margin-top: 12px;
+  padding: 9px 16px;
+  font-size: 13.5px;
+}
+/* 키가 작은 화면: 카드·버튼이 아래 메뉴에 가리지 않게 위아래 여백을 줄여요 */
+@media (max-height: 700px) {
+  .h3-p2 {
+    padding-top: calc(58px + env(safe-area-inset-top));
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+  .h3-p2 .h3-dots,
+  .h3-p2 .h3-add {
+    margin-top: 8px;
+  }
+}
 
 </style>
 </head>
@@ -19113,6 +19131,7 @@ function h3HomeV() {
         <div class="h3-car" id="h3car">${cards.join('')}</div>
         <div class="h3-dots" aria-hidden="true"><i class="${pg ? '' : 'on'}"></i><i class="${pg ? 'on' : ''}"></i></div>
       </div>
+      <button class="h3-start h3-add" data-act="newPlan">${ic('plus')}${L('새 계획 추가하기', '新しい計画を追加')}</button>
     </section>
   </main>`;
 }
