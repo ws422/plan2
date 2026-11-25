@@ -60,23 +60,13 @@ function h3Plan() {
   return sortedPlans().find(p => planStatus(p).k !== 'past') || null;
 }
 
-// ---- 아래 5칸 메뉴 ----
-function h3NavV() {
-  const t = S.htab || 'home',
+// ---- 아래 4칸 메뉴 (위쪽에 줄무늬 한 줄) ----
+function h3NavV(on) {
+  const t = on || S.htab || 'home',
     it = (k, i, l) =>
       `<button class="h3-ni${t === k ? ' on' : ''}" data-act="htab" data-t="${k}"${t === k ? ' aria-current="page"' : ''}>${ic(i)}<span>${l}</span></button>`;
-  const cols = ['#15203A', '#D63A1F', '#D9962B', '#6B3E8E', '#2459C9'];
-  const arc = cols
-    .map(
-      (c, i) =>
-        `<path d="M2 0A38 38 0 0 0 78 0" fill="none" stroke="${c}" stroke-width="4.5" stroke-dasharray="5 20" stroke-dashoffset="${-5 * i}"/>`
-    )
-    .join('');
   return `<nav class="h3-nav" aria-label="${L('메인 메뉴', 'メインメニュー')}">
-    <svg class="h3-arc" width="80" height="44" viewBox="0 -2.25 80 44" aria-hidden="true">${arc}</svg>
-    ${it('home', 'home', L('홈', 'ホーム'))}${it('prep', 'plane', L('여행 준비', '旅の準備'))}
-    <button class="h3-fab" data-act="newPlan"><span aria-hidden="true">${ic('plus')}</span>${L('새 여행', '新しい旅行')}</button>
-    ${it('areas', 'map', L('동네', 'エリア'))}${it('trips', 'list', L('내 여행', 'マイ旅行'))}
+    ${it('home', 'home', L('홈', 'ホーム'))}${it('prep', 'plane', L('여행 준비', '旅の準備'))}${it('areas', 'map', L('동네', 'エリア'))}${it('trips', 'list', L('내 여행', 'マイ旅行'))}
   </nav>`;
 }
 
@@ -95,7 +85,11 @@ function h3HomeV() {
       </div>
       <div class="h3-p1b">
         <ul class="h3-feats"><li>${ic('map')}${L('동선 자동', 'ルート自動')}</li><li>${ic('walk')}${L('걷는 길 추천', '歩く道のおすすめ')}</li><li>${ic('wallet')}${L('교통비·패스', '交通費・パス')}</li></ul>
-        ${p ? `<button class="h3-cue" data-act="h3Down">${L('위로 넘기면 내 여행', '上にスワイプでマイ旅行')}${ic('up')}</button>` : ''}
+        ${
+          p
+            ? `<button class="h3-cue" data-act="h3Down">${L('위로 넘기면 내 여행', '上にスワイプでマイ旅行')}${ic('up')}</button>`
+            : `<button class="h3-start" data-act="newPlan">${ic('plus')}${L('새 여행 계획 세우기', '新しい旅行計画を作る')}</button>`
+        }
       </div>
     </section>`;
   if (!p) return `${top}<main class="h3-pages" id="h3pages">${hero}</main>`;
@@ -378,6 +372,7 @@ function h3TripsV() {
   return `${h3BandV(L('내 여행', 'マイ旅行'), plans.length ? L(`계획 ${plans.length}개`, `計画 ${plans.length}件`) : '')}
   <main class="h3-page">
     ${big}
+    ${f ? `<button class="h3-new" data-act="newPlan">${ic('plus')}<span>${L('새 여행 계획 세우기', '新しい旅行計画を作る')}</span></button>` : ''}
     ${rest.length ? `<h2 class="h3-sec">${L('다른 계획', 'ほかの計画')}</h2><ul class="plist">${rest.map(planRow).join('')}</ul>` : ''}
     <button class="h3-recv" data-act="recvOpen">${ic('save')}<span>${L('공유받은 계획 불러오기', '受け取った計画を取り込む')}</span></button>
     <p class="store-note" id="storeNote">${storeNote()}</p>
@@ -450,6 +445,13 @@ function h3Paint(n) {
 
 Object.assign(A, {
   htab(d) {
+    // 계획 화면에서 누르면 그 탭으로 홈에 돌아가요 (저장 안 했으면 먼저 물어요)
+    if (S.view !== 'home') {
+      S.htab = d.t;
+      S.h3p2 = false;
+      A.goHome();
+      return;
+    }
     if (d.t === 'home' && S.htab === 'home' && S.h3p2) {
       h3GoPage(0);
       return;

@@ -801,14 +801,19 @@ function fareTab() {
     </div>`;
 }
 // 계획 화면 아래 탭 (일정·지도·길안내·교통비)
-function bottomNav() {
+// 계획 화면 위쪽 탭 (일정·지도·길안내·교통비)
+function planTabs() {
   const T = [
-    ['sched', 'list', '일정'],
-    ['map', 'map', '지도'],
-    ['guide', 'nav', '길안내'],
-    ['fare', 'wallet', '교통비']
+    ['sched', 'list', L('일정', '予定')],
+    ['map', 'map', L('지도', '地図')],
+    ['guide', 'nav', L('길안내', '道案内')],
+    ['fare', 'wallet', L('교통비', '交通費')]
   ];
-  return `<nav class="tabbar" aria-label="화면 전환">${T.map(([k, i, l]) => `<button class="${S.tab === k ? 'on' : ''}" data-act="tab" data-t="${k}" aria-pressed="${S.tab === k}">${ic(i)}<span>${l}</span></button>`).join('')}</nav>`;
+  return `<nav class="ptabs" aria-label="${L('계획 화면', '計画の画面')}">${T.map(([k, i, l]) => `<button class="${S.tab === k ? 'on' : ''}" data-act="tab" data-t="${k}" aria-pressed="${S.tab === k}">${ic(i)}<span>${l}</span></button>`).join('')}</nav>`;
+}
+// 계획 화면 아래 바: 홈과 같은 5칸 메뉴 (home3.js 의 h3NavV, 「내 여행」이 켜져 있어요)
+function bottomNav() {
+  return h3NavV('trips');
 }
 // ★ 화면: 계획 (위 제목 + 탭 내용)
 function planV() {
@@ -821,7 +826,9 @@ function planV() {
       title: `<button class="ab-title" data-act="rename">${esc(p.title)}${ic('pen')}</button>`,
       sub: `${mds(p.set.start)} – ${mds(p.set.end)} · ${nights(N)}`,
       right
-    }) +
+    })
+      .replace('<header class="appbar">', '<header class="appbar has-pt">')
+      .replace(/<\/header>$/, `${planTabs()}</header>`) +
     (S.isNew ? progress(3) : '') +
     `<main class="scr plan t-${S.tab}">${S.tab !== 'fare' ? dayPills() : ''}${S.tab === 'sched' ? schedTab() : S.tab === 'map' ? mapTab() : S.tab === 'guide' ? guideTab() : fareTab()}</main>` +
     bottomNav()
@@ -1018,6 +1025,12 @@ function go(view) {
   window.scrollTo(0, 0);
 }
 
+// 「저장하지 않고 나갈까요?」에서 고른 뒤 원래 가려던 곳으로 (새 여행 등)
+function afterLeave() {
+  const f = S.afterLeave;
+  S.afterLeave = null;
+  if (f && A[f]) A[f]();
+}
 // ---- 동작 ----
 const A = {
   goHome() {
@@ -1042,11 +1055,13 @@ const A = {
     S.plan = null;
     S.saved = true;
     go('home');
+    afterLeave();
   },
   saveLeave() {
     A.save();
     S.plan = null;
     go('home');
+    afterLeave();
   },
   saveGuide() {
     A.save(null, null, null, true);
@@ -1063,6 +1078,12 @@ const A = {
     if (el) window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - 140) });
   },
   newPlan() {
+    // 저장 안 한 계획을 보는 중이면 먼저 저장할지 물어요
+    if (S.view === 'plan' && !S.saved) {
+      S.afterLeave = 'newPlan';
+      A.goHome();
+      return;
+    }
     S.draft = defaultDraft();
     S.mv = null;
     go('dates');
@@ -1493,6 +1514,7 @@ const A = {
     render();
   },
   closeSheet() {
+    S.afterLeave = null;
     S.sheet = null;
     render();
   }

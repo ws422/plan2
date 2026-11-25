@@ -6541,7 +6541,6 @@ body {
   --h3-light: 0;
   --h3-sunop: 0.85;
   --h3-cloudop: 0.7;
-  --h3-fab: #1f2b4d;
   position: relative;
   min-height: 100vh;
   min-height: 100dvh;
@@ -6584,7 +6583,6 @@ body {
     --h3-light: 1;
     --h3-sunop: 1;
     --h3-cloudop: 0.22;
-    --h3-fab: #d63a1f;
   }
 }
 :root[data-theme='dark'] .h3 {
@@ -6620,7 +6618,6 @@ body {
   --h3-light: 1;
   --h3-sunop: 1;
   --h3-cloudop: 0.22;
-  --h3-fab: #d63a1f;
 }
 .h3-stars {
   fill: #fff;
@@ -6699,7 +6696,7 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 0 18px calc(124px + env(safe-area-inset-bottom));
+  padding: 0 18px calc(92px + env(safe-area-inset-bottom));
 }
 .h3-hero {
   margin-top: 26px;
@@ -7195,7 +7192,7 @@ body {
   font-weight: 800;
   cursor: pointer;
 }
-/* 아래 5칸 메뉴: 흰 바탕에 ＋ 자리만 둥글게 파이고, 줄무늬가 그 자리를 감싸요 */
+/* 아래 4칸 메뉴: 흰 바탕 위쪽 가장자리에 줄무늬 한 줄 */
 .h3-nav {
   position: fixed;
   z-index: 30;
@@ -7205,18 +7202,19 @@ body {
   width: 100%;
   max-width: 520px;
   box-sizing: border-box;
-  height: calc(84px + env(safe-area-inset-bottom));
-  padding: 16px 0 env(safe-area-inset-bottom);
+  height: calc(68px + env(safe-area-inset-bottom));
+  padding: 11px 0 env(safe-area-inset-bottom);
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: start;
-  background: radial-gradient(circle at 50% 0, transparent 39px, var(--surface) 39.5px);
+  background: var(--surface);
 }
-.h3-nav::before,
-.h3-nav::after {
+.h3-nav::before {
   content: '';
   position: absolute;
   top: -2.25px;
+  left: 0;
+  right: 0;
   height: 4.5px;
   background: repeating-linear-gradient(
     90deg,
@@ -7227,23 +7225,7 @@ body {
     #2459c9 20px 25px
   );
 }
-.h3-nav::before {
-  left: 0;
-  right: calc(50% + 38px);
-}
-.h3-nav::after {
-  left: calc(50% + 38px);
-  right: 0;
-}
-.h3-arc {
-  position: absolute;
-  top: -2.25px;
-  left: calc(50% - 40px);
-  overflow: visible;
-  pointer-events: none;
-}
-.h3-ni,
-.h3-fab {
+.h3-ni {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -7265,30 +7247,49 @@ body {
   color: var(--pri);
   font-weight: 800;
 }
-.h3-fab {
-  position: relative;
-  z-index: 1;
-  margin-top: -46px;
-  gap: 12px;
-  font-weight: 800;
-  color: var(--ink);
-}
-.h3-fab > span {
-  width: 60px;
-  height: 60px;
-  border-radius: 30px;
-  background: var(--h3-fab);
+/* 새 여행 시작 버튼: 첫 화면(계획이 없을 때)과 내 여행 탭 */
+.h3-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   color: #fff;
-  display: grid;
-  place-items: center;
-  box-shadow: 0 6px 16px rgba(31, 43, 77, 0.28);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  text-shadow: 0 1px 6px rgba(10, 15, 30, 0.35);
+  cursor: pointer;
 }
-.h3-fab .ic {
-  width: 26px;
-  height: 26px;
+.h3-start .ic {
+  width: 18px;
+  height: 18px;
+}
+.h3-new {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  border: 1.5px dashed color-mix(in srgb, var(--pri) 55%, transparent);
+  border-radius: 18px;
+  background: none;
+  color: var(--pri);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.h3-new .ic {
+  width: 20px;
+  height: 20px;
 }
 .v-home .toasts {
-  bottom: calc(110px + env(safe-area-inset-bottom));
+  bottom: calc(84px + env(safe-area-inset-bottom));
 }
 /* 다른 탭: 위쪽 하늘 띠 */
 .h3-band {
@@ -7325,7 +7326,7 @@ body {
 }
 .h3-page {
   position: relative;
-  padding: 12px 16px calc(112px + env(safe-area-inset-bottom));
+  padding: 12px 16px calc(92px + env(safe-area-inset-bottom));
   display: grid;
   gap: 12px;
 }
@@ -7608,7 +7609,7 @@ body {
   flex-direction: column;
 }
 .h3-p1 {
-  padding: calc(54px + env(safe-area-inset-top)) 18px calc(104px + env(safe-area-inset-bottom));
+  padding: calc(54px + env(safe-area-inset-top)) 18px calc(96px + env(safe-area-inset-bottom));
 }
 .h3-p1b {
   margin-top: auto;
@@ -7647,7 +7648,7 @@ body {
 }
 .h3-p2 {
   justify-content: flex-end;
-  padding: calc(70px + env(safe-area-inset-top)) 18px calc(124px + env(safe-area-inset-bottom));
+  padding: calc(70px + env(safe-area-inset-top)) 18px calc(92px + env(safe-area-inset-bottom));
 }
 .h3-p2 .h3-cards {
   margin-top: 0;
@@ -7671,4 +7672,52 @@ body {
 }
 .h3-p2 .h3-dots i.on {
   background: #fff;
+}
+/* 계획 화면: 위쪽 탭(일정·지도·길안내·교통비) + 아래는 홈과 같은 5칸 메뉴 */
+.appbar.has-pt {
+  row-gap: 8px;
+}
+.ptabs {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+.ptabs button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 36px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.ptabs button .ic {
+  width: 16px;
+  height: 16px;
+}
+.ptabs button.on {
+  background: #1f2b4d;
+  color: #fff;
+}
+.v-plan .days {
+  top: calc(var(--ab-h, 115px) + env(safe-area-inset-top));
+}
+.v-plan .plan {
+  padding-bottom: calc(92px + env(safe-area-inset-bottom));
+}
+.v-plan .plan.t-map {
+  padding-bottom: 0;
+}
+.v-plan .dmap {
+  height: calc(100vh - var(--ab-h, 115px) - 84px - 80px - env(safe-area-inset-bottom));
+}
+.v-plan .toasts {
+  bottom: calc(84px + env(safe-area-inset-bottom));
 }
