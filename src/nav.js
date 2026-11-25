@@ -59,7 +59,11 @@ function navBack() {
     A.goHome();
     return;
   }
-  if (S.view === 'areas') {
+  if (S.view === 'areas' || S.view === 'wplan') {
+    A.toHow();
+    return;
+  }
+  if (S.view === 'how') {
     A.toDates();
     return;
   }

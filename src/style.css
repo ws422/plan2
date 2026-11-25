@@ -7811,3 +7811,678 @@ body {
     margin-top: 8px;
   }
 }
+
+/* ===== 가고 싶은 곳 (wish.js) ===== */
+/* 동네 탭: 사진 오른쪽 「＋ 직접 장소 추가」 (부제목 줄과 가운데 맞춤) */
+.h3-bandbtn {
+  position: absolute;
+  z-index: 3;
+  right: 16px;
+  bottom: 27px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 11px;
+  border-radius: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(20, 24, 36, 0.38);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.h3-bandbtn .ic {
+  width: 16px;
+  height: 16px;
+}
+.h3-band.has-btn .h3-bt {
+  right: 144px;
+}
+.h3-band.has-btn .h3-bt p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 380px) {
+  .h3-band.has-btn .bopt {
+    display: none;
+  }
+  .h3-band.has-btn .h3-bt p {
+    font-size: 12px;
+  }
+}
+@media (max-width: 420px) {
+  html[lang='ja'] .h3-band.has-btn .bopt {
+    display: none;
+  }
+}
+.h3-seg.w4 {
+  grid-template-columns: 0.8fr 0.8fr 1.05fr 1.35fr;
+}
+.h3-seg.w4 button {
+  white-space: nowrap;
+  font-size: 14px;
+  padding: 0 4px;
+}
+@media (max-width: 370px) {
+  .h3-seg.w4 button {
+    font-size: 12.5px;
+  }
+}
+.h3-page.w-page {
+  padding-bottom: calc(160px + env(safe-area-inset-bottom));
+}
+.w-top,
+.w-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+.w-top b {
+  color: var(--ink);
+}
+.w-top > .ic,
+.w-hint > .ic {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--pri);
+}
+.w-hint {
+  background: none;
+  padding: 2px 2px 0;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+.w-hint > .ic {
+  width: 16px;
+  height: 16px;
+  color: #e0a00f;
+}
+.w-grp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 2px -4px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink-2);
+}
+.w-grp .ic {
+  width: 15px;
+  height: 15px;
+}
+.w-grp i {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+.w-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.w-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 11px 12px;
+  border: 1.5px solid transparent;
+}
+.w-row.in {
+  border-color: color-mix(in srgb, var(--pri) 35%, transparent);
+}
+.w-row > .ct {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+}
+.w-t {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  text-align: left;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+}
+button.w-t {
+  cursor: pointer;
+}
+.w-t b {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.w-t small {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.w-u,
+.w-app {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 800;
+  vertical-align: 1px;
+  color: var(--blue);
+  background: color-mix(in srgb, var(--blue) 10%, var(--surface));
+}
+.w-app {
+  color: var(--pri);
+  background: color-mix(in srgb, var(--pri) 10%, var(--surface));
+}
+.w-x {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.w-x .ic {
+  width: 16px;
+  height: 16px;
+}
+.w-addline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 13px;
+  border: 1.5px dashed color-mix(in srgb, var(--pri) 50%, transparent);
+  border-radius: 16px;
+  background: none;
+  color: var(--pri);
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.w-addline .ic {
+  width: 18px;
+  height: 18px;
+}
+.w-empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 26px 18px;
+  text-align: center;
+  background: var(--surface);
+  border-radius: 18px;
+}
+.w-empty > .ic {
+  width: 28px;
+  height: 28px;
+  color: var(--pri);
+}
+.w-empty b {
+  font-size: 15.5px;
+  color: var(--ink);
+}
+.w-empty small {
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+/* 「이 장소들로 계획 짜기」: 아래 메뉴 바로 위에 고정 */
+.w-cta {
+  position: fixed;
+  z-index: 29;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(68px + env(safe-area-inset-bottom));
+  width: 100%;
+  max-width: 520px;
+  box-sizing: border-box;
+  padding: 10px 16px 12px;
+  background: linear-gradient(to top, var(--bg) 75%, transparent);
+}
+.w-cta .btn {
+  width: 100%;
+}
+/* 동네 둘러보기·추천 목록의 ＋ / ✓ */
+.ar-top li,
+.ar-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ar-top li .ar-tc,
+.ar-list li .arl-b {
+  flex: 1;
+  min-width: 0;
+}
+.w-plus {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--line);
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+.w-plus .ic {
+  width: 17px;
+  height: 17px;
+}
+.w-plus.on {
+  background: var(--pri);
+  border-color: var(--pri);
+  color: #fff;
+}
+/* 직접 장소 추가: 주의사항 · 종류·시간 */
+.w-caution {
+  margin-top: 12px;
+  padding: 13px 14px;
+  border-radius: 16px;
+  background: color-mix(in srgb, #e8a317 12%, var(--surface));
+  border: 1.5px solid color-mix(in srgb, #e8a317 45%, transparent);
+}
+.w-caution.hot {
+  border-color: var(--bad);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--bad) 15%, transparent);
+}
+.w-caution h4 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 8px;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.w-caution h4 .ic {
+  width: 18px;
+  height: 18px;
+  color: #c98a00;
+}
+.w-caution ol {
+  margin: 0;
+  padding: 0 0 0 18px;
+  display: grid;
+  gap: 6px;
+}
+.w-caution li {
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.w-caution li b {
+  color: var(--ink);
+}
+.w-caution small {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.w-gbtn {
+  margin-top: 10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.w-gbtn .ic {
+  width: 16px;
+  height: 16px;
+}
+.w-kind {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+.w-kind .fld > span small {
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.w-kind .chips-sel button {
+  padding: 8px 14px;
+  font-size: 13.5px;
+}
+/* 새 여행 2단계: 어떻게 짤까요? */
+.how-p {
+  margin: 4px 2px 14px;
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.how-c {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 18px;
+  text-align: left;
+  border: 2px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+.how-c.on {
+  border-color: var(--pri);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--pri) 14%, transparent);
+}
+.how-i {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  color: var(--blue);
+  background: color-mix(in srgb, var(--blue) 12%, var(--surface));
+}
+.how-c.on .how-i {
+  color: var(--pri);
+  background: color-mix(in srgb, var(--pri) 12%, var(--surface));
+}
+.how-i .ic {
+  width: 26px;
+  height: 26px;
+}
+.how-b {
+  flex: 1;
+  min-width: 0;
+}
+.how-b > b {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 17.5px;
+  font-weight: 800;
+}
+.how-b > small {
+  display: block;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.how-l {
+  display: grid;
+  gap: 5px;
+  margin-top: 10px;
+}
+.how-l span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.how-l .ic {
+  width: 15px;
+  height: 15px;
+  color: var(--ok);
+}
+.how-n {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--pri);
+  background: color-mix(in srgb, var(--pri) 10%, var(--surface));
+}
+.how-r {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+}
+.how-c.on .how-r {
+  border-color: var(--pri);
+  background: var(--pri);
+  color: #fff;
+}
+.how-r .ic {
+  width: 15px;
+  height: 15px;
+}
+/* 가고 싶은 곳으로 짜기 화면 */
+.wplan {
+  display: grid;
+  gap: 10px;
+}
+.w-row.wp {
+  align-items: flex-start;
+}
+.w-row.wp > .ct {
+  margin-top: 2px;
+}
+.w-star {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  margin: 4px -4px 0 -4px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  color: var(--line);
+  cursor: pointer;
+}
+.w-star .ic {
+  width: 21px;
+  height: 21px;
+}
+.w-star.on {
+  color: #e8a317;
+}
+.w-star.on .ic path {
+  fill: currentColor;
+}
+.w-fix {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.w-fix select {
+  max-width: 100%;
+  padding: 5px 8px;
+  border-radius: 10px;
+  border: 1.5px dashed var(--line);
+  background: var(--surface);
+  color: var(--ink-3);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+}
+.w-fix select.set {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--blue) 40%, transparent);
+  color: var(--blue);
+  background: color-mix(in srgb, var(--blue) 8%, var(--surface));
+}
+.w-adds {
+  margin-top: 4px;
+}
+.w-tog {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--surface);
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  cursor: pointer;
+}
+.w-tog > span {
+  flex: 1;
+}
+.w-tog b {
+  display: block;
+  font-size: 14px;
+}
+.w-tog small {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.w-sw {
+  flex: none;
+  position: relative;
+  width: 46px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--line);
+  transition: background 0.15s;
+}
+.w-sw::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left 0.15s;
+}
+.w-sw.on {
+  background: var(--pri);
+}
+.w-sw.on::after {
+  left: 21px;
+}
+/* 시트: 추천 장소 담기 */
+.w-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 10px;
+  padding: 0 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink-3);
+}
+.w-search .ic {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+.w-search input {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 14.5px;
+  color: var(--ink);
+  outline: none;
+}
+.w-chips {
+  display: flex;
+  gap: 6px;
+  margin: 0 -18px 8px;
+  padding: 0 18px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.w-chips::-webkit-scrollbar {
+  display: none;
+}
+.w-chips button {
+  flex: none;
+  padding: 7px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.w-chips button.on {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+}
+.w-chips.soft button.on {
+  background: color-mix(in srgb, var(--pri) 10%, var(--surface));
+  border-color: color-mix(in srgb, var(--pri) 40%, transparent);
+  color: var(--pri);
+}
+.s-wpick .w-list {
+  margin-top: 6px;
+}
+.w-none {
+  padding: 18px 8px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+/* 계획 화면 위 결과 알림 */
+.w-banner .w-bd {
+  display: inline-block;
+  margin: 4px 10px 0 0;
+  white-space: nowrap;
+}
+.w-banner .btn.wide {
+  width: 100%;
+  margin-top: 10px;
+}

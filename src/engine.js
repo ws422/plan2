@@ -226,6 +226,55 @@ function fareUnknown(f) {
 // 출발한다고 보고, 역·정류장에 닿는 시각 이후 가장 빠른 차를 잡아요. 막차가 지나면 lastGone = true.
 const LINE_HW = { kuko: 5, hako: 7, nana: 7 }; // 지하철 노선별 배차 간격(분, 낮 기준)
 const SERVICE = { subway: [330, 1450], bus: [390, 1420], train: [330, 1440], ferry: [480, 1050] }; // 첫차~막차(분)
+// 화면 글자 (한국어, 일본어). 일본어 장치(i18n.js)가 없는 곳(깃허브 점검 tools/check.js)에서는 한국어로
+function LL(ko, ja) {
+  return typeof L === 'function' ? L(ko, ja) : ko;
+}
+// 노선별 첫차·막차 (분, 타는 곳에서 출발하는 시각). 2026년 10월 시간표 기준 대략값 — 바뀌면 여기만 고쳐요
+// out: 후쿠오카 → 그 지역 / back: 그 지역 → 후쿠오카
+const SVC_ROUTE = {
+  'yufuin:0': { out: [528, 1008], back: [480, 1020], n: ['고속버스 유후인호', '高速バスゆふいん号'] }, // 하카타BT 08:48~16:48 · 유후인 08:00~17:00
+  'yufuin:1': { out: [463, 1110], back: [548, 1167], n: ['JR 특급 유후·유후인노모리', 'JR特急ゆふ・ゆふいんの森'] }, // 하카타 07:43~18:30 · 유후인 09:08~19:27
+  'beppu:0': { out: [381, 1326], back: [321, 1298], n: ['JR 특급 소닉', 'JR特急ソニック'] }, // 하카타 06:21~22:06 · 벳푸 05:21~21:38
+  airbus: { out: [390, 1260], back: [390, 1260], n: ['공항 직행버스', '空港直行バス'] } // 국제선 → 하카타역 막차 21:00
+};
+// 이동 o 의 '주로 타는 차'가 다니는 시간 {w:[첫차, 막차], pre: 타기 전까지 걸리는 분, n: 이름}. 확인 안 하는 이동이면 null
+// (시내·동네 버스는 일반 버스 시간 6:30~23:40, 배는 섬·노선마다 달라서 따로 보지 않아요)
+function svcOf(o) {
+  if (!o) return null;
+  if (o.airBus) {
+    const r = SVC_ROUTE.airbus;
+    return { w: o.airBus.out ? r.out : r.back, pre: o.airBus.out ? 0 : Math.max(0, o.min - 23), n: LL(...r.n) };
+  }
+  const g = (o.gparts || []).find(x => x.vkey);
+  const r = g && SVC_ROUTE[g.vkey];
+  if (r) return { w: g.out ? r.out : r.back, pre: o.pre || 0, n: LL(...r.n) };
+  const nm = { subway: ['지하철', '地下鉄'], train: ['전철', '電車'], bus: ['버스', 'バス'] }[o.mode];
+  if (nm && SERVICE[o.mode]) return { w: SERVICE[o.mode], pre: o.pre || 0, n: LL(...nm) };
+  return null;
+}
+// 출발 시각 t 기준 첫차·막차 확인 (계획 짤 때)
+//  - 첫차 전이면 첫차까지 기다리는 시간을 더해요 (firstWait · firstAt)
+//  - 막차가 지났으면 고를 수 없게(isOff) 하고 이유를 적어요 (svcGone · offNote) → 기본 선택이 택시 등으로 바뀌어요
+function svcCheck(o, t) {
+  const s = svcOf(o);
+  if (!s || t == null) return o;
+  const board = t + s.pre,
+    [f, l] = s.w;
+  if (board > l && board < f + 1440) return svcGoneOf(o, s);
+  if (board < f) return { ...o, min: o.min + (f - board), firstWait: f - board, firstAt: f, svcName: s.n };
+  return o;
+}
+function svcGoneOf(o, s) {
+  return {
+    ...o,
+    isOff: true,
+    svcGone: true,
+    svcName: s.n,
+    svcLast: s.w[1],
+    offNote: LL(`막차가 끝났어요 · ${s.n} 막차 약 ${fmt(s.w[1] % 1440)}`, `最終便が終わりました · ${s.n}の最終 約${fmt(s.w[1] % 1440)}`)
+  };
+}
 // 교통편 이름으로 배차 간격(분) 추정
 function hwOf(label, mode) {
   const L = label || '';
@@ -256,7 +305,8 @@ function nextDep(t, hw, phase, first, last) {
 function withTimetable(o, t0) {
   if (!o || !o.hw || t0 == null || (o.mode !== 'subway' && o.mode !== 'train')) return o;
   const board = t0 + (o.pre || 0),
-    svc = SERVICE[o.mode] || [330, 1440];
+    so = svcOf(o),
+    svc = (so && so.w) || SERVICE[o.mode] || [330, 1440];
   const { d, over } = nextDep(board, o.hw, phaseOf(o.label || o.mode, o.hw), svc[0], svc[1]);
   const wait = d - board,
     wait0 = Math.min(o.wait0 == null ? o.hw / 2 : o.wait0, Math.max(0, o.min - 1));
@@ -567,29 +617,55 @@ function isOff(o, date) {
 }
 // 이동 방법 목록에서 기본으로 고를 것
 function pickDefault(opts, date) {
-  opts = opts.filter(o => !isOff(o, date));
+  const all = opts;
+  opts = opts.filter(o => !o.isOff && !isOff(o, date));
+  if (!opts.length) return all[0];
   const walk = opts.find(o => o.mode === 'walk');
   if (opts.length === 1) return opts[0];
   if (walk && walk.min <= 15) return walk;
   const pub = opts.filter(o => o.mode !== 'taxi' && o.mode !== 'walk');
   const eff = o => o.min + fareSum(o.fare) / 100;
-  const best = pub.sort((x, y) => eff(x) - eff(y))[0];
+  const best = pub.sort((x, y) => eff(x) - eff(y))[0],
+    taxi = opts.find(o => o.mode === 'taxi');
+  // 막차가 끝났거나 첫차를 한참 기다려야 하는 시간: 택시까지 같이 견주고, 오래 걷는 길(25분 넘게)은 고르지 않아요
+  if (taxi && all.some(o => o.svcGone || o.firstWait > 20 || (o.tt && o.wait > 20))) {
+    const b2 = [...pub, taxi].sort((x, y) => eff(x) - eff(y))[0];
+    return walk && walk.min <= 25 && walk.min <= eff(b2) + 3 ? walk : b2;
+  }
   if (walk && (!best || walk.min <= best.min + 3)) return walk;
-  return best || opts.find(o => o.mode === 'taxi') || walk || opts[0];
+  return best || taxi || walk || opts[0];
 }
 // 두 지점 사이 가장 나은 방법 하나
 function bestOpt(a, b) {
   return pickDefault(legOptions(a, b));
 }
-// 일정 칸 사이 이동: 직접 고른 방법이 있으면 그것, 없으면 기본. t 가 있으면 그 시각 기준 '다음 차'
-function chooseLeg(a, b, mode, date, t) {
+// 일정 칸 사이 이동: 직접 고른 방법이 있으면 그것, 없으면 기본.
+// t(출발 시각)가 있으면 첫차·막차를 확인하고(svcCheck), live 면 그 시각 이후 '다음 차'에 맞춰요(withTimetable)
+// 막차가 끝나 원래 고를 방법을 못 쓰면 swapFrom 에 그 방법을 적어요 (화면에 「막차 끝남 → 택시」)
+function chooseLeg(a, b, mode, date, t, live) {
   const base = legOptions(a, b),
-    timed = t == null ? base : base.map(o => withTimetable(o, t));
+    timed =
+      t == null
+        ? base
+        : base.map(o => {
+            const g = svcCheck(o, t);
+            if (g.isOff || !live) return g;
+            const tt = withTimetable(o, t);
+            if (!tt.tt) return g;
+            return tt.lastGone ? svcGoneOf(o, svcOf(o)) : tt;
+          });
   const opts = timed.map(o => (isOff(o, date) ? { ...o, isOff: true } : o));
-  const pick =
-    (mode && (opts.find(o => o.id === mode && !o.isOff) || opts.find(o => o.mode === mode && !o.isOff))) ||
-    pickDefault(opts, date);
-  return { ...pick, chosen: !!(mode && (pick.id === mode || pick.mode === mode)), opts };
+  const want = (list, ok) =>
+    (mode && (list.find(o => o.id === mode && ok(o)) || list.find(o => o.mode === mode && ok(o)))) ||
+    pickDefault(list, date);
+  const pick = want(opts, o => !o.isOff);
+  let swapFrom = null;
+  if (opts.some(o => o.svcGone)) {
+    const un = opts.map(o => (o.svcGone ? { ...o, isOff: false } : o)),
+      w = want(un, o => !isOff(o, date));
+    if (w.svcGone && w.id !== pick.id) swapFrom = { mode: w.mode, id: w.id, n: w.svcName, last: w.svcLast };
+  }
+  return { ...pick, chosen: !!(mode && (pick.id === mode || pick.mode === mode)), opts, swapFrom };
 }
 
 // ---- 계획 모델 ----
@@ -831,8 +907,8 @@ function inSeason(s, date) {
 }
 let WD = ['일', '월', '화', '수', '목', '금', '토'];
 
-// ★ 새 계획 만들기: 날짜·숙소·고른 동네로 날마다 일정을 채워요
-function createPlan(set, areaIds) {
+// 새 계획의 뼈대: 날짜별 하루(시작·마무리 시각), 첫날 짐 맡기기, 숙소
+function planShell(set, areaIds) {
   const dates = datesBetween(set.start, set.end);
   const N = dates.length;
   const plan = {
@@ -865,6 +941,11 @@ function createPlan(set, areaIds) {
   plan.set.stays = normStays(set.stays, N - 1, set.hotel);
   if (!plan.set.stays.length) delete plan.set.stays;
   syncMoveItems(plan);
+  return plan;
+}
+// ★ 새 계획 만들기: 날짜·숙소·고른 동네로 날마다 일정을 채워요
+function createPlan(set, areaIds) {
+  const plan = planShell(set, areaIds);
   const alloc = allocate(
     plan,
     areaIds.map(id => AREA[id])
@@ -887,6 +968,256 @@ function createPlan(set, areaIds) {
   rebalance(plan);
   plan.days.forEach((d, i) => cleanModes(plan, i));
   return plan;
+}
+// ★ 가고 싶은 곳으로 계획 만들기 (직접 고르기)
+// entries: [{ w: 가고 싶은 곳 한 곳, must: 꼭 갈 곳, day: 고정한 날(0부터) 또는 null, at: 고정한 시각(분) 또는 null }]
+// opt.fill: 남는 시간을 앱 추천(근처 맛집·명소)으로 채울지
+// 순서: ① 같은 동네끼리 묶어 날짜에 나누기(먼 곳은 하루 따로, 날짜 고정은 그날)
+//       ② 식당은 점심·저녁, 예약 시간은 그 시각에  ③ (켰으면) 빈 시간 채우기
+//       ④ 날마다 이동이 가장 짧은 순서로 + 문 여는 시간·식사·막차 맞추기  ⑤ 넘치면 꼭 갈 곳이 아닌 곳부터 보류함
+function areaNear(pt) {
+  return AREAS.slice().sort((a, b) => km(a, pt) - km(b, pt))[0];
+}
+function wishPt(w) {
+  return w.sid ? SPOT[w.sid] : w;
+}
+function wishItem(e) {
+  const w = e.w;
+  let it;
+  if (w.sid) it = mkItem(w.sid, 'wish');
+  else
+    it = {
+      uid: uid(),
+      n: w.n,
+      custom: true,
+      cat: w.c || 'free',
+      stay: w.stay || 60,
+      lat: w.lat,
+      lng: w.lng,
+      z: w.z || areaNear(w).z,
+      wh: 'pin',
+      src: 'wish'
+    };
+  it.wid = w.id;
+  if (e.must) it.must = true;
+  if (e.day != null) it.fixDay = e.day;
+  if (e.at != null) it.at = e.at;
+  return it;
+}
+function createPlanWish(set, entries, opt = {}) {
+  const plan = planShell(set, []);
+  plan.mode = 'wish';
+  const N = plan.days.length,
+    caps = plan.days.map((d, i) => dayCap(plan, i)),
+    avg = caps.reduce((a, b) => a + b, 0) / N;
+  const cost = x => x.it.stay + 15;
+  const xs = entries
+    .filter(e => e.w && (!e.w.sid || SPOT[e.w.sid]))
+    .map(e => ({ it: wishItem(e), aid: e.w.sid ? SPOT[e.w.sid].a : e.w.a || areaNear(e.w).id, day: e.day }));
+  const fixedBy = plan.days.map(() => []),
+    free = [];
+  xs.forEach(x => (x.day != null && x.day >= 0 && x.day < N ? fixedBy[x.day] : free).push(x));
+  // ① 같은 동네끼리 묶기. 시내 동네가 하루에 다 못 볼 만큼 많으면 가까운 순서로 나눠요
+  const byA = {};
+  free.forEach(x => (byA[x.aid] = byA[x.aid] || []).push(x));
+  const groups = [];
+  Object.keys(byA).forEach(aid => {
+    const a = AREA[aid],
+      lim = Math.max(180, avg * 0.7);
+    let rest = byA[aid].slice(),
+      cur = a,
+      chunk = [],
+      sum = 0;
+    while (rest.length) {
+      rest.sort((p, q) => km(cur, itemPt(plan, p.it)) - km(cur, itemPt(plan, q.it)));
+      const x = rest.shift();
+      if (chunk.length && a.z === 'city' && sum + cost(x) > lim) {
+        groups.push({ ...a, min: sum, xs: chunk });
+        chunk = [];
+        sum = 0;
+      }
+      chunk.push(x);
+      sum += cost(x);
+      cur = itemPt(plan, x.it);
+    }
+    if (chunk.length) groups.push({ ...a, min: sum, xs: chunk });
+  });
+  // 날짜를 고정한 곳은 먼저 그날에
+  const init = { asg: plan.days.map(() => []), load: plan.days.map(() => 0) };
+  fixedBy.forEach((ys, i) => {
+    const by = {};
+    ys.forEach(y => (by[y.aid] = by[y.aid] || []).push(y));
+    Object.keys(by).forEach(aid => {
+      const g = { ...AREA[aid], min: by[aid].reduce((t, y) => t + cost(y), 0) };
+      init.asg[i].push(g);
+      init.load[i] += g.min + 2 * accessMin(g.z);
+    });
+  });
+  const alloc = allocate(plan, groups, init);
+  plan.days.forEach((day, i) => {
+    const mine = [...fixedBy[i], ...alloc[i].filter(g => g.xs).flatMap(g => g.xs)];
+    day.areas = [...new Set(mine.map(x => x.aid))];
+    mine.forEach(x => day.items.push(x.it));
+  });
+  // ② 식사 정하기 ③ 빈 시간 채우기 ④ 순서·시간 ⑤ 넘치면 보류함
+  plan.days.forEach((day, i) => {
+    const s0 = toMin(day.start.time),
+      e0 = toMin(day.end.time),
+      canL = s0 <= 750 && e0 >= 810,
+      canD = e0 >= 1170,
+      has = {};
+    const wishes = day.items.filter(it => it.src === 'wish');
+    const isFood = it => (it.sid ? !!SPOT[it.sid].meal : it.cat === 'food');
+    const night = it => !!(it.sid && (SPOT[it.sid].b === 'n' || SPOT[it.sid].pd));
+    // 저녁 전에 문 닫는 곳은 저녁으로, 점심 뒤에 여는 곳·밤에만 하는 곳은 점심으로 넣지 않아요
+    const okD = it => !(it.sid && SPOT[it.sid].to && toMin(SPOT[it.sid].to) < 1110);
+    const okL = it => !(it.sid && (SPOT[it.sid].b === 'n' || (SPOT[it.sid].from && toMin(SPOT[it.sid].from) > 780)));
+    wishes
+      .filter(it => isFood(it) && it.at != null)
+      .forEach(it => {
+        const w = mealWin(it.at);
+        if (w && !has[w]) {
+          it.meal = w;
+          has[w] = true;
+        }
+      });
+    wishes
+      .filter(it => isFood(it) && it.at == null)
+      .sort((a, b) => night(b) - night(a))
+      .forEach(it => {
+        if (night(it) && canD && !has.D && okD(it)) it.meal = has.D = 'D';
+        else if (canL && !has.L && okL(it)) it.meal = has.L = 'L';
+        else if (canD && !has.D && okD(it)) it.meal = has.D = 'D';
+      });
+    const cafe = wishes.find(
+      it => !it.meal && (it.sid ? ['cafe', 'sweet'].includes(SPOT[it.sid].menu) : it.cat === 'cafe')
+    );
+    if (cafe && s0 <= 840 && e0 >= 1080) cafe.meal = has.S = 'S';
+    if (opt.fill) {
+      let areas = (day.areas || []).map(id => AREA[id]);
+      if (!areas.length) {
+        // 담은 곳이 없는 날: 그날 숙소에서 가까운 시내 동네로
+        const ref = N > 1 ? hotelPt(nightHotel(plan, Math.min(i, N - 2))) : AREA.hakata;
+        const near = AREAS.filter(a => a.kind === 'city').sort((a, b) => km(a, ref) - km(b, ref))[0];
+        areas = [near];
+        day.areas = [near.id];
+      }
+      const used = wishes.reduce((t, it) => t + it.stay + 12, 0);
+      pickSpots(plan, i, areas, { used, has, fill: true }).forEach(p => {
+        if (p.gen) day.items.push(snackItem(p.gen));
+        else {
+          const it = mkItem(p.s.id, 'auto');
+          if (p.meal) it.meal = p.meal;
+          day.items.push(it);
+        }
+      });
+    }
+    reorderDay(plan, i, leadingFixed(day));
+    // 그 동네 장소를 다 넣었는데도 빈 시간이 길면 (예약 시각까지 기다리는 시간 포함) 가까운 시내 동네에서 더 채워요
+    for (let round = 0; opt.fill && round < 2; round++) {
+      if ((day.areas || []).some(id => AREA[id].z !== 'city')) break;
+      const c = computeDay(plan, i);
+      let idle = 0;
+      c.rows.forEach((r, k) => {
+        if (r.it.at == null) return;
+        const prev = k ? c.rows[k - 1].dep : c.start;
+        idle += Math.max(0, r.arr - (prev + r.leg.min));
+      });
+      if (c.deadline - c.endArr + idle < 100) break;
+      const mine = new Set(day.areas),
+        ref = day.areas.length ? AREA[day.areas[0]] : AREA.hakata,
+        city = AREAS.filter(a => a.kind === 'city' && !mine.has(a.id)),
+        free = city.filter(a => !plan.days.some(d => (d.areas || []).includes(a.id)));
+      const next = (free.length ? free : city).sort((a, b) => km(a, ref) - km(b, ref))[0];
+      if (!next) break;
+      day.areas.push(next.id);
+      const used = day.items.reduce((t, it) => t + it.stay + 12, 0); // 기다리는 시간은 비어 있는 시간으로 쳐요
+      const add = pickSpots(plan, i, [next], { used, has: { L: true, D: true, S: true }, fill: true });
+      if (!add.length) break;
+      add.forEach(p => {
+        if (!p.gen) day.items.push(mkItem(p.s.id, 'auto'));
+      });
+      reorderDay(plan, i, leadingFixed(day));
+    }
+    trimDay(plan, i, leadingFixed(day));
+    snackFit(plan, i);
+  });
+  moveMusts(plan);
+  rebalance(plan);
+  plan.days.forEach((d, i) => cleanModes(plan, i));
+  // 날마다 실제로 들르는 동네만 남겨요 (일차 카드에 보이는 동네 이름)
+  plan.days.forEach(d => {
+    d.areas = (d.areas || []).filter(id =>
+      d.items.some(it => (it.sid ? SPOT[it.sid].a === id : it.src === 'wish' && areaNear(it).id === id))
+    );
+  });
+  plan.areas = [...new Set(plan.days.flatMap(d => d.areas || []))];
+  return plan;
+}
+// 꼭 갈 곳(★)이 많아 시간이 넘치는 날: 날짜를 고정하지 않은 ★를 여유 있는 다른 날로 옮겨 봐요
+// (옮긴 날이 넘치면 그날의 ★ 아닌 곳을 보류함으로. 그래도 넘치면 되돌려요)
+function moveMusts(plan) {
+  for (let i = 0; i < plan.days.length; i++) {
+    for (let guard = 0; guard < 6 && computeDay(plan, i).over > 20; guard++) {
+      const day = plan.days[i],
+        cand = day.items.filter(it => it.must && it.fixDay == null && it.at == null).sort((a, b) => b.stay - a.stay);
+      let moved = false;
+      for (const it of cand) {
+        const pt = itemPt(plan, it);
+        const order = plan.days
+          .map((d, j) => ({ j, c: computeDay(plan, j) }))
+          .filter(x => x.j !== i && x.c.deadline - x.c.endArr > it.stay + 20)
+          .sort((a, b) => {
+            const near = j => Math.min(9, ...plan.days[j].items.map(o => km(itemPt(plan, o), pt)));
+            return near(a.j) - near(b.j) || b.c.deadline - b.c.endArr - (a.c.deadline - a.c.endArr);
+          });
+        for (const { j } of order) {
+          const snapI = clone(day),
+            snapJ = clone(plan.days[j]),
+            snapP = clone(plan.parked);
+          day.items = day.items.filter(x => x !== it);
+          plan.days[j].items.push(it);
+          reorderDay(plan, j, leadingFixed(plan.days[j]));
+          trimDay(plan, j, leadingFixed(plan.days[j]));
+          if (computeDay(plan, j).over <= 10 && plan.days[j].items.includes(it)) {
+            reorderDay(plan, i, leadingFixed(day));
+            const a = it.sid ? SPOT[it.sid].a : areaNear(pt).id;
+            if (!(plan.days[j].areas || []).includes(a)) (plan.days[j].areas = plan.days[j].areas || []).push(a);
+            moved = true;
+            break;
+          }
+          plan.days[i] = snapI;
+          plan.days[j] = snapJ;
+          plan.parked = snapP;
+        }
+        if (moved) break;
+      }
+      if (!moved) break;
+    }
+  }
+}
+// 가고 싶은 곳으로 짠 결과 요약 (계획 화면 위 알림)
+function wishSummary(plan) {
+  const days = plan.days.map((d, i) => {
+    const w = d.items.filter(it => it.src === 'wish');
+    return {
+      i,
+      n: w.length,
+      fill: d.items.filter(it => it.src === 'auto' && !it.fixed && !it.place).length,
+      areas: (d.areas || []).filter(id => AREA[id]),
+      over: computeDay(plan, i).over
+    };
+  });
+  const all = plan.days.flatMap(d => d.items.filter(it => it.src === 'wish'));
+  return {
+    n: all.length + plan.parked.filter(p => p.src === 'wish').length,
+    placed: all.length,
+    must: all.filter(it => it.must).length,
+    fixed: all.filter(it => it.at != null).map(it => ({ n: itemName(plan, it), at: it.at, di: plan.days.findIndex(d => d.items.includes(it)) })),
+    fill: days.reduce((t, d) => t + d.fill, 0),
+    parked: plan.parked.map(p => ({ n: itemName(plan, p), reason: p.reason, wish: p.src === 'wish' })),
+    days
+  };
 }
 // 간식이 점심·저녁과 너무 붙으면(1시간 30분 안) 빼요. 플래너가 아는 카페면 간식 표시만 떼고 그대로 들러요
 function snackFit(plan, di) {
@@ -920,11 +1251,12 @@ function leadingFixed(day) {
 }
 
 // 고른 동네를 날짜에 나누기 (숙소에서 가까운 동네를 그날로)
-function allocate(plan, areas) {
+// init: 이미 날짜가 정해진 것(가고 싶은 곳에서 날짜를 고정한 곳)이 있으면 { asg: 날마다 동네, load: 날마다 쓴 분 }
+function allocate(plan, areas, init) {
   const N = plan.days.length,
     caps = plan.days.map((d, i) => dayCap(plan, i));
-  const asg = plan.days.map(() => []),
-    load = caps.map(() => 0);
+  const asg = init ? init.asg.map(x => x.slice()) : plan.days.map(() => []),
+    load = init ? init.load.slice() : caps.map(() => 0);
   const need = a => a.min + 2 * accessMin(a.z);
   const edge = i => N > 2 && (i === 0 || i === N - 1);
   const hp = plan.days.map((d, i) => (i < N - 1 ? hotelPt(nightHotel(plan, i)) : null)); // 숙소로 돌아오는 날만 숙소와 가까운 동네를 우선
@@ -962,15 +1294,18 @@ function allocate(plan, areas) {
 }
 
 // 하루에 넣을 장소·식당 고르기
-function pickSpots(plan, i, areas) {
+// opt (가고 싶은 곳으로 짤 때 빈 시간 채우기): used = 이미 넣은 곳이 쓰는 분, has = 이미 정해진 식사 {L, D, S}, fill = 남는 시간만큼만
+function pickSpots(plan, i, areas, opt = {}) {
   const day = plan.days[i];
   const s0 = toMin(day.start.time),
-    e0 = toMin(day.end.time);
-  let budget = dayCap(plan, i);
+    e0 = toMin(day.end.time),
+    has = opt.has || {};
+  let budget = dayCap(plan, i) - (opt.used || 0);
   areas.forEach(a => {
     if (a.z !== 'city') budget -= 2 * accessMin(a.z);
   });
   const taken = new Set(plan.days.flatMap(d => d.items.map(it => it.sid)).filter(Boolean));
+  if (opt.fill) plan.parked.forEach(p => p.sid && taken.add(p.sid)); // 보류함에 간 곳을 다른 날 다시 고르지 않게
   const ok = s =>
     !taken.has(s.id) &&
     inSeason(s, day.date) &&
@@ -984,8 +1319,8 @@ function pickSpots(plan, i, areas) {
     taken.add(s.id);
     budget -= s.s + 12;
   };
-  const needL = s0 <= 750 && e0 >= 810,
-    needD = e0 >= 1170;
+  const needL = !has.L && s0 <= 750 && e0 >= 810,
+    needD = !has.D && e0 >= 1170;
   const hasOuter = areas.some(a => a.z !== 'city');
   const meals = SPOTS.filter(s => s.meal && ok(s));
   const near = (pool, ref) => pool.slice().sort((x, y) => km(x, ref) - km(y, ref));
@@ -1046,7 +1381,7 @@ function pickSpots(plan, i, areas) {
     if (s) takeMeal(s, 'D');
   }
   // 간식 시간 (오후 3~4시): 하루가 길고 여유가 있으면 그 동네 카페·디저트, 없으면 「카페·디저트 타임」 칸
-  const needS = s0 <= 840 && e0 >= 1080 && budget >= 200;
+  const needS = !has.S && s0 <= 840 && e0 >= 1080 && budget >= 200;
   if (needS) {
     const snack = SPOTS.filter(
       s =>
@@ -1074,7 +1409,7 @@ function pickSpots(plan, i, areas) {
       .sort((x, y) => y.p - x.p)
       .forEach(s => {
         const c = s.s + 12;
-        if (used === 0 || used + c <= share + 10) {
+        if ((used === 0 && !opt.fill) || used + c <= share + 10) {
           take(s);
           used += c;
         }
@@ -1090,6 +1425,7 @@ function timePen(c, arr, ctx) {
   const sp = c.sp,
     it = c.it;
   let p = 0;
+  if (it.at != null && arr > it.at) p += (arr - it.at) * 20; // 예약 시간보다 늦으면 아주 크게 (거의 꼭 지켜요)
   if (it.meal === 'L') p += outside(arr, 690, 810) * 1.2;
   else if (it.meal === 'D') p += outside(arr, 1080, 1200) * 1.2;
   else if (it.meal === 'S') p += outside(arr, 870, 990) * 0.8;
@@ -1115,6 +1451,11 @@ function seqEval(ctx, seq) {
   for (const c of seq) {
     const m = bestOpt(cur, c.pt).min;
     t += m;
+    // 예약 시간보다 일찍 도착하면 그때까지 기다려요 (기다리는 시간은 조금 벌점)
+    if (c.it.at != null && t < c.it.at) {
+      cost += (c.it.at - t) * 0.5;
+      t = c.it.at;
+    }
     cost += m + timePen(c, t, ctx);
     t += c.it.stay;
     cur = c.pt;
@@ -1194,8 +1535,9 @@ function computeDay(plan, di) {
   for (const it of day.items) {
     const p = itemPt(plan, it),
       key = ck + '>' + it.uid,
-      leg = chooseLeg(cur, p, day.modes[key], day.date, live ? t : null);
+      leg = chooseLeg(cur, p, day.modes[key], day.date, t, live);
     let arr = t + leg.min;
+    if (it.at != null && arr < it.at) arr = it.at; // 예약 시간까지 기다려요
     if (it.arrAct != null) {
       arr = it.arrAct;
       live = true;
@@ -1207,6 +1549,8 @@ function computeDay(plan, di) {
       live = true;
     } // '지금 출발'로 넣은 실제 출발 시각
     const warn = [];
+    if (it.at != null && it.arrAct == null && arr > it.at + 5)
+      warn.push(LL(`예약 시간 ${fmt(it.at)}보다 늦게 도착해요`, `予約時間 ${fmt(it.at)} より遅れて着きます`));
     const s = it.sid && SPOT[it.sid];
     if (s) {
       if (s.cl && s.cl.includes(wd)) warn.push(`${WD[wd]}요일은 휴관일 수 있어요`);
@@ -1222,7 +1566,7 @@ function computeDay(plan, di) {
     ck = it.uid;
   }
   const endKey = ck + '>E',
-    endLeg = chooseLeg(cur, endPt, day.modes[endKey], day.date, live ? t : null);
+    endLeg = chooseLeg(cur, endPt, day.modes[endKey], day.date, t, live);
   const endArr = t + endLeg.min,
     deadline = toMin(day.end.time);
   const walkKm =
@@ -1254,8 +1598,10 @@ function mealsUsedBefore(plan, di, n) {
   return { used, c };
 }
 // 장소 우선순위 점수
+// 가고 싶은 곳(wish)은 앱이 고른 곳보다 늦게 빠지고, 꼭 갈 곳(must)은 빠지지 않아요
 function pri(it) {
-  return it.sid ? SPOT[it.sid].p : it.snack ? 1 : 3;
+  const b = it.sid ? SPOT[it.sid].p : it.snack ? 1 : 3;
+  return it.must ? 99 : it.src === 'wish' ? b + 10 : b;
 }
 
 // fixedCount 이후의 일정을 다시 짠다 (strict: 문 닫는 시간을 더 엄격하게)
@@ -1268,6 +1614,10 @@ function reorderDay(plan, di, fixedCount, strict) {
   const open = new Set();
   if (!used.L && t <= 810 && c.deadline >= 720) open.add('L');
   if (!used.D && c.deadline >= 1110) open.add('D');
+  // 직접 넣은 식당(가고 싶은 곳)이 맡은 식사 시간대는 비워 두지 않아요
+  rest.forEach(it => {
+    if (!it.sid && it.meal) open.delete(it.meal);
+  });
   const parked = [];
   const meals = rest
     .filter(it => it.sid && SPOT[it.sid].meal)
@@ -1338,7 +1688,12 @@ function trimDay(plan, di, fixedCount, strict) {
     const day = plan.days[di];
     const cand = day.items
       .map((it, idx) => ({ it, idx }))
-      .filter(x => x.idx >= fixedCount && x.it.src === 'auto' && !x.it.fixed);
+      .filter(
+        x =>
+          x.idx >= fixedCount &&
+          (x.it.src === 'auto' || (x.it.src === 'wish' && !x.it.must && x.it.fixDay == null && x.it.at == null)) &&
+          !x.it.fixed
+      );
     if (!cand.length) break;
     const nonMeal = cand.filter(x => !(x.it.sid && SPOT[x.it.sid].meal));
     const pool = nonMeal.length ? nonMeal : cand;
@@ -1365,6 +1720,7 @@ function dropClosed(plan, di, fixedCount) {
       return (
         i >= fixedCount &&
         !x.it.fixed &&
+        !x.it.must &&
         x.it.arrAct == null &&
         x.it.leave == null &&
         s &&
@@ -1401,6 +1757,7 @@ function cleanModes(plan, di) {
 // 시간이 모자라 보류된 곳을 여유 있는 다른 날로 옮겨 본다
 function rebalance(plan) {
   for (const p of plan.parked.filter(x => x.reason.startsWith('시간') && x.sid)) {
+    if (p.fixDay != null || plan.days.some(d => d.items.some(x => x.sid === p.sid))) continue;
     const slack = j => {
       const c = computeDay(plan, j);
       return c.deadline - c.endArr;
@@ -1770,5 +2127,7 @@ if (typeof module !== 'undefined')
     hotelPt,
     hotelLabel,
     syncMoveItems,
-    dayHotel
+    dayHotel,
+    createPlanWish,
+    wishSummary
   };

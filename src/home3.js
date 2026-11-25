@@ -303,9 +303,9 @@ function h3BandSVG() {
 <rect y="155" width="390" height="15" style="fill:var(--bg)"/>
 </svg>`;
 }
-function h3BandV(t, s) {
-  return `<header class="h3-band">${S.photoBroken ? h3BandSVG() : h3Bg()}<span class="h3-bshade"></span>
-    <div class="h3-bt"><h1>${t}</h1>${s ? `<p>${s}</p>` : ''}</div><span class="h3-bl">${langBtn(true)}</span></header>`;
+function h3BandV(t, s, extra) {
+  return `<header class="h3-band${extra ? ' has-btn' : ''}">${S.photoBroken ? h3BandSVG() : h3Bg()}<span class="h3-bshade"></span>
+    <div class="h3-bt"><h1>${t}</h1>${s ? `<p>${s}</p>` : ''}</div><span class="h3-bl">${langBtn(true)}</span>${extra || ''}</header>`;
 }
 
 // 여행 준비 탭
@@ -331,7 +331,7 @@ function h3AreasV() {
       ['outer', L('근교', '近郊')],
       ['trip', L('당일치기', '日帰り')]
     ];
-  const list = AREAS.filter(a => (a.kind || 'city') === seg);
+  const list = seg === 'wish' ? [] : AREAS.filter(a => (a.kind || 'city') === seg);
   const card = a => {
     const n = SPOTS.filter(s => s.a === a.id).length,
       [c1, c2] = AREA_TONE[a.id] || ['#F0703A', '#B92E1C'],
@@ -343,15 +343,18 @@ function h3AreasV() {
       <span class="h3-ab"><b>${a.n}</b><small>${esc(a.sub)}</small><em>${span} · ${L(`${n}곳`, `${n}か所`)}</em></span>
     </button>`;
   };
-  return `${h3BandV(L('동네', 'エリア'), L(`후쿠오카 동네 ${AREAS.length}곳 · 눌러서 명소 보기`, `福岡のエリア${AREAS.length}か所 · タップで見どころ`))}
-  <main class="h3-page">
-    <div class="h3-seg" role="tablist">${segs
+  // 사진 오른쪽 「＋ 직접 장소 추가」, 탭 맨 끝 「가고 싶은 곳」 (wish.js)
+  const addBtn = `<button class="h3-bandbtn" data-act="wishAdd">${ic('plus')}${L('직접 장소 추가', '場所を追加')}</button>`;
+  // 폭이 좁으면 앞의 「후쿠오카」를 숨겨서 한 줄에 맞춰요 (style.css 의 .h3-band.has-btn .bopt)
+  return `${h3BandV(L('동네', 'エリア'), L(`<span class="bopt">후쿠오카 </span>동네 ${AREAS.length}곳 · 눌러서 명소 보기`, `<span class="bopt">福岡の</span>エリア${AREAS.length}か所 · タップで見どころ`), addBtn)}
+  <main class="h3-page${seg === 'wish' ? ' w-page' : ''}">
+    <div class="h3-seg w4" role="tablist">${segs
       .map(([k, t]) => {
         const n = AREAS.filter(a => (a.kind || 'city') === k).length;
         return `<button role="tab" aria-selected="${seg === k}" class="${seg === k ? 'on' : ''}" data-act="aseg" data-k="${k}">${t} ${n}</button>`;
       })
-      .join('')}</div>
-    <div class="h3-alist">${list.map(card).join('')}</div>
+      .join('')}<button role="tab" aria-selected="${seg === 'wish'}" class="${seg === 'wish' ? 'on' : ''}" data-act="aseg" data-k="wish">${L('가고 싶은 곳', '行きたい所')} ${S.wish.length}</button></div>
+    ${seg === 'wish' ? wishTabV() : `<div class="h3-alist">${list.map(card).join('')}</div>`}
   </main>`;
 }
 

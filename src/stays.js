@@ -108,8 +108,10 @@ function draftHotelCard() {
 }
 // 숙소 위치 고르기 — 지도에 핀 꽂기 · 이름으로 찾기 · 좌표 붙여넣기 · 동네만
 function hpickSheetV(sh) {
-  const c = stayCtx(sh.ctx),
-    st = c.get(),
+  // ctx 'wish' = 동네 탭·가고 싶은 곳의 「직접 장소 추가」 (같은 지도·찾기 화면을 써요)
+  const W = sh.ctx === 'wish',
+    c = W ? null : stayCtx(sh.ctx),
+    st = c ? c.get() : [],
     x = st[sh.k] || st[0],
     h = sh.h,
     tab = sh.tab || 'find',
@@ -120,7 +122,9 @@ function hpickSheetV(sh) {
     ? ns
       ? L(`${ns.st.n}역까지 걸어서 ${wmin(ns.d)}분`, `${ns.st.j}駅まで徒歩${wmin(ns.d)}分`)
       : L('가까운 지하철역이 없어요 · 버스·택시로 계산해요', '近くに地下鉄駅がありません · バス・タクシーで計算します')
-    : L(`지금은 「${hotelWhereT(h)} 근처」로 대략 계산해요`, `今は「${hotelWhereT(h)}周辺」でおおまかに計算しています`);
+    : W && !sh.picked
+      ? L('이름으로 찾거나, 지도를 눌러 핀을 꽂아 주세요', '名前で探すか、地図をタップしてピンを置いてください')
+      : L(`지금은 「${hotelWhereT(h)} 근처」로 대략 계산해요`, `今は「${hotelWhereT(h)}周辺」でおおまかに計算しています`);
   const tabBtn = (t, label) =>
     `<button role="tab" class="${tab === t ? 'on' : ''}" aria-selected="${tab === t}" data-act="hpTab" data-t="${t}">${label}</button>`;
   let body = '';
@@ -129,20 +133,25 @@ function hpickSheetV(sh) {
     if (sh.busy) res = `<p class="hp-msg">${ic('search')}${L('찾는 중…', '検索中…')}</p>`;
     else if (sh.err) res = `<p class="hp-msg bad">${esc(sh.err)}</p>`;
     else if (sh.res && !sh.res.length)
-      res = `<p class="hp-msg">${L('못 찾았어요. 일본어·영어 이름으로 다시 찾거나, 위 지도에서 숙소 자리를 직접 눌러 주세요.', '見つかりませんでした。日本語・英語の名前で探すか、上の地図で宿の場所を直接タップしてください。')}</p>`;
+      res = W
+        ? `<p class="hp-msg">${ic('search')}${L(`「${esc(sh.q || '')}」(으)로는 못 찾았어요.`, `「${esc(sh.q || '')}」では見つかりませんでした。`)}</p>`
+        : `<p class="hp-msg">${L('못 찾았어요. 일본어·영어 이름으로 다시 찾거나, 위 지도에서 숙소 자리를 직접 눌러 주세요.', '見つかりませんでした。日本語・英語の名前で探すか、上の地図で宿の場所を直接タップしてください。')}</p>`;
     else if (sh.res)
       res = `<ul class="hp-res">${sh.res
         .map(
           (r, i) =>
-            `<li><button class="${pin && +h.lat === r.lat && +h.lng === r.lng ? 'on' : ''}" data-act="hpRes" data-i="${i}">${ic('pin')}<span><b>${esc(r.name)}</b><small>${esc(r.addr)}</small></span>${pin && +h.lat === r.lat && +h.lng === r.lng ? ic('check', 'ok') : ''}</button></li>`
+            `<li><button class="${pin && +h.lat === r.lat && +h.lng === r.lng ? 'on' : ''}" data-act="hpRes" data-i="${i}">${ic(r.sid ? 'star' : 'pin')}<span><b>${esc(r.name)}${r.sid ? `<i class="w-app">${L('앱 추천', 'アプリのおすすめ')}</i>` : ''}</b><small>${esc(r.addr)}</small></span>${pin && +h.lat === r.lat && +h.lng === r.lng ? ic('check', 'ok') : ''}</button></li>`
         )
         .join('')}</ul>`;
-    body = `<div class="hp-find"><input id="hQ" type="search" enterkeyhint="search" autocomplete="off" value="${esc(sh.q ?? '')}" placeholder="${L('예: Dormy Inn Hakata, ドーミーイン博多', '例: ドーミーイン博多、Dormy Inn')}"><button class="btn pri" data-act="hpFind">${L('찾기', '検索')}</button></div>
+    body = W
+      ? `<div class="hp-find"><input id="hQ" type="search" enterkeyhint="search" autocomplete="off" value="${esc(sh.q ?? '')}" placeholder="${L('예: 一蘭 博多, Ichiran Hakata', '例: 一蘭 博多、Ichiran Hakata')}"><button class="btn pri" data-act="hpFind">${L('찾기', '検索')}</button></div>
+      <p class="fine hp-fine">${L('앱에 있는 장소를 먼저 보여 주고, 그다음 OpenStreetMap에서 찾아요 · 인터넷이 필요해요', 'アプリ内の場所を先に表示し、次にOpenStreetMapで探します · インターネットが必要です')}</p>${res}${wishCautionV((sh.res && !sh.res.length) || !!sh.err)}`
+      : `<div class="hp-find"><input id="hQ" type="search" enterkeyhint="search" autocomplete="off" value="${esc(sh.q ?? '')}" placeholder="${L('예: Dormy Inn Hakata, ドーミーイン博多', '例: ドーミーイン博多、Dormy Inn')}"><button class="btn pri" data-act="hpFind">${L('찾기', '検索')}</button></div>
       <p class="fine hp-fine">${L('예약 확인서에 적힌 일본어·영어 호텔 이름으로 찾으면 잘 나와요. 인터넷이 필요해요.', '予約確認書の日本語・英語のホテル名で探すと見つかりやすいです。インターネットが必要です。')}</p>${res}`;
   } else if (tab === 'paste') {
     body = `<div class="hp-find"><input id="hPaste" type="text" inputmode="decimal" autocomplete="off" value="${esc(sh.paste ?? '')}" placeholder="33.5905, 130.4207"><button class="btn pri" data-act="hpPaste">${L('적용', '適用')}</button></div>
       <ol class="hp-how">
-        <li>${L('구글 지도에서 숙소를 찾아 그 자리를 꾹 눌러요', 'Googleマップで宿を探し、その場所を長押しします')}</li>
+        <li>${W ? L('구글 지도 앱에서 가게를 찾아 그 자리를 꾹 눌러요', 'Googleマップでお店を探し、その場所を長押しします') : L('구글 지도에서 숙소를 찾아 그 자리를 꾹 눌러요', 'Googleマップで宿を探し、その場所を長押しします')}</li>
         <li>${L('위에 나온 숫자 좌표(33.59…, 130.41…)를 복사해요', '上に出る数字の座標(33.59…, 130.41…)をコピーします')}</li>
         <li>${L('여기에 붙여 넣고 「적용」을 눌러요. 주소창의 긴 링크도 돼요', 'ここに貼り付けて「適用」。アドレスバーの長いリンクでもOK')}</li>
       </ol>`;
@@ -168,21 +177,24 @@ function hpickSheetV(sh) {
       <h3 class="sec"><span>${L('다른 역 근처', 'ほかの駅の近く')}</span></h3>${lines}`;
   }
   return (
-    shHead(
-      L('숙소 위치', '宿の場所'),
-      `${L(`${sh.k + 1}번째 숙소`, `${sh.k + 1}番目の宿`)} · ${mds(nightDate(c.start, x.n0))} – ${mds(nightDate(c.start, x.n1 + 1))}`
-    ) +
-    `<label class="fld hp-name"><span>${L('숙소 이름', '宿の名前')}</span><input id="hName" type="text" maxlength="40" value="${esc(sh.nm ?? h.name ?? '')}" placeholder="${L('예: 도미인 하카타 기온', '例: ドーミーイン博多祇園')}" autocomplete="off"></label>
+    (W
+      ? shHead(L('직접 장소 추가', '場所を直接追加'), L('찾은 곳은 「가고 싶은 곳」에 담겨요', '見つけた場所は「行きたい所」に入ります'))
+      : shHead(
+          L('숙소 위치', '宿の場所'),
+          `${L(`${sh.k + 1}번째 숙소`, `${sh.k + 1}番目の宿`)} · ${mds(nightDate(c.start, x.n0))} – ${mds(nightDate(c.start, x.n1 + 1))}`
+        )) +
+    `<label class="fld hp-name"><span>${W ? L('장소 이름', '場所の名前') : L('숙소 이름', '宿の名前')}</span><input id="hName" type="text" maxlength="40" value="${esc(sh.nm ?? h.name ?? '')}" placeholder="${W ? L('예: 친구가 추천한 이자카야', '例: 友だちおすすめの居酒屋') : L('예: 도미인 하카타 기온', '例: ドーミーイン博多祇園')}" autocomplete="off"></label>
     <div class="hp-map-wrap">
       <div class="hp-map" id="hpmap" role="application" aria-label="${L('숙소 위치 지도 · 눌러서 핀 꽂기', '宿の場所の地図 · タップでピンを置く')}"></div>
       <div class="hp-zoom"><button class="ib sm" data-act="hpZoom" data-n="1" aria-label="${L('확대', '拡大')}">${ic('plus')}</button><button class="ib sm" data-act="hpZoom" data-n="-1" aria-label="${L('축소', '縮小')}">${ic('minus')}</button></div>
       ${hpMode(sh) === 'svg' ? `<p class="hp-off">${L('인터넷이 없어 간단한 지도로 보여요', 'オフラインのため簡易地図で表示しています')}</p>` : ''}
-      <p class="hp-tip">${pin ? L('다른 곳을 누르면 핀이 옮겨져요', '別の場所をタップするとピンが移動します') : L('숙소 자리를 눌러 핀을 꽂아요', '宿の場所をタップしてピンを置きます')}</p>
+      <p class="hp-tip">${pin ? L('다른 곳을 누르면 핀이 옮겨져요', '別の場所をタップするとピンが移動します') : W ? L('장소 자리를 눌러 핀을 꽂아요', '場所をタップしてピンを置きます') : L('숙소 자리를 눌러 핀을 꽂아요', '宿の場所をタップしてピンを置きます')}</p>
     </div>
-    <div class="hp-now${pin ? ' ok' : ''}">${ic(pin ? 'check' : 'pin')}<span><b>${pin ? L('정확한 위치로 정했어요', '正確な場所に設定しました') : L('아직 대략적인 위치예요', 'まだおおまかな場所です')}</b><small>${nowSub}</small></span></div>
-    <div class="hp-tabs" role="tablist">${tabBtn('find', L('이름으로 찾기', '名前で探す'))}${tabBtn('paste', L('좌표·링크', '座標・リンク'))}${tabBtn('area', L('동네만 고르기', 'エリアだけ'))}</div>
+    <div class="hp-now${pin ? ' ok' : ''}">${ic(pin ? 'check' : 'pin')}<span><b>${pin ? L('정확한 위치로 정했어요', '正確な場所に設定しました') : W && !sh.picked ? L('아직 위치를 안 정했어요', 'まだ場所が決まっていません') : W ? L('동네로 정했어요', 'エリアで設定しました') : L('아직 대략적인 위치예요', 'まだおおまかな場所です')}</b><small>${nowSub}</small></span></div>
+    <div class="hp-tabs" role="tablist">${tabBtn('find', L('이름으로 찾기', '名前で探す'))}${tabBtn('paste', W ? L('구글 좌표', 'Google座標') : L('좌표·링크', '座標・リンク'))}${tabBtn('area', L('동네만 고르기', 'エリアだけ'))}</div>
     <div class="hp-body">${body}</div>
-    <div class="sh-foot"><button class="btn pri" data-act="hpSave">${ic('check')}${L('이 숙소로 정하기', 'この宿に決める')}</button></div>`
+    ${W ? wishKindV(sh) : ''}
+    <div class="sh-foot"><button class="btn pri" data-act="hpSave">${W ? `${ic('plus')}${L('가고 싶은 곳에 담기', '行きたい所に入れる')}` : `${ic('check')}${L('이 숙소로 정하기', 'この宿に決める')}`}</button></div>`
   );
 }
 // 숙소 위치 지도 (실제 축척 · 끌어서 이동 · 눌러서 핀)
@@ -804,7 +816,7 @@ async function hpSearch(q) {
         .filter(p => p && p !== ja && !/^\d{3}-\d{4}$/.test(p) && p !== '日本')
         .reverse()
         .join('');
-      return { lat: +(+x.lat).toFixed(6), lng: +(+x.lon).toFixed(6), name: LANG === 'ja' ? ja : ko, ja, addr };
+      return { lat: +(+x.lat).toFixed(6), lng: +(+x.lon).toFixed(6), name: LANG === 'ja' ? ja : ko, ja, addr, kind: osmKind(x) };
     })
     .filter(x => x.name && isFinite(x.lat));
 }
@@ -857,6 +869,7 @@ Object.assign(A, {
     hpKeep();
     const [t, v] = d.v.split(':');
     S.sheet.h = t === 'k' ? { k: v } : { st: v };
+    S.sheet.picked = true;
     S.sheet.view = null;
     S.sheet.tv = null;
     S.sheet.recenter = 14;
@@ -899,13 +912,16 @@ Object.assign(A, {
     Object.assign(sh, { busy: true, err: '', res: null });
     S.keepSheetScroll = true;
     render();
+    // 직접 장소 추가: 앱에 있는 장소(한국어 이름으로도 찾아져요)를 먼저
+    const local = sh.ctx === 'wish' ? wishLocal(q) : [];
     try {
       const res = await hpSearch(q);
       if (S.sheet !== sh) return;
-      sh.res = res;
+      sh.res = [...local, ...res.filter(r => !local.some(l => km(l, r) < 0.05))];
     } catch (e) {
       if (S.sheet !== sh) return;
-      sh.err = L(
+      if (local.length) sh.res = local;
+      else sh.err = L(
         '지금은 찾을 수 없어요. 인터넷 연결을 확인하거나, 좌표 붙여넣기·지도에서 직접 찍기를 써 주세요.',
         '今は検索できません。接続を確認するか、座標の貼り付け・地図で直接タップを使ってください。'
       );
@@ -921,8 +937,20 @@ Object.assign(A, {
       r = sh.res && sh.res[Number(d.i)];
     if (!r) return;
     sh.h = { lat: r.lat, lng: r.lng, addr: r.ja && r.addr ? r.addr : undefined };
-    if (!sh.h.addr) delete sh.h.addr;
-    if (!(sh.nm || '').trim()) sh.nm = r.name;
+    if (!sh.h.addr || r.sid) delete sh.h.addr;
+    // 이름 칸이 비었거나, 앞에서 고른 결과 이름 그대로면 새로 고른 이름으로
+    if (!(sh.nm || '').trim() || (sh.ctx === 'wish' && sh.nm === sh.autoNm)) {
+      sh.nm = r.name;
+      sh.autoNm = r.name;
+    }
+    if (sh.ctx === 'wish') {
+      sh.sid = r.sid || null;
+      const k = r.sid ? SPOT[r.sid].c : r.kind;
+      if (k && !sh.kindSet) {
+        sh.kind = k;
+        sh.stay = r.sid ? SPOT[r.sid].s : WISH_STAY[k] || 60;
+      }
+    }
     sh.view = { lat: r.lat, lng: r.lng, span: 1.4 };
     sh.tv = { lat: r.lat, lng: r.lng, z: 17 };
     sh.recenter = 16;
@@ -967,6 +995,7 @@ Object.assign(A, {
   },
   hpSave() {
     hpKeep();
+    if (S.sheet && S.sheet.ctx === 'wish') return wishSheetSave(S.sheet);
     const sh = S.sheet,
       name = (sh.nm || '').trim().slice(0, 40);
     const h = { ...sh.h };
