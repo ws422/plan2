@@ -8,7 +8,7 @@
 // 홈에서 누르면 원래대로 앱이 닫혀요.
 const NAV = { skip: 0, on: IS_APP && !!(window.history && history.pushState) };
 function navAtRoot() {
-  return S.view === 'home' && !S.sheet;
+  return S.view === 'home' && !S.sheet && (S.htab || 'home') === 'home';
 }
 function navSync() {
   if (!NAV.on || NAV.skip) return;
@@ -35,6 +35,10 @@ function navBack() {
       S.sheet = { type: sh.back };
       render();
     } else A.closeSheet();
+    return;
+  }
+  if (S.view === 'home' && S.htab && S.htab !== 'home') {
+    A.htab({ t: 'home' });
     return;
   }
   if (S.view === 'plan') {

@@ -391,23 +391,7 @@ function tripCard(p) {
   </article>`;
 }
 
-// ★ 화면: 홈
-function homeV() {
-  const plans = sortedPlans(),
-    f = plans[0],
-    rest = plans.slice(1);
-  return `<div class="home2">${heroV(f)}<main class="home-body">
-    ${f ? tripCard(f) + `<button class="newp" data-act="newPlan">${ic('plus')}<span>새 여행 계획 세우기</span>${ic('next', 'chev')}</button>` : startCard()}
-    <h2 class="sec"><span>여행 준비</span></h2>
-    <div class="tiles">${TILES.map(tileV).join('')}</div>
-    <h2 class="sec"><span>동네 둘러보기</span><small>눌러서 명소 보기</small></h2>
-    <div class="acar">${AREAS.map(areaTile).join('')}</div>
-    ${rest.length ? `<h2 class="sec"><span>다른 계획</span></h2><ul class="plist">${rest.map(planRow).join('')}</ul>` : ''}
-    <button class="xfer-btn" data-act="xferSheet">${ic('share')}<span><b>${IS_APP ? L('계획 공유하기', '計画を共有') : '계획 옮기기'}</b><small>${IS_APP ? L('친구에게 보내기 · 내 다른 폰으로 옮기기', '友だちに送る · 別のスマホに移す') : '앱 버전이나 다른 기기로 보내기 · 가져오기'}</small></span>${ic('next', 'chev')}</button>
-    <p class="store-note" id="storeNote">${storeNote()}</p>
-    ${S.photoBroken ? '' : `<p class="credit">${L('상단 사진', 'トップの写真')} <a href="${heroPhoto(heroScene()).url}" target="_blank" rel="noopener">${heroPhoto(heroScene()).by}</a> · Unsplash</p>`}
-  </main></div>`;
-}
+// ★ 화면: 홈 → home3.js 의 homeV (새 홈: 일러스트 + 아래 5칸 메뉴)
 
 // ---- 홈에서 여는 시트 ----
 function shHead(t, p) {
@@ -936,7 +920,7 @@ function xferSheetV(sh) {
     return (
       head +
       out +
-      `<details class="xdev"${n ? '' : ' open'}><summary>${ic('plus')}<span>${L('앱에서 보낸 코드 가져오기', 'アプリから届いたコードを取り込む')}</span>${ic('down', 'chev')}</summary>${codeIn}</details>`
+      `<details class="xdev"${n && !sh.openIn ? '' : ' open'}><summary>${ic('plus')}<span>${L('앱에서 보낸 코드 가져오기', 'アプリから届いたコードを取り込む')}</span>${ic('down', 'chev')}</summary>${codeIn}</details>`
     );
   }
   const head = shHead(
@@ -956,7 +940,7 @@ function xferSheetV(sh) {
     head +
     picker +
     main +
-    `<details class="xdev"><summary>${ic('save')}<span>${L('고급 · 코드나 파일로 백업·가져오기', '詳細設定 · コードやファイルでバックアップ・取り込み')}</span>${ic('down', 'chev')}</summary>
+    `<details class="xdev"${sh.openIn ? ' open' : ''}><summary>${ic('save')}<span>${L('고급 · 코드나 파일로 백업·가져오기', '詳細設定 · コードやファイルでバックアップ・取り込み')}</span>${ic('down', 'chev')}</summary>
       <p class="xdev-sub">${L('링크가 잘 안 열릴 때나, 홈 화면에 설치한 앱으로 직접 옮길 때 써요.', 'リンクがうまく開かないときや、ホーム画面のアプリに直接移すときに使います。')}</p>
       ${n ? `<h4 class="xdev-h">${L('보내기', '送る')}</h4>${codeOut}` : ''}<h4 class="xdev-h">${L('가져오기', '取り込む')}</h4>${codeIn}</details>`
   );

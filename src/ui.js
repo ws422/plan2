@@ -1000,6 +1000,7 @@ function render() {
   window.scrollTo(0, y);
   drawMaps();
   wireHero();
+  if (typeof h3Wire === 'function') h3Wire();
   if (typeof navSync === 'function') navSync();
 }
 // 아래에 떠 있는 버튼 칸(.cta)만큼 화면 아래 여백을 줘요. 그래야 맨 아래 카드가 버튼 뒤에 가려지지 않아요
@@ -1149,7 +1150,8 @@ const A = {
     S.banner = null;
     S.sel = null;
     S.tab = d.tab || 'sched';
-    S.di = Math.min(planStatus(p).di, p.days.length - 1);
+    S.di =
+      d.di != null ? Math.min(Number(d.di) || 0, p.days.length - 1) : Math.min(planStatus(p).di, p.days.length - 1);
     go('plan');
   },
   save(d, el, e, toGuide) {
