@@ -508,8 +508,8 @@ const PASSES = [
     ok: '버스만 여러 번 타는 날',
     d: '시내버스 하루 무제한이에요.',
     ic: 'bus',
-    url: ['https://www.nishitetsu.jp/kr/1daypass/', 'https://www.nishitetsu.jp/'],
-    pl: ['ko', 'ja']
+    url: ['https://www.nishitetsu.jp/kr/1daypass/', 'https://www.nishitetsu.jp/en/ticket/1daypass/'],
+    pl: ['ko', 'en']
   },
   {
     t: '다자이후·야나가와 관광 티켓',
@@ -535,7 +535,7 @@ const PASSES = [
     ok: '고속버스로 유후인·벳푸를 다녀올 때',
     d: '북큐슈 고속버스·시내버스 3일 무제한. 고속버스는 좌석 예약이 필요해요.',
     ic: 'bus',
-    url: ['https://www.sunqpass.jp/korean/riyo/', 'https://www.sunqpass.jp/'],
+    url: ['https://www.sunqpass.jp/kr/about/', 'https://www.sunqpass.jp/about/'],
     pl: ['ko', 'ja']
   }
 ];
