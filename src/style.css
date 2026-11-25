@@ -8486,3 +8486,7 @@ button.w-t {
   width: 100%;
   margin-top: 10px;
 }
+/* 홈(첫 화면)에서는 아래 메뉴 위 줄무늬를 빼요. 다른 탭·계획 화면은 그대로 */
+.h3-home .h3-nav::before {
+  display: none;
+}
