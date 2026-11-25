@@ -7773,3 +7773,41 @@ body {
   color: #ff7d66;
   border-color: color-mix(in srgb, #ff7d66 40%, transparent);
 }
+/* 첫차·막차: 막차가 끝나 바꾼 이동 설명, 공항 운영 시간 안내 */
+.lchip .lc-l.warn {
+  color: var(--bad);
+  font-weight: 700;
+}
+.h3-x.warn {
+  color: var(--bad);
+}
+.air-note[hidden] {
+  display: none;
+}
+.air-note {
+  align-items: flex-start;
+  background: color-mix(in srgb, var(--bad) 8%, var(--surface));
+  color: var(--ink);
+}
+.air-note .ic {
+  flex: none;
+  color: var(--bad);
+}
+/* 홈 두 번째 화면: 카드 아래 「새 계획 추가하기」 */
+.h3-p2 .h3-add {
+  align-self: center;
+  margin-top: 12px;
+  padding: 9px 16px;
+  font-size: 13.5px;
+}
+/* 키가 작은 화면: 카드·버튼이 아래 메뉴에 가리지 않게 위아래 여백을 줄여요 */
+@media (max-height: 700px) {
+  .h3-p2 {
+    padding-top: calc(58px + env(safe-area-inset-top));
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+  .h3-p2 .h3-dots,
+  .h3-p2 .h3-add {
+    margin-top: 8px;
+  }
+}

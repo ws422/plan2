@@ -111,6 +111,7 @@ function h3HomeV() {
         <div class="h3-car" id="h3car">${cards.join('')}</div>
         <div class="h3-dots" aria-hidden="true"><i class="${pg ? '' : 'on'}"></i><i class="${pg ? 'on' : ''}"></i></div>
       </div>
+      <button class="h3-start h3-add" data-act="newPlan">${ic('plus')}${L('새 계획 추가하기', '新しい計画を追加')}</button>
     </section>
   </main>`;
 }
@@ -181,9 +182,11 @@ function h3LegBox(leg, A, B, t0) {
     </div>`;
   }
   const M = MODE[leg.mode] || MODE.walk;
-  const tt = leg.hw ? withTimetable(leg, t0) : null;
+  const tt = leg.hw ? withTimetable(leg, t0) : null,
+    sw = svcSwapTxt(leg);
   return `<div class="h3-leg" style="--lc:${M.color}">
     <p class="h3-lh"><span class="h3-li">${ic(leg.mode)}</span><span>${M.n}</span> ${dur(leg.min)}${fare ? ` · ${fare}` : ''}</p>
+    ${sw ? `<p class="h3-x warn">${ic('alert')}${esc(sw)}</p>` : ''}
     ${leg.label && leg.mode !== 'walk' ? `<p class="h3-dir">${esc(leg.label)}</p>` : ''}
     ${leg.mode === 'walk' && leg.km ? `<p class="h3-dir">${L(`약 ${leg.km.toFixed(1)}km 걸어요`, `約${leg.km.toFixed(1)}km歩きます`)}</p>` : ''}
     ${tt && tt.tt ? `<p class="h3-next"><span>${L(`다음 차 (약 ${leg.hw}분 간격)`, `次の便(約${leg.hw}分間隔)`)}</span><b>${fmt(tt.depAt % 1440)}</b></p>` : ''}
