@@ -6334,7 +6334,6 @@ body {
   box-shadow: none;
   border: 1px solid var(--line, rgba(0, 0, 0, 0.08));
 }
-.tl.compact li.stop:not(.sel) .drag-h,
 .tl.compact li.stop:not(.sel) .desc,
 .tl.compact li.stop:not(.sel) .tags,
 .tl.compact li.stop:not(.sel) .num,
@@ -6499,4 +6498,10 @@ body {
 /* 한 줄 카드에서는 「지금 도착·지금 출발」을 카드를 펼쳤을 때 보여줘요 */
 .tl.compact li.stop:not(.sel) .itemact {
   display: none;
+}
+/* 한 줄 카드에서도 ≡ 손잡이로 끌어서 순서를 바꿔요 (카드 높이는 그대로) */
+.tl.compact li.stop:not(.sel) .drag-h {
+  width: 32px;
+  height: 34px;
+  margin: -8px -6px -8px 2px;
 }
