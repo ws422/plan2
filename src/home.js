@@ -535,7 +535,7 @@ const PASSES = [
     ok: '고속버스로 유후인·벳푸를 다녀올 때',
     d: '북큐슈 고속버스·시내버스 3일 무제한. 고속버스는 좌석 예약이 필요해요.',
     ic: 'bus',
-    url: ['https://www.sunqpass.jp/kr/about/', 'https://www.sunqpass.jp/about/'],
+    url: ['https://www.sunqpass.jp/kr/', 'https://www.sunqpass.jp/'],
     pl: ['ko', 'ja']
   }
 ];
