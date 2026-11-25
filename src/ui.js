@@ -625,7 +625,7 @@ function bannerV() {
     L.push(`<li><i class="dot d-ok"></i><span><b>추가</b> ${r.added.map(esc).join(', ')}</span></li>`);
   if (r.parked && r.parked.length)
     L.push(
-      `<li><i class="dot d-warn"></i><span><b>보류함으로</b> ${r.parked.map(x => `${esc(x.n)} <small>(${esc(x.reason.replace(' 보류', ''))})</small>`).join(', ')}</span></li>`
+      `<li><i class="dot d-warn"></i><span><b>보류함으로</b> ${r.parked.map(x => `<span>${esc(x.n)}</span> <small>(${esc(x.reason.replace(' 보류', ''))})</small>`).join(', ')}</span></li>`
     );
   if (r.moved) L.push(`<li><i class="dot"></i><span><b>순서 조정</b> 남은 ${r.rest}곳 중 ${r.moved}곳</span></li>`);
   else if (r.rest)

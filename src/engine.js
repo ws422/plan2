@@ -1098,7 +1098,12 @@ function timePen(c, arr, ctx) {
     if (sp.b === 'n' && arr < 1080) p += (1080 - arr) * 0.8;
     if (sp.b === 'e') p += outside(arr, ctx.sunset - 70, ctx.sunset + 10) * 0.5;
     if (sp.b === 'm' && arr > 660) p += (arr - 660) * 0.25;
-    if (sp.to && arr + it.stay > toMin(sp.to)) p += (arr + it.stay - toMin(sp.to)) * 1.5;
+    if (sp.to && arr + it.stay > toMin(sp.to)) {
+      const late = arr + it.stay - toMin(sp.to);
+      p += late * 1.5;
+      // 다시 짤 때(strict)는 문 닫은 뒤까지 머무는 순서를 크게 피해요
+      if (ctx.strict && late > 10) p += 300 + late * 1.5;
+    }
   }
   return p;
 }
@@ -1253,8 +1258,8 @@ function pri(it) {
   return it.sid ? SPOT[it.sid].p : it.snack ? 1 : 3;
 }
 
-// fixedCount 이후의 일정을 다시 짠다
-function reorderDay(plan, di, fixedCount) {
+// fixedCount 이후의 일정을 다시 짠다 (strict: 문 닫는 시간을 더 엄격하게)
+function reorderDay(plan, di, fixedCount, strict) {
   const day = plan.days[di];
   const { used, c } = mealsUsedBefore(plan, di, fixedCount);
   const cur = fixedCount ? c.rows[fixedCount - 1].p : c.startPt;
@@ -1267,12 +1272,19 @@ function reorderDay(plan, di, fixedCount) {
   const meals = rest
     .filter(it => it.sid && SPOT[it.sid].meal)
     .sort((a, b) => (b.meal ? 1 : 0) - (a.meal ? 1 : 0) || (b.src !== 'auto') - (a.src !== 'auto') || pri(b) - pri(a));
+  // 다시 짤 때(strict): 제 식사 시간대가 아직 남은 곳부터 자리를 잡고,
+  // 그 시간대가 되기 전에 문을 닫는 곳은 다른 식사로 돌리지 않아요 (점심집을 저녁으로 옮겨 진짜 저녁이 빠지는 일 막기)
+  const winOk = (m, w) => {
+    const to = SPOT[m.sid].to;
+    return !(strict && to && toMin(to) < Math.max(t, w === 'L' ? 690 : 1080) + 30);
+  };
+  if (strict) meals.sort((a, b) => (b.meal && open.has(b.meal) ? 1 : 0) - (a.meal && open.has(a.meal) ? 1 : 0));
   for (const m of meals) {
-    if (m.meal && open.has(m.meal)) {
+    if (m.meal && open.has(m.meal) && winOk(m, m.meal)) {
       open.delete(m.meal);
       continue;
     }
-    const alt = [...open].find(w => !(w === 'L' && SPOT[m.sid].b === 'n'));
+    const alt = [...open].find(w => !(w === 'L' && SPOT[m.sid].b === 'n') && winOk(m, w));
     if (alt) {
       m.meal = alt;
       open.delete(alt);
@@ -1282,14 +1294,23 @@ function reorderDay(plan, di, fixedCount) {
       parked.push({
         it: m,
         reason:
-          (used.L && used.D) || (m.meal && used[m.meal])
-            ? '식사가 이미 계획돼 있어서 보류'
-            : '식사 시간대와 맞지 않아 보류'
+          strict && [...open].some(w => !winOk(m, w))
+            ? '문 닫는 시간이 지나서 보류'
+            : (used.L && used.D) || (m.meal && used[m.meal])
+              ? '식사가 이미 계획돼 있어서 보류'
+              : '식사 시간대와 맞지 않아 보류'
       });
     else m.meal = null;
   }
   const keep = rest.filter(it => !parked.some(p => p.it === it));
-  const ctx = { cur, t, endPt: c.endPt, deadline: c.deadline, sunset: SUNSET[Number(day.date.slice(5, 7))] };
+  const ctx = {
+    cur,
+    t,
+    endPt: c.endPt,
+    deadline: c.deadline,
+    sunset: SUNSET[Number(day.date.slice(5, 7))],
+    strict: !!strict
+  };
   const seq = optimize(
     ctx,
     keep.map(it => ({ it, pt: itemPt(plan, it), sp: it.sid ? SPOT[it.sid] : null }))
@@ -1309,7 +1330,7 @@ function park(plan, di, it, reason) {
   plan.parked.push({ ...rest, reason, fromDay: di });
 }
 // 시간이 넘치는 하루에서 덜 중요한 곳 빼기
-function trimDay(plan, di, fixedCount) {
+function trimDay(plan, di, fixedCount, strict) {
   const out = [];
   for (let guard = 0; guard < 30; guard++) {
     const c = computeDay(plan, di);
@@ -1329,7 +1350,37 @@ function trimDay(plan, di, fixedCount) {
       park(plan, di, v.it, '시간이 부족해서 보류');
       out.push({ n: itemName(plan, v.it), reason: '시간이 부족해서 보류' });
     }
-    reorderDay(plan, di, fixedCount);
+    reorderDay(plan, di, fixedCount, strict);
+  }
+  return out;
+}
+// 다시 짠 뒤에도 문 닫기 전에 못 가는 곳은 보류함으로 (고정 칸·실제 시각을 넣은 칸은 그대로)
+// 문 닫는 시각보다 10분 넘게 늦게 나오게 되는 곳이 대상이에요 (bestSlot 의 'late' 와 같은 기준)
+function dropClosed(plan, di, fixedCount) {
+  const out = [];
+  for (let guard = 0; guard < 30; guard++) {
+    const c = computeDay(plan, di);
+    const r = c.rows.find((x, i) => {
+      const s = x.it.sid && SPOT[x.it.sid];
+      return (
+        i >= fixedCount &&
+        !x.it.fixed &&
+        x.it.arrAct == null &&
+        x.it.leave == null &&
+        s &&
+        s.to &&
+        x.dep > toMin(s.to) + 10
+      );
+    });
+    if (!r) break;
+    const day = plan.days[di];
+    day.items = day.items.filter(i => i !== r.it);
+    // 「카페·디저트 타임」 칸은 보류함에 넣지 않고 그냥 빼요
+    if (!r.it.snack) {
+      park(plan, di, r.it, '문 닫는 시간이 지나서 보류');
+      out.push({ n: itemName(plan, r.it), reason: '문 닫는 시간이 지나서 보류' });
+    }
+    out.push(...reorderDay(plan, di, fixedCount, true).parked);
   }
   return out;
 }
@@ -1387,8 +1438,11 @@ function rebalance(plan) {
 // 고정 구간 이후 재계획 + 요약
 function replanFrom(plan, di, fixedCount, added = []) {
   const before = computeDay(plan, di);
-  const r = reorderDay(plan, di, fixedCount);
-  const trimmed = trimDay(plan, di, fixedCount);
+  // 다시 짤 때는 문 닫는 시간을 엄격하게 봐요: 순서를 먼저 맞추고, 그래도 못 가는 곳은 보류함으로
+  const r = reorderDay(plan, di, fixedCount, true);
+  const closed = dropClosed(plan, di, fixedCount);
+  const trimmed = trimDay(plan, di, fixedCount, true);
+  closed.push(...dropClosed(plan, di, fixedCount));
   cleanModes(plan, di);
   const after = computeDay(plan, di);
   const items = plan.days[di].items.slice(fixedCount).map(i => i.uid);
@@ -1397,7 +1451,7 @@ function replanFrom(plan, di, fixedCount, added = []) {
   for (let k = 1; k < items.length; k++) if (pos(items[k]) < pos(items[k - 1])) moved++;
   return {
     added,
-    parked: [...r.parked, ...trimmed],
+    parked: [...r.parked, ...closed, ...trimmed],
     moved,
     rest: items.length,
     endBefore: before.endArr,
