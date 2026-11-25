@@ -118,7 +118,7 @@ def used_photos(js):
 
 def page(js, css, is_app):
     head = APP_HEAD if is_app else '<meta name="viewport" content="width=device-width, initial-scale=1">'
-    code = f'const IS_APP = {"true" if is_app else "false"};\n' + js + '\napplyLang();\nstartTr();\nrender();\nstore.init();\n'
+    code = f'const IS_APP = {"true" if is_app else "false"};\n' + js + '\napplyLang();\napplyTheme();\nstartTr();\nrender();\nstore.init();\n'
     if is_app:
         code += "if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));\n"
     return f'''<!DOCTYPE html>
@@ -127,6 +127,7 @@ def page(js, css, is_app):
 <meta charset="utf-8">
 {head}
 <title>후쿠오카 여행 플래너</title>
+<script>try{{var t=JSON.parse(localStorage.getItem('fk-theme'));if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}}catch(e){{}}</script>
 {FONTS}
 <style>
 {css}
