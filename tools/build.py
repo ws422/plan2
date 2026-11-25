@@ -35,12 +35,13 @@ JS_FILES = [
     'guide.js',      # 길안내 탭, 일본어로 보여주기
     'here.js',       # 지금 위치(GPS)에서 다음 장소까지 길 안내
     'live.js',       # 여행 중 다시 짜기 (지금 도착·지금 출발, 다음 차 계산)
+    'home3.js',      # 새 홈: 모모치 바다 일러스트 + 지금 이동/오늘 일정 카드 + 아래 5칸 메뉴
     'maps.js',       # 지도 그리기
 ]
 FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n'
          '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
          '<link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;600;700;800&family=Outfit:wght@500;600;700'
-         '&family=Noto+Sans+JP:wght@400;500;700;800&family=Nanum+Myeongjo:wght@700;800&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">')
+         '&family=Noto+Sans+JP:wght@400;500;700;800&family=Nanum+Myeongjo:wght@700;800&family=Noto+Serif+JP:wght@200;300;600;700&display=swap" rel="stylesheet">')
 APP_HEAD = '''<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F7F3ED" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0E1424" media="(prefers-color-scheme: dark)">
