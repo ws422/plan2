@@ -5692,3 +5692,81 @@ body {
 .here-g {
   margin-top: 0;
 }
+
+/* ===== 여행 중 다시 짜기 (지금 도착·지금 출발) ===== */
+.nowbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 10px;
+  background: var(--blue-2);
+  color: var(--blue);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.nowbtn .ic {
+  width: 14px;
+  height: 14px;
+}
+.anc > .nowbtn {
+  grid-column: 2;
+  justify-self: start;
+  margin-top: 6px;
+}
+.itemact {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.tag.live {
+  background: var(--blue-2);
+  color: var(--blue);
+}
+.lc-m .nxt {
+  font-style: normal;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--blue);
+}
+.lc-m .nxt.gone {
+  color: var(--bad);
+}
+.livebar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--blue-2);
+  color: var(--blue);
+}
+.livebar > .ic {
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+.livebar > span {
+  flex: 1;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.livebar b {
+  font-size: 14px;
+}
+.livebar small {
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.livebar.soft {
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+.banner .btn.wide {
+  margin-top: 8px;
+}

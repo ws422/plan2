@@ -529,7 +529,7 @@ function legRow(leg, li) {
   const ft = fareTxt(leg.fare, true);
   return `<li class="leg m-${leg.mode}" style="--m:${MODE[leg.mode].color}"><span class="rail"></span>
     <button class="lchip" data-act="leg" data-li="${li}" aria-label="이동 방법 바꾸기: ${MODE[leg.mode].n} ${leg.min}분 ${ft}">
-      ${modeIc(leg.mode, 'sm')}<span class="lc-m"><b>${MODE[leg.mode].n} ${leg.min}분</b>${ft ? `<em>${ft}</em>` : ''}${leg.chosen ? '<i class="mine">직접 고름</i>' : ''}</span>
+      ${modeIc(leg.mode, 'sm')}<span class="lc-m"><b>${MODE[leg.mode].n} ${leg.min}분</b>${ft ? `<em>${ft}</em>` : ''}${leg.chosen ? '<i class="mine">직접 고름</i>' : ''}${liveLegTag(leg)}</span>
       <span class="lc-l">${esc(leg.mode === 'walk' ? dist(leg.km) : leg.label)}</span>${ic('next', 'chev')}
     </button></li>`;
 }
@@ -561,7 +561,8 @@ function itemRow(p, r, i, N) {
         <span class="sc-t"><b>${esc(itemName(p, it))}</b><small>${s ? `${CATS[s.c].n} · ` : ''}${dur(it.stay)} 머묾${s && s.j ? ` · <span lang="ja">${esc(s.j)}</span>` : ''}${whereLabel(it) ? ` · ${esc(whereLabel(it))}` : ''}</small></span>
         <span class="num">${i + 1}</span>
       </button>${N2 > 1 ? `<button type="button" class="drag-h" data-uid="${it.uid}" aria-label="${esc(L(`${itemName(p, it)} 순서 바꾸기 (끌거나 위아래 화살표)`, `${s ? s.j : trText(itemName(p, it))} の順番を変える(ドラッグか上下キー)`))}">${ic('grip')}</button>` : ''}</div>
-      ${tags ? `<div class="tags">${tags}</div>` : ''}
+      ${tags || liveTags(it) ? `<div class="tags">${tags}${liveTags(it)}</div>` : ''}
+      ${liveActs(it)}
       ${s ? `<p class="desc">${esc(s.d)}${s.g ? ' (여러 가게 중 골라서)' : ''}</p>` : ''}
       ${r.warn.map(w => `<p class="warn">${ic('alert')}${esc(w)}</p>`).join('')}
       ${it.memo ? `<p class="memo">${esc(it.memo)}</p>` : ''}
@@ -583,6 +584,7 @@ function itemRow(p, r, i, N) {
         <div class="ed"><span>순서</span><div class="stp"><button data-act="move" data-uid="${it.uid}" data-n="-1" ${i === 0 ? 'disabled' : ''} aria-label="앞으로">${ic('up')}</button><button data-act="move" data-uid="${it.uid}" data-n="1" aria-label="뒤로">${ic('down')}</button></div></div>
         ${N > 1 ? `<label class="ed"><span>다른 날로</span><select data-change="moveDay" data-uid="${it.uid}"><option value="">옮길 날 선택</option>${p.days.map((d, k) => (k === S.di ? '' : `<option value="${k}">${k + 1}일차 · ${mds(d.date)}</option>`)).join('')}</select></label>` : ''}
         <label class="ed col"><span>메모</span><input type="text" id="memo-${it.uid}" data-input="memo" data-uid="${it.uid}" value="${esc(it.memo || '')}" placeholder="예약 번호, 먹고 싶은 메뉴" maxlength="120"></label>
+        ${liveClearBtn(it)}
         <div class="row2"><button class="btn soft" data-act="replanHere" data-uid="${it.uid}">${ic('shuffle')}여기부터 다시 짜기</button><button class="btn soft" data-act="toPark" data-uid="${it.uid}">${ic('box')}보류함으로</button></div>
         ${s ? `<button class="btn soft wide" data-act="spotSheet" data-id="${s.id}">${ic('info')}장소 정보·가는 법 보기</button>` : ''}
         <button class="btn soft wide" data-act="gpsGo" data-uid="${it.uid}">${ic('pin')}${L('지금 위치에서 가는 길', '現在地からの行き方')}</button>
@@ -613,8 +615,10 @@ function reAskRow(it, c) {
 }
 // 다시 짠 결과 알림
 function bannerV() {
-  const b = S.banner;
-  if (!b) return '';
+  const b = S.banner,
+    bar = liveBar(S.plan, S.di);
+  if (!b) return bar;
+  if (b.sync) return bar + liveBannerV(b);
   const r = b.res,
     L = [];
   if (r.added && r.added.length)
@@ -629,7 +633,7 @@ function bannerV() {
   L.push(
     `<li><i class="dot"></i><span><b>마무리</b> ${fmt(r.endBefore)} → ${fmt(r.endAfter)}${r.over > 0 ? ` <small class="bad-t">(${r.over}분 늦음)</small>` : ''}</span></li>`
   );
-  return `<div class="banner" role="status"><div class="bn-h">${ic('spark')}<b>${esc(b.title)}</b></div><ul>${L.join('')}</ul>
+  return `${bar}<div class="banner" role="status"><div class="bn-h">${ic('spark')}<b>${esc(b.title)}</b></div><ul>${L.join('')}</ul>
     <div class="row2"><button class="btn soft" data-act="undo">${ic('undo')}되돌리기</button><button class="btn soft" data-act="closeBanner">확인</button></div></div>`;
 }
 // 1일차·2일차 버튼줄
@@ -646,7 +650,7 @@ function schedTab() {
   const slack = c.deadline - c.endArr,
     last = S.di === N - 1;
   let tl = `<ol class="tl">`;
-  tl += `<li class="anc"><div class="tm"><b>${fmt(c.start)}</b></div><button class="anc-c" data-act="dayTime">${ic(day.start.kind === 'airport' ? 'plane' : 'home')}<span>${anchorLabel(day.start, false)}</span>${ic('clock', 'chev')}</button></li>`;
+  tl += `<li class="anc"><div class="tm"><b>${fmt(c.start)}</b></div><button class="anc-c" data-act="dayTime">${ic(day.start.kind === 'airport' ? 'plane' : 'home')}<span>${anchorLabel(day.start, false)}</span>${ic('clock', 'chev')}</button><button class="nowbtn" data-act="startNow">${ic('clock')}지금 출발</button></li>`;
   c.rows.forEach((r, i) => {
     tl += legRow(r.leg, i) + itemRow(p, r, i, N) + reAskRow(r.it, c);
   });

@@ -221,6 +221,83 @@ function fareUnknown(f) {
   return (f || []).some(x => x.yen == null);
 }
 
+// ---- 여행 중 다시 짜기: '다음 차' 계산 ----
+// 실제 시간표가 아니라 '배차 간격' 기준 추정이에요. 노선마다 정해진 분(phase)에 일정한 간격(hw)으로
+// 출발한다고 보고, 역·정류장에 닿는 시각 이후 가장 빠른 차를 잡아요. 막차가 지나면 lastGone = true.
+const LINE_HW = { kuko: 5, hako: 7, nana: 7 }; // 지하철 노선별 배차 간격(분, 낮 기준)
+const SERVICE = { subway: [330, 1450], bus: [390, 1420], train: [330, 1440], ferry: [480, 1050] }; // 첫차~막차(분)
+// 교통편 이름으로 배차 간격(분) 추정
+function hwOf(label, mode) {
+  const L = label || '';
+  if (/유후인노모리/.test(L)) return 120;
+  if (/소닉/.test(L)) return 30;
+  if (/1시간 간격|고속버스|유후인호/.test(L)) return 60;
+  if (/신칸센/.test(L)) return 15;
+  if (/니시테츠/.test(L) && mode === 'train') return 15;
+  if (/페리|도선|우미나카 라인|선착장/.test(L) || mode === 'ferry') return 45;
+  return { train: 20, bus: 20 }[mode] || 0;
+}
+// 노선마다 출발하는 분을 고정값으로 흩어 놓기 (모든 노선이 정각에 출발하지 않게)
+function phaseOf(key, hw) {
+  let h = 7;
+  for (const ch of String(key)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  let p = h % hw;
+  if (hw >= 10) p = (Math.round(p / 5) * 5) % hw;
+  return p;
+}
+// 시각 t 이후 첫 출발 시각. 막차(last)가 지났으면 다음 날 첫차 + over
+function nextDep(t, hw, phase, first, last) {
+  const al = x => x + ((((phase - x) % hw) + hw) % hw);
+  let d = al(Math.max(t, first));
+  if (d > last) return { d: al(first + 1440), over: true };
+  return { d, over: false };
+}
+// 이동 o 를 "t0 에 출발한다면" 기준으로 다시 계산 (지하철·전철만, 버스·배는 평균 대기 그대로)
+function withTimetable(o, t0) {
+  if (!o || !o.hw || t0 == null || (o.mode !== 'subway' && o.mode !== 'train')) return o;
+  const board = t0 + (o.pre || 0),
+    svc = SERVICE[o.mode] || [330, 1440];
+  const { d, over } = nextDep(board, o.hw, phaseOf(o.label || o.mode, o.hw), svc[0], svc[1]);
+  const wait = d - board,
+    wait0 = Math.min(o.wait0 == null ? o.hw / 2 : o.wait0, Math.max(0, o.min - 1));
+  return {
+    ...o,
+    min: Math.max(1, Math.round(o.min - wait0 + wait)),
+    wait,
+    boardAt: board,
+    depAt: d,
+    lastGone: over,
+    tt: true
+  };
+}
+// 이동 후보에 배차 간격(hw)·타기 전 걷는 시간(pre)·평소 대기(wait0) 붙이기
+function vkeyWait(vkey) {
+  if (!vkey) return undefined;
+  if (vkey.startsWith('direct:')) return (DIRECT[vkey.slice(7)] || {}).wait;
+  const [Z, vi] = vkey.split(':');
+  const v = ((ACCESS[Z] || {}).v || [])[Number(vi)];
+  return v ? v.wait : undefined;
+}
+function addHw(o) {
+  if (!o || o.hw) return o;
+  if (o.mode === 'subway' && o.route) {
+    const r = o.route;
+    return { ...o, hw: LINE_HW[(r.rides[0] || {}).line] || 6, pre: (r.wa || 0) + (r.airFrom ? 12 : 0), wait0: 3 };
+  }
+  if (o.mode === 'train' || o.mode === 'bus' || o.mode === 'ferry') {
+    if (o.label === 'JR 열차' && !o.gparts) return { ...o, hw: 15, pre: 5, wait0: 7 }; // 모지코 안 JR
+    const gp = o.gparts || [];
+    const vk = gp.find(g => g.vkey);
+    return {
+      ...o,
+      hw: hwOf(o.label, o.mode),
+      pre: gp.length === 3 && gp[0].opt ? gp[0].opt.min : 0,
+      wait0: vk ? vkeyWait(vk.vkey) : undefined
+    };
+  }
+  return o;
+}
+
 // ---- 이동 방법 계산 ----
 const LEG_MEMO = {};
 // 두 지점 사이 갈 수 있는 이동 방법 목록 (걷기·지하철·버스·택시·전철 등)
@@ -237,7 +314,7 @@ function legOptions(a, b) {
     o.id = o.mode + (opts.filter((x, j) => j < i && x.mode === o.mode).length || '');
     o.fare = o.fare || [];
   });
-  return (LEG_MEMO[key] = opts);
+  return (LEG_MEMO[key] = opts.map(addHw));
 }
 // 직선 이동 모양(지도에 그릴 선) 만들기
 function straight(mode, a, b) {
@@ -504,9 +581,11 @@ function pickDefault(opts, date) {
 function bestOpt(a, b) {
   return pickDefault(legOptions(a, b));
 }
-// 일정 칸 사이 이동: 직접 고른 방법이 있으면 그것, 없으면 기본
-function chooseLeg(a, b, mode, date) {
-  const opts = legOptions(a, b).map(o => (isOff(o, date) ? { ...o, isOff: true } : o));
+// 일정 칸 사이 이동: 직접 고른 방법이 있으면 그것, 없으면 기본. t 가 있으면 그 시각 기준 '다음 차'
+function chooseLeg(a, b, mode, date, t) {
+  const base = legOptions(a, b),
+    timed = t == null ? base : base.map(o => withTimetable(o, t));
+  const opts = timed.map(o => (isOff(o, date) ? { ...o, isOff: true } : o));
   const pick =
     (mode && (opts.find(o => o.id === mode && !o.isOff) || opts.find(o => o.mode === mode && !o.isOff))) ||
     pickDefault(opts, date);
@@ -1080,13 +1159,25 @@ function computeDay(plan, di) {
   const rows = [],
     wd = weekday(day.date),
     mon = Number(day.date.slice(5, 7));
+  // 실시간 모드: '지금 출발'을 누른 날(day.live)이거나, 실제 도착/출발 시각을 넣은 항목 다음부터는
+  // 이동을 '그 시각 이후 다음 차' 기준으로 계산해요.
+  let live = !!day.live;
   for (const it of day.items) {
     const p = itemPt(plan, it),
       key = ck + '>' + it.uid,
-      leg = chooseLeg(cur, p, day.modes[key], day.date);
-    const arr = t + leg.min,
-      dep = arr + it.stay,
-      warn = [];
+      leg = chooseLeg(cur, p, day.modes[key], day.date, live ? t : null);
+    let arr = t + leg.min;
+    if (it.arrAct != null) {
+      arr = it.arrAct;
+      live = true;
+    } // '지금 도착'으로 넣은 실제 도착 시각
+    let dep = arr + it.stay;
+    if (it.leave != null) {
+      dep = it.leave;
+      arr = Math.min(arr, dep);
+      live = true;
+    } // '지금 출발'로 넣은 실제 출발 시각
+    const warn = [];
     const s = it.sid && SPOT[it.sid];
     if (s) {
       if (s.cl && s.cl.includes(wd)) warn.push(`${WD[wd]}요일은 휴관일 수 있어요`);
@@ -1102,7 +1193,7 @@ function computeDay(plan, di) {
     ck = it.uid;
   }
   const endKey = ck + '>E',
-    endLeg = chooseLeg(cur, endPt, day.modes[endKey], day.date);
+    endLeg = chooseLeg(cur, endPt, day.modes[endKey], day.date, live ? t : null);
   const endArr = t + endLeg.min,
     deadline = toMin(day.end.time);
   const walkKm =
