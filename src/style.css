@@ -3686,13 +3686,48 @@ small {
   gap: 8px;
 }
 .passl li {
+  background: var(--surface);
+  border-radius: 18px;
+  box-shadow: var(--sh);
+}
+/* 카드 전체가 공식 안내 링크 */
+.passl li > a {
   display: flex;
   gap: 12px;
   align-items: flex-start;
-  background: var(--surface);
-  border-radius: 18px;
   padding: 14px;
-  box-shadow: var(--sh);
+  border-radius: 18px;
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s, background 0.12s;
+}
+.passl li > a:active {
+  transform: scale(0.985);
+  background: var(--surface-2);
+}
+.passl li > a:focus-visible {
+  outline: 2px solid var(--pri);
+  outline-offset: 2px;
+}
+.ps-go {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--pri);
+}
+.ps-go i {
+  font-style: normal;
+  font-weight: 600;
+  opacity: 0.75;
+}
+.ps-go .ic {
+  width: 14px;
+  height: 14px;
 }
 .ps-ic {
   display: grid;
@@ -8489,4 +8524,26 @@ button.w-t {
 /* 홈(첫 화면)에서는 아래 메뉴 위 줄무늬를 빼요. 다른 탭·계획 화면은 그대로 */
 .h3-home .h3-nav::before {
   display: none;
+}
+/* 공항에서 시내로: 「내 숙소」·「다른 역」 */
+.s-air .chips-sel button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.s-air .chips-sel button .ic {
+  width: 15px;
+  height: 15px;
+}
+.air-st {
+  margin: 10px 0 2px;
+  padding: 4px 12px 12px;
+  border-radius: 16px;
+  background: var(--surface-2);
+}
+.air-st .chips-sel button {
+  background: var(--surface);
+}
+.air-st .chips-sel button.on {
+  background: var(--ink);
 }

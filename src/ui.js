@@ -33,6 +33,7 @@ const ICON = {
   up: '<path d="M6 15l6-6 6 6"/>',
   down: '<path d="M6 9l6 6 6-6"/>',
   next: '<path d="M9 5l7 7-7 7"/>',
+  out: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
   undo: '<path d="M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3"/>',
   trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
@@ -549,6 +550,10 @@ function anchorLabel(an, isEnd) {
   const moving = di < p.days.length - 1 && !sameHotel(nightHotel(p, di - 1), nightHotel(p, di));
   return `${moving ? L('체크아웃하고 출발', 'チェックアウトして出発') : '숙소에서 출발'} · ${esc(hotelLabelT(nightHotel(p, di - 1)))}`;
 }
+// 이동 방법 아래 작은 설명. 「택시」처럼 이름을 그대로 되풀이하면 안 보여요
+function optLabel(o) {
+  return !o.label || o.label === MODE[o.mode].n ? '' : o.label;
+}
 // 이동 수단 이름 (일본어 화면이면 일본어로)
 function modeNm(m) {
   const n = (MODE[m] || MODE.walk).n;
@@ -576,7 +581,7 @@ function legRow(leg, li) {
   return `<li class="leg m-${leg.mode}" style="--m:${MODE[leg.mode].color}"><span class="rail"></span>
     <button class="lchip" data-act="leg" data-li="${li}" aria-label="이동 방법 바꾸기: ${MODE[leg.mode].n} ${leg.min}분 ${ft}">
       ${modeIc(leg.mode, 'sm')}<span class="lc-m"><b>${MODE[leg.mode].n} ${leg.min}분</b>${ft ? `<em>${ft}</em>` : ''}${leg.chosen ? '<i class="mine">직접 고름</i>' : ''}${liveLegTag(leg)}${svcLegTag(leg)}</span>
-      <span class="lc-l${sw ? ' warn' : ''}">${esc(sw || (leg.mode === 'walk' ? dist(leg.km) : leg.label))}</span>${ic('next', 'chev')}
+      <span class="lc-l${sw ? ' warn' : ''}">${esc(sw || (leg.mode === 'walk' ? dist(leg.km) : optLabel(leg)))}</span>${ic('next', 'chev')}
     </button></li>`;
 }
 // ★ 일정 카드 한 장 (펼치면 시간·순서·메모 등)
@@ -948,7 +953,7 @@ function legSheet(sh) {
         return `<button class="opt${on ? ' on' : ''}${o.isOff ? ' off' : ''}" data-act="legMode" data-mode="${o.id}" aria-pressed="${on}" ${o.isOff ? 'disabled' : ''}>
         ${modeIc(o.mode)}<span class="ob"><span class="o1"><b>${MODE[o.mode].n}</b>${badges}</span>
         <span class="o2"><b>${o.min}분</b><em>${ft}</em></span>
-        <span class="ol">${esc(o.label)}</span>
+        ${optLabel(o) ? `<span class="ol">${esc(optLabel(o))}</span>` : ''}
         ${o.steps && o.steps.length ? `<ol class="osteps">${o.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>` : ''}
         ${
           o.isOff
