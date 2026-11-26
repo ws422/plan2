@@ -87,7 +87,7 @@ function h3NavV(on) {
 // 「지금 이동 / 오늘 일정」(여행 전이면 「다가오는 여행 / 첫날 일정」) 카드가 나오고 제목은 한 줄로 줄어요
 function h3HomeV() {
   const p = h3Plan();
-  const top = `<header class="h3-top"><span class="h3-logo" data-notr${p ? '' : ' hidden'}><span class="j" lang="ja">福岡</span><b>${L('후쿠오카', 'ふくおか')}</b></span><span class="h3-tr">${themeBtn(true)}${langBtn(true)}</span></header>`;
+  const top = `<header class="h3-top"><span class="h3-logo" data-notr${p ? '' : ' hidden'}><span class="j" lang="ja">福岡</span><b>${L('후쿠오카', 'ふくおか')}</b></span><span class="h3-topr">${themeBtn(true)}${langBtn(true)}</span></header>`;
   const hero = `<section class="h3-p1">
       <div class="h3-hero" data-notr>
         <div class="j" lang="ja">福岡</div>

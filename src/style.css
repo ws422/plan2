@@ -4096,7 +4096,8 @@ html[lang='ja'] body {
   width: 19px;
   height: 19px;
 }
-.h3-tr,
+/* 위쪽 오른쪽 버튼 묶음 (밝기·언어). 카드 탭의 .h3-tr 과 이름이 겹치지 않게 h3-topr */
+.h3-topr,
 .h3-bl {
   display: flex;
   align-items: center;
