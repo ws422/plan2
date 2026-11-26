@@ -357,6 +357,11 @@ function dirty() {
 }
 // 화면 아래 잠깐 뜨는 알림
 function toast(msg, undo) {
+  // 화면이 바뀌는 애니메이션 중이면 새 화면이 그려진 뒤에 보여요 (안 그러면 예전 화면과 같이 사라져요)
+  if (VT.pending) {
+    VT.after.push(() => toast(msg, undo));
+    return;
+  }
   clearTimeout(S.toastT);
   const w = document.getElementById('toasts');
   if (!w) return;
@@ -1122,12 +1127,58 @@ function fitCta() {
   if (cta && scr) scr.style.paddingBottom = cta.offsetHeight + 24 + 'px';
 }
 window.addEventListener('resize', fitCta);
-// 다른 화면으로 가기 (home·dates·areas·plan)
+// ---- 화면이 바뀔 때 애니메이션 (살짝 떠오르기) ----
+// 브라우저의 화면 전환 기능(View Transitions)으로 예전 화면은 빨리 사라지고 새 화면이 살짝 떠오르며 나타나요.
+// 앞으로 갈 때(새 여행 → 날짜 → 짜는 방법 → 동네 → 계획)는 아래에서, 뒤로 갈 때는 위에서 10px.
+// 위쪽 줄(appbar)·단계 표시(prog)·아래 버튼(cta)·아래 메뉴는 제자리에 있고 내용만 바뀌어요.
+// 기능이 없는 브라우저·「동작 줄이기」 설정이면 그냥 바로 바뀌어요. 모양·빠르기: style.css 「화면 바뀔 때 애니메이션」
+const VT = { pending: false, after: [] };
+const VIEW_ORDER = { home: 0, dates: 1, how: 2, areas: 3, wplan: 3, plan: 4 };
+function vtRun(dir, paint) {
+  const r = document.documentElement,
+    calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!document.startViewTransition || calm || VT.pending) {
+    paint();
+    return;
+  }
+  const done = () => {
+    VT.pending = false;
+    const q = VT.after.splice(0);
+    q.forEach(f => f());
+  };
+  try {
+    r.dataset.vdir = dir;
+    VT.pending = true;
+    const vt = document.startViewTransition(() => {
+      try {
+        paint();
+      } finally {
+        done();
+      }
+    });
+    // 빠르게 연달아 누르면 앞 전환은 건너뛰어요. 그때 나는 알림은 무시해요
+    [vt.ready, vt.updateCallbackDone].forEach(pr => pr && pr.catch(() => {}));
+    vt.finished.catch(() => {}).finally(() => {
+      if (r.dataset.vdir === dir) delete r.dataset.vdir;
+      if (VT.pending) done();
+    });
+  } catch (e) {
+    VT.pending = false;
+    paint();
+    done();
+  }
+}
+// 다른 화면으로 가기 (home·dates·how·areas·wplan·plan)
 function go(view) {
+  const from = S.view;
   S.view = view;
   S.sheet = null;
-  render();
-  window.scrollTo(0, 0);
+  const paint = () => {
+    render();
+    window.scrollTo(0, 0);
+  };
+  if (from === view) paint();
+  else vtRun((VIEW_ORDER[view] ?? 0) >= (VIEW_ORDER[from] ?? 0) ? 'fwd' : 'back', paint);
 }
 
 // 「저장하지 않고 나갈까요?」에서 고른 뒤 원래 가려던 곳으로 (새 여행 등)
@@ -1334,10 +1385,15 @@ const A = {
     toast('계획을 삭제했어요.');
   },
   tab(d) {
+    const same = S.tab === d.t;
     S.tab = d.t;
     S.sel = null;
-    render();
-    window.scrollTo(0, 0);
+    const paint = () => {
+      render();
+      window.scrollTo(0, 0);
+    };
+    if (same) paint();
+    else vtRun('tab', paint);
   },
   day(d) {
     S.di = Number(d.i);

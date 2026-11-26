@@ -8595,13 +8595,26 @@ button.w-t {
 .air-st .chips-sel button.on {
   background: var(--ink);
 }
-/* ---- 탭 넘어갈 때 애니메이션 (home3.js 의 tabSwitch) ----
+/* ---- 화면 바뀔 때 애니메이션 (ui.js 의 vtRun · 홈 탭, 계획 탭, 새 여행 단계 모두) ----
    살짝 떠오르기: 예전 화면은 0.12초 만에 사라지고, 새 화면이 10px 아래에서 0.24초 동안 올라와요.
-   아래 메뉴(h3nav)는 따로 떼어 두어서 제자리에 있어요 */
+   뒤로 갈 때(data-vdir="back")는 10px 위에서 내려와요.
+   아래 이름표가 붙은 것들은 따로 떼어 두어서 제자리에서 글자만 부드럽게 바뀌어요 */
 .h3-nav {
   view-transition-name: h3nav;
 }
-::view-transition-group(h3nav) {
+.appbar {
+  view-transition-name: appbar;
+}
+.prog {
+  view-transition-name: prog;
+}
+.cta {
+  view-transition-name: cta;
+}
+::view-transition-group(h3nav),
+::view-transition-group(appbar),
+::view-transition-group(prog),
+::view-transition-group(cta) {
   animation-duration: 0.2s;
 }
 ::view-transition-old(root) {
@@ -8609,6 +8622,23 @@ button.w-t {
 }
 ::view-transition-new(root) {
   animation: tvRise 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+html[data-vdir='back']::view-transition-new(root) {
+  animation-name: tvDrop;
+}
+/* 위쪽 줄·아래 버튼 글자는 겹쳐 보이지 않게: 예전 글자가 먼저 사라지고 새 글자가 이어서 나타나요 */
+::view-transition-old(appbar),
+::view-transition-old(cta) {
+  animation: tvOut 0.09s ease-out both;
+}
+::view-transition-new(appbar),
+::view-transition-new(cta) {
+  animation: tvIn 0.15s ease-out 0.07s both;
+}
+@keyframes tvIn {
+  from {
+    opacity: 0;
+  }
 }
 @keyframes tvOut {
   to {
@@ -8619,6 +8649,12 @@ button.w-t {
   from {
     opacity: 0;
     transform: translateY(10px);
+  }
+}
+@keyframes tvDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
 }
 @media (prefers-reduced-motion: reduce) {

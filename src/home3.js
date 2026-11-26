@@ -66,20 +66,10 @@ function h3Plan() {
 // 빠르기·높이는 style.css 의 「탭 넘어갈 때 애니메이션」에서 고쳐요
 // set: 상태 바꾸기(바로 해요 · 뒤로가기 계산이 바로 새 탭을 봐요), paint: 화면 다시 그리기(애니메이션 안에서 해요)
 function tabSwitch(next, set, paint) {
-  const calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches,
-    anim = !!document.startViewTransition && !calm && (S.htab || 'home') !== next && S.view === 'home';
+  const anim = (S.htab || 'home') !== next && S.view === 'home';
   set();
-  if (!anim) {
-    paint();
-    return;
-  }
-  try {
-    const vt = document.startViewTransition(paint);
-    // 빠르게 연달아 누르면 앞 전환은 건너뛰어요 (화면은 그대로 새로 그려져요). 그때 나는 알림은 무시해요
-    [vt.ready, vt.finished, vt.updateCallbackDone].forEach(pr => pr && pr.catch(() => {}));
-  } catch (e) {
-    paint();
-  }
+  if (anim) vtRun('tab', paint);
+  else paint();
 }
 
 // ---- 아래 4칸 메뉴 ----
