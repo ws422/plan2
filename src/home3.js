@@ -60,6 +60,28 @@ function h3Plan() {
   return sortedPlans().find(p => planStatus(p).k !== 'past') || null;
 }
 
+// ---- 탭 넘어갈 때 애니메이션 (살짝 떠오르기) ----
+// 브라우저의 화면 전환 기능(View Transitions)으로 예전 화면은 빨리 사라지고 새 화면이 10px 아래에서 올라와요.
+// 아래 메뉴는 따로 떼어 두어서 움직이지 않아요. 기능이 없는 브라우저·「동작 줄이기」 설정이면 그냥 바로 바뀌어요.
+// 빠르기·높이는 style.css 의 「탭 넘어갈 때 애니메이션」에서 고쳐요
+// set: 상태 바꾸기(바로 해요 · 뒤로가기 계산이 바로 새 탭을 봐요), paint: 화면 다시 그리기(애니메이션 안에서 해요)
+function tabSwitch(next, set, paint) {
+  const calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches,
+    anim = !!document.startViewTransition && !calm && (S.htab || 'home') !== next && S.view === 'home';
+  set();
+  if (!anim) {
+    paint();
+    return;
+  }
+  try {
+    const vt = document.startViewTransition(paint);
+    // 빠르게 연달아 누르면 앞 전환은 건너뛰어요 (화면은 그대로 새로 그려져요). 그때 나는 알림은 무시해요
+    [vt.ready, vt.finished, vt.updateCallbackDone].forEach(pr => pr && pr.catch(() => {}));
+  } catch (e) {
+    paint();
+  }
+}
+
 // ---- 아래 4칸 메뉴 ----
 function h3NavV(on) {
   const t = on || S.htab || 'home',
@@ -472,11 +494,18 @@ Object.assign(A, {
       h3GoPage(0);
       return;
     }
-    S.htab = d.t;
-    S.h3p2 = false;
-    S.sheet = null;
-    render();
-    window.scrollTo(0, 0);
+    tabSwitch(
+      d.t,
+      () => {
+        S.htab = d.t;
+        S.h3p2 = false;
+        S.sheet = null;
+      },
+      () => {
+        render();
+        window.scrollTo(0, 0);
+      }
+    );
   },
   h3Down() {
     h3GoPage(1);

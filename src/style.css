@@ -8567,3 +8567,36 @@ button.w-t {
 .air-st .chips-sel button.on {
   background: var(--ink);
 }
+/* ---- 탭 넘어갈 때 애니메이션 (home3.js 의 tabSwitch) ----
+   살짝 떠오르기: 예전 화면은 0.12초 만에 사라지고, 새 화면이 10px 아래에서 0.24초 동안 올라와요.
+   아래 메뉴(h3nav)는 따로 떼어 두어서 제자리에 있어요 */
+.h3-nav {
+  view-transition-name: h3nav;
+}
+::view-transition-group(h3nav) {
+  animation-duration: 0.2s;
+}
+::view-transition-old(root) {
+  animation: tvOut 0.12s ease-out both;
+}
+::view-transition-new(root) {
+  animation: tvRise 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes tvOut {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes tvRise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
