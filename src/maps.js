@@ -105,6 +105,9 @@ function drawMaps() {
   else if (WMV) wmDrop();
   const hm = document.getElementById('hpmap');
   if (hm) drawHpMap(hm);
+  const wp = document.getElementById('wpmap');
+  if (wp) drawWpMap(wp);
+  else if (WPV) wpDrop();
 }
 // ★ 새 여행 2단계 지도 (동네 동그라미 + 내 숙소 핀)
 // 글자 폭 재기 (1px 글꼴 기준 폭을 기억해 둬요. 못 재면 대충 계산)
@@ -295,6 +298,7 @@ function rgFail() {
   rgDrop();
   dmDrop();
   wmDrop();
+  wpDrop();
   render();
 }
 function rgVector(el) {
@@ -1344,3 +1348,230 @@ function drawWalkSvg(el, sh) {
   });
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="걷는 길 추천 지도">${h}</svg>`;
 }
+
+// ======================================================================
+// ★ 가고 싶은 곳 지도 (가고 싶은 곳으로 짜기 화면 맨 위) — 지도 탭과 같은 진짜 지도.
+//    핀·묶음·이름표는 앱이 위에 그려요. 못 불러오면 안내 지도 위에 같은 핀을 그려요.
+//    화면 글자·버튼은 wish.js 의 wpMapV
+// ======================================================================
+let WPV = null;
+function wpDrop() {
+  if (!WPV) return;
+  try {
+    if (WPV.map) WPV.map.remove();
+  } catch (_) {}
+  WPV = null;
+}
+function drawWpMap(el) {
+  const d = wpData();
+  if (!d.items.length) return;
+  const v = wpView(d),
+    shown = wpShown(d, v);
+  if (rgMode() === 'vector') return wpVector(el, d, v, shown);
+  if (WPV) wpDrop();
+  el.classList.remove('vector');
+  wpSvg(el, d, v, shown);
+}
+function wpPts(d, v, shown) {
+  return v === 'city' ? shown.concat([d.hotel]) : shown.slice();
+}
+function wpBounds(pts) {
+  const lats = pts.map(p => p.lat),
+    lngs = pts.map(p => p.lng);
+  return [
+    [Math.min(...lngs) - 0.002, Math.min(...lats) - 0.0015],
+    [Math.max(...lngs) + 0.002, Math.max(...lats) + 0.0015]
+  ];
+}
+function wpPad() {
+  return { top: 96, bottom: S.draft && S.draft.wpSel ? 140 : 58, left: 36, right: 58 };
+}
+function wpVector(el, d, v, shown) {
+  const key = `${hpDark() ? 'd' : 'l'}${LANG}`,
+    fit = v + '|' + shown.map(i => `${i.id}:${i.lat.toFixed(5)}`).join(',');
+  if (WPV && WPV.key !== key) wpDrop();
+  if (!WPV) {
+    const box = document.createElement('div'),
+      gl = document.createElement('div'),
+      ov = document.createElement('div');
+    box.className = 'rg-vmap';
+    gl.className = 'rg-gl';
+    ov.className = 'rg-ov';
+    box.append(gl, ov);
+    WPV = { key, box, gl, ov, map: null, fit, b0: wpBounds(wpPts(d, v, shown)) };
+    loadMapLibre().then(wpInit).catch(rgFail);
+  }
+  el.classList.add('vector');
+  if (WPV.box.parentNode !== el) {
+    el.innerHTML = '';
+    el.appendChild(WPV.box);
+  }
+  if (!WPV.map) return;
+  WPV.map.resize();
+  if (WPV.fit !== fit) {
+    WPV.fit = fit;
+    WPV.map.fitBounds(wpBounds(wpPts(d, v, shown)), { padding: wpPad(), maxZoom: 15.5, duration: 450 });
+  }
+  wpOverlay();
+}
+function wpInit(gl) {
+  const V = WPV;
+  if (!V || V.map) return;
+  let map;
+  try {
+    map = new gl.Map({
+      container: V.gl,
+      style: HP_STYLE,
+      bounds: V.b0,
+      fitBoundsOptions: { padding: wpPad(), maxZoom: 15.5 },
+      minZoom: 7,
+      maxZoom: 18,
+      dragRotate: false,
+      pitchWithRotate: false,
+      touchPitch: false,
+      attributionControl: { compact: true },
+      fadeDuration: 0
+    });
+  } catch (e) {
+    rgFail();
+    return;
+  }
+  map.touchZoomRotate.disableRotation();
+  V.map = map;
+  map.on('load', () => {
+    if (WPV !== V) return;
+    V.loaded = true;
+    try {
+      hpVecStyle(map);
+      hpVecOverlay(map);
+    } catch (e) {
+      console.warn('wish map style', e);
+    }
+    wpOverlay();
+  });
+  setTimeout(() => {
+    if (WPV === V && !V.loaded) rgFail();
+  }, 10000);
+  map.on('move', wpOverlay);
+  map.on('resize', wpOverlay);
+}
+function wpOverlay() {
+  const V = WPV;
+  if (!V || !V.map || S.view !== 'wplan') return;
+  const W = V.box.clientWidth,
+    H = V.box.clientHeight;
+  if (!W || !H) return;
+  const map = V.map;
+  V.ov.innerHTML = wpPinsHTML(p => {
+    const q = map.project([p.lng, p.lat]);
+    return { x: q.x, y: q.y };
+  }, W, H);
+}
+// 인터넷이 안 될 때: 안내 지도 위에 같은 핀
+function wpSvg(el, d, v, shown) {
+  const W = el.clientWidth,
+    H = el.clientHeight;
+  if (!W || !H) return;
+  const pts = wpPts(d, v, shown),
+    sel = S.draft && S.draft.wpSel,
+    { P, s } = linear(pts, W, H - (sel ? 150 : 104), 40, 0.8),
+    P2 = (la, ln) => {
+      const q = P(la, ln);
+      return [q[0], q[1] + 58];
+    };
+  const bg = geoSVG(P2, 1, { stations: s > 160, riverW: clamp(s * 0.05, 1.5, 6), lineW: 2 });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">${bg}</svg><div class="rg-ov">${wpPinsHTML(p => {
+    const q = P2(p.lat, p.lng);
+    return { x: q[0], y: q[1] };
+  }, W, H)}</div>`;
+}
+// 핀·묶음·이름표 (진짜 지도·안내 지도 같이 써요). proj: 장소 → 화면 좌표
+function wpPinsHTML(proj, W, H) {
+  const d = wpData(),
+    v = wpView(d),
+    shown = wpShown(d, v),
+    selId = S.draft.wpSel;
+  const tag = o => (o.at != null ? fmt(o.at) : o.day != null ? L(`${o.day + 1}일차`, `${o.day + 1}日目`) : '');
+  let svg = '',
+    html = '',
+    list = shown,
+    cl = null;
+  const cen = arr => {
+    const ps = arr.map(proj);
+    return { x: ps.reduce((t, p) => t + p.x, 0) / ps.length, y: ps.reduce((t, p) => t + p.y, 0) / ps.length, ps };
+  };
+  // 「전체」로 보면 작게 몰린 시내는 숫자 묶음 하나로
+  if (v === 'all' && d.city.length >= 2) {
+    const c = cen(d.city),
+      r = Math.max(...c.ps.map(p => Math.hypot(p.x - c.x, p.y - c.y)));
+    if (r < 95) {
+      cl = c;
+      list = shown.filter(i => i.z !== 'city');
+    }
+  }
+  // 「전체」: 시내 → 먼 동네 점선과 걸리는 시간
+  if (v === 'all') {
+    const h = cl || proj(d.hotel);
+    d.far.forEach(f => {
+      const c = cen(f.list),
+        m = { x: (h.x + c.x) / 2, y: (h.y + c.y) / 2 };
+      svg += `<path class="far" d="M${f1(h.x)},${f1(h.y)}L${f1(c.x)},${f1(c.y)}"/>`;
+      html += `<span class="wpp-dist" style="left:${f1(m.x)}px;top:${f1(m.y)}px">${ic('train')}${L(`약 ${accessMin(f.list[0].z)}분`, `約${accessMin(f.list[0].z)}分`)}</span>`;
+    });
+  } else if (v !== 'city') {
+    const z = shown[0] && shown[0].z;
+    if (z) html += `<span class="wpp-dist top">${ic('train')}${L(`시내에서 약 ${accessMin(z)}분`, `市内から約${accessMin(z)}分`)}</span>`;
+  }
+  // 겹치는 핀은 살짝 펼쳐요 (숙소 핀은 그대로)
+  const hp = proj(d.hotel),
+    showHotel = v === 'city' || (v === 'all' && !cl);
+  const arr = list.map(i => {
+    const q = proj(i);
+    return { i, x: q.x, y: q.y, ox: q.x, oy: q.y };
+  });
+  const fixed = showHotel ? [{ x: hp.x, y: hp.y + 18, fx: 1 }] : [];
+  for (let it = 0; it < 60; it++) {
+    let moved = false;
+    const all = arr.concat(fixed);
+    for (let a = 0; a < arr.length; a++)
+      for (let b = 0; b < all.length; b++) {
+        const A1 = arr[a],
+          B1 = all[b];
+        if (A1 === B1) continue;
+        let dx = A1.x - B1.x,
+          dy = A1.y - B1.y,
+          dd = Math.hypot(dx, dy);
+        if (dd >= 34) continue;
+        if (dd < 0.01) {
+          dx = Math.cos(a + b);
+          dy = Math.sin(a + b);
+          dd = 1;
+        }
+        const m = (34 - dd) / (B1.fx ? 1 : 2);
+        A1.x += (dx / dd) * m;
+        A1.y += (dy / dd) * m;
+        if (!B1.fx) {
+          B1.x -= (dx / dd) * m;
+          B1.y -= (dy / dd) * m;
+        }
+        moved = true;
+      }
+    if (!moved) break;
+  }
+  arr.forEach(q => {
+    if (Math.hypot(q.x - q.ox, q.y - q.oy) > 3)
+      svg += `<line class="lead" x1="${f1(q.ox)}" y1="${f1(q.oy)}" x2="${f1(q.x)}" y2="${f1(q.y - 4)}"/><circle class="dot" cx="${f1(q.ox)}" cy="${f1(q.oy)}" r="2.6"/>`;
+  });
+  if (showHotel) html += `<span class="wpp-h" style="left:${f1(hp.x)}px;top:${f1(hp.y)}px" title="${L('숙소', '宿')}">${ic('home')}</span>`;
+  if (cl)
+    html += `<button class="wpp-cl" data-act="wpView" data-v="city" style="left:${f1(cl.x)}px;top:${f1(cl.y)}px" aria-label="${L(`시내 ${d.city.length}곳 크게 보기`, `市内 ${d.city.length}か所を大きく見る`)}"><b>${d.city.length}</b><span>${L('시내', '市内')}</span></button>`;
+  arr
+    .sort((a, b) => (a.i.id === selId) - (b.i.id === selId) || a.y - b.y)
+    .forEach(({ i, x, y }) => {
+      const t = tag(i.o),
+        far = v === 'all' && i.z !== 'city';
+      html += `<button class="wpp${i.o.must ? ' must' : ''}${i.w.sid ? '' : ' mine'}${i.id === selId ? ' sel' : ''}" data-act="wpSel" data-id="${i.id}" style="left:${f1(x)}px;top:${f1(y)}px" aria-label="${esc(wishNameT(i.w))}" aria-pressed="${i.id === selId}"><span class="dr"><i>${ic(wishKind(i.w))}</i></span>${i.o.must ? `<b class="st">${ic('star')}</b>` : ''}${t ? `<em>${t}</em>` : far ? `<em class="nm">${esc(wishNameT(i.w))}</em>` : ''}</button>`;
+    });
+  return `<svg class="wpm-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">${svg}</svg>${html}`;
+}
+

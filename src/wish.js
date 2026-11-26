@@ -286,6 +286,84 @@ const WISH_TIMES = (() => {
   for (let m = 7 * 60; m <= 23 * 60; m += 30) r.push(m);
   return r;
 })();
+// ---- 가고 싶은 곳 지도 (화면 맨 위) ----
+// 담은 곳을 핀으로 보여 줘요. 핀은 모두 남색, ★ 꼭 갈 곳만 빨강. 안의 흰 아이콘으로 종류를 알아봐요.
+// 시내 밖(다자이후 등)에 담은 곳이 있으면 처음엔 시내만 크게, 위 버튼으로 전체·동네별로 바꿔 봐요.
+// 지도 그리기는 maps.js 의 drawWpMap (진짜 지도 MapLibre · 못 불러오면 안내 지도)
+function wpData() {
+  const D = S.draft,
+    ws = D.wset || {};
+  const items = S.wish.map(w => {
+    const p = w.sid ? SPOT[w.sid] : w;
+    return { w, id: w.id, lat: p.lat, lng: p.lng, z: (w.sid ? SPOT[w.sid].z : w.z) || 'city', a: wishArea(w), o: ws[w.id] || {} };
+  });
+  const city = items.filter(i => i.z === 'city'),
+    by = {};
+  items.filter(i => i.z !== 'city').forEach(i => (by[i.a] = by[i.a] || []).push(i));
+  const far = AREAS.filter(a => by[a.id]).map(a => ({ a, list: by[a.id] }));
+  let hotel;
+  try {
+    hotel = hotelPt(nightHotel({ set: draftSet(D) }, 0));
+  } catch (e) {
+    hotel = PLACES.hotel.hakata;
+  }
+  return { items, city, far, hotel };
+}
+function wpView(d = wpData()) {
+  let v = S.draft.wpView || (d.city.length ? 'city' : 'all');
+  if (v === 'city' && !d.city.length) v = 'all';
+  if (v !== 'all' && v !== 'city' && !d.far.some(f => f.a.id === v)) v = d.city.length ? 'city' : 'all';
+  if (v === 'all' && !d.far.length) v = 'city';
+  return v;
+}
+function wpShown(d, v) {
+  return v === 'all' ? d.items : v === 'city' ? d.city : (d.far.find(f => f.a.id === v) || { list: [] }).list;
+}
+function wDayOpts(cap, cur) {
+  return (
+    `<option value="">${L('아무 날', 'いつでも')}</option>` +
+    cap.days.map((d, k) => `<option value="${k}"${cur === k ? ' selected' : ''}>${L(`${k + 1}일차`, `${k + 1}日目`)} · ${mds(d.date)}</option>`).join('')
+  );
+}
+function wpMapV(cap) {
+  if (!S.wish.length) return '';
+  const d = wpData(),
+    v = wpView(d),
+    sel = d.items.find(i => i.id === S.draft.wpSel);
+  const segs = d.far.length
+    ? [['all', L(`전체 ${d.items.length}`, `すべて ${d.items.length}`)], d.city.length ? ['city', L(`시내 ${d.city.length}`, `市内 ${d.city.length}`)] : null, ...d.far.map(f => [f.a.id, `${areaNameT(f.a.id)} ${f.list.length}`])].filter(Boolean)
+    : [];
+  const seg = segs.length
+    ? `<div class="wpm-seg" role="group" aria-label="${L('지도 범위', '地図の範囲')}">${segs.map(([k, t]) => `<button class="${v === k ? 'on' : ''}" data-act="wpView" data-v="${k}" aria-pressed="${v === k}">${esc(t)}</button>`).join('')}</div>`
+    : '';
+  const nFar = d.far.reduce((t, f) => t + f.list.length, 0);
+  const edge =
+    v === 'city' && d.far.length && !sel
+      ? `<button class="wpm-edge" data-act="wpView" data-v="${d.far.length === 1 ? d.far[0].a.id : 'all'}">${
+          d.far.length === 1
+            ? esc(L(`${areaNameT(d.far[0].a.id)} ${nFar}곳 보기`, `${areaNameT(d.far[0].a.id)} ${nFar}か所を見る`))
+            : esc(L(`시내 밖 ${nFar}곳 보기`, `市外 ${nFar}か所を見る`))
+        }${ic('next')}</button>`
+      : '';
+  const mine = d.items.some(i => !i.w.sid);
+  const leg = sel
+    ? ''
+    : `<div class="wpm-leg" aria-hidden="true"><span><i class="lp must"></i>${L('꼭 갈 곳', '必ず行く')}</span><span><i class="lp"></i>${L('담은 곳', '入れた所')}</span>${v === 'city' ? `<span><i class="lh">${ic('home')}</i>${L('숙소', '宿')}</span>` : ''}${mine ? `<span><i class="lm"></i>${L('직접 추가', '直接追加')}</span>` : ''}</div>`;
+  let card = '';
+  if (sel) {
+    const w = sel.w,
+      o = sel.o,
+      day = o.day != null && o.day < cap.days.length ? o.day : null;
+    card = `<div class="wpm-card">
+      ${catTile(wishKind(w))}
+      <span class="t"><b>${w.sid ? esc(wishName(w)) : `<span data-notr>${esc(wishName(w))}</span>`}</b><small>${w.sid ? `<span>${esc(areaNameT(sel.a))}</span> · ` : ''}${wishMeta(w)}</small></span>
+      <button class="ib xs wpm-x" data-act="wpSel" data-id="" aria-label="${L('닫기', '閉じる')}">${ic('close')}</button>
+      <span class="acts"><button class="wpm-star${o.must ? ' on' : ''}" data-act="wMust" data-id="${w.id}" aria-pressed="${!!o.must}">${ic('star')}${L('꼭 갈 곳', '必ず行く')}</button><select data-change="wDay" data-id="${w.id}" aria-label="${L('날짜 고정', '日付の固定')}" class="${day != null ? 'set' : ''}">${wDayOpts(cap, day)}</select><button class="wpm-del" data-act="wishDel" data-id="${w.id}">${L('빼기', '外す')}</button></span>
+    </div>`;
+  }
+  return `<div class="wpm${sel ? ' has-card' : ''}" id="wpm"><div class="wpm-map" id="wpmap" role="img" aria-label="${L('가고 싶은 곳 지도', '行きたい所の地図')}"></div>${seg}<div class="map-ctl"><button class="ib sm" data-act="wpZoom" data-n="1" aria-label="${L('확대', '拡大')}">${ic('plus')}</button><button class="ib sm" data-act="wpZoom" data-n="-1" aria-label="${L('축소', '縮小')}">${ic('minus')}</button></div>${edge}${leg}${card}</div>`;
+}
+
 function wplanV() {
   const D = S.draft,
     ws = D.wset || (D.wset = {}),
@@ -302,11 +380,7 @@ function wplanV() {
       : pct <= 100
         ? L('일정에 딱 맞아요', 'ちょうどいい量です')
         : L('빠듯해요 · ★ 아닌 곳은 보류함으로 갈 수 있어요', 'きつめ · ★以外は保留箱に入ることがあります');
-  const dayOpts = cur =>
-    `<option value="">${L('아무 날', 'いつでも')}</option>` +
-    cap.days
-      .map((d, k) => `<option value="${k}"${cur === k ? ' selected' : ''}>${L(`${k + 1}일차`, `${k + 1}日目`)} · ${mds(d.date)}</option>`)
-      .join('');
+  const dayOpts = cur => wDayOpts(cap, cur);
   const atOpts = cur =>
     `<option value="">${L('시간 아무 때', '時間はいつでも')}</option>` +
     WISH_TIMES.map(m => `<option value="${m}"${cur === m ? ' selected' : ''}>${fmt(m)}</option>`).join('');
@@ -314,10 +388,10 @@ function wplanV() {
     const o = ws[w.id] || {},
       day = o.day != null && o.day < cap.days.length ? o.day : null;
     const tail = `<button class="w-x" data-act="wishDel" data-id="${w.id}" aria-label="${esc(L(`${wishName(w)} 빼기`, `${wishNameT(w)}を外す`))}">${ic('close')}</button>`;
-    return `<li class="w-row wp">
+    return `<li class="w-row wp${D.wpSel === w.id ? ' hl' : ''}">
       <button class="w-star${o.must ? ' on' : ''}" data-act="wMust" data-id="${w.id}" aria-pressed="${!!o.must}" aria-label="${esc(L(`${wishName(w)} 꼭 갈 곳`, `${wishNameT(w)} 必ず行く所`))}">${ic('star')}</button>
-      ${catTile(wishKind(w))}
-      <span class="w-t"><b>${w.sid ? esc(wishName(w)) : `<span data-notr>${esc(wishName(w))}</span><i class="w-u">${L('직접 추가', '直接追加')}</i>`}</b><small>${wishMeta(w)}</small>
+      <button class="w-ct" data-act="wpSel" data-id="${w.id}" data-from="list" aria-label="${esc(L(`${wishName(w)} 지도에서 보기`, `${wishNameT(w)}を地図で見る`))}">${catTile(wishKind(w))}</button>
+      <span class="w-t"><b data-act="wpSel" data-id="${w.id}" data-from="list">${w.sid ? esc(wishName(w)) : `<span data-notr>${esc(wishName(w))}</span><i class="w-u">${L('직접 추가', '直接追加')}</i>`}</b><small>${wishMeta(w)}</small>
         <span class="w-fix"><select data-change="wDay" data-id="${w.id}" aria-label="${L('날짜 고정', '日付の固定')}" class="${day != null ? 'set' : ''}">${dayOpts(day)}</select>${day != null ? `<select data-change="wAt" data-id="${w.id}" aria-label="${L('시간 고정', '時間の固定')}" class="${o.at != null ? 'set' : ''}">${atOpts(o.at)}</select>` : ''}</span></span>
       ${tail}</li>`;
   };
@@ -331,6 +405,7 @@ function wplanV() {
     appbar({ back: 'toHow', title: L(`가고 싶은 곳 ${W.length}곳`, `行きたい所 ${W.length}か所`), sub: draftSub() }) +
     progress(3) +
     `<main class="scr flow wplan">
+    ${wpMapV(cap)}
     ${list}
     <div class="row2 w-adds"><button class="btn soft" data-act="wpickSheet">${ic('star')}${L('추천 장소 담기', 'おすすめから入れる')}</button><button class="btn soft" data-act="wishAdd">${ic('pin')}${L('직접 장소 추가', '場所を直接追加')}</button></div>
     <button class="w-tog" data-act="wFill" role="switch" aria-checked="${fill}"><span><b>${L('빈 시간은 추천 장소로 채우기', '空き時間はおすすめで埋める')}</b><small>${L('담은 곳 사이에 시간이 남으면 근처 맛집·명소를 넣어요', '入れた場所の間に時間が余れば、近くのお店・見どころを入れます')}</small></span><i class="w-sw${fill ? ' on' : ''}"></i></button>
@@ -423,11 +498,41 @@ Object.assign(A, {
     S.keepSheetScroll = true;
     render();
   },
+  // 지도: 범위 바꾸기 (전체 · 시내 · 동네)
+  wpView(d) {
+    S.draft.wpView = d.v;
+    S.draft.wpSel = null;
+    render();
+  },
+  // 지도 핀 또는 목록을 누르면: 그 장소를 고르고 지도를 그쪽으로 (한 번 더 누르면 해제)
+  wpSel(d) {
+    const D = S.draft;
+    if (!d.id || D.wpSel === d.id) {
+      D.wpSel = null;
+      render();
+      return;
+    }
+    const dd = wpData(),
+      it = dd.items.find(i => i.id === d.id);
+    if (!it) return;
+    D.wpSel = d.id;
+    if (!wpShown(dd, wpView(dd)).includes(it)) D.wpView = it.z === 'city' ? 'city' : it.a;
+    render();
+    if (typeof WPV !== 'undefined' && WPV && WPV.map) WPV.map.easeTo({ center: [it.lng, it.lat], offset: [0, -44], duration: 420 });
+    if (d.from === 'list') {
+      const m = document.getElementById('wpm');
+      if (m && m.getBoundingClientRect().top < 40) window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  },
+  wpZoom(d) {
+    if (typeof WPV !== 'undefined' && WPV && WPV.map) Number(d.n) > 0 ? WPV.map.zoomIn() : WPV.map.zoomOut();
+  },
   wishDel(d) {
     const i = S.wish.findIndex(w => w.id === d.id);
     if (i < 0) return;
     const [w] = S.wish.splice(i, 1);
     if (S.draft && S.draft.wset) delete S.draft.wset[w.id];
+    if (S.draft && S.draft.wpSel === w.id) S.draft.wpSel = null;
     wishSave();
     S.keepSheetScroll = true;
     render();

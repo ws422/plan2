@@ -8665,3 +8665,441 @@ html[data-vdir='back']::view-transition-new(root) {
     animation: none !important;
   }
 }
+
+/* ---- 가고 싶은 곳 지도 (가고 싶은 곳으로 짜기 맨 위 · maps.js drawWpMap) ----
+   핀은 모두 남색 한 가지, ★ 꼭 갈 곳만 빨강. 종류는 핀 안의 흰 아이콘으로 */
+.wpm {
+  --pin: #15203a;
+  --pin-i: #fff;
+  --pin-e: #fff;
+  --tag: #15203a;
+  --tag-i: #fff;
+  position: relative;
+  height: 268px;
+  margin: 0 0 16px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--land);
+  box-shadow: var(--sh);
+}
+:root[data-theme='dark'] .wpm {
+  --pin: #dfe5f1;
+  --pin-i: #15203a;
+  --pin-e: #15203a;
+  --tag: #dfe5f1;
+  --tag-i: #15203a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .wpm {
+    --pin: #dfe5f1;
+    --pin-i: #15203a;
+    --pin-e: #15203a;
+    --tag: #dfe5f1;
+    --tag-i: #15203a;
+  }
+}
+.wpm-map,
+.wpm-map .rg-vmap,
+.wpm-map .rg-gl,
+.wpm-map .rg-gl.maplibregl-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.wpm-map > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.wpm-map .rg-ov {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.wpm-svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+.wpm-svg .lead {
+  stroke: #15203a;
+  stroke-width: 1.3;
+  opacity: 0.45;
+}
+.wpm-svg .dot {
+  fill: #15203a;
+  opacity: 0.55;
+}
+.wpm-svg .far {
+  fill: none;
+  stroke: #15203a;
+  stroke-width: 2;
+  stroke-dasharray: 2 5;
+  stroke-linecap: round;
+  opacity: 0.5;
+}
+.wpp {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  margin: -38px 0 0 -16px;
+  padding: 0;
+  border: 0;
+  background: none;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 3;
+  -webkit-tap-highlight-color: transparent;
+}
+.wpp .dr {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--pin);
+  border: 2.5px solid var(--pin-e);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28);
+}
+.wpp .dr > i {
+  display: grid;
+  transform: rotate(45deg);
+  color: var(--pin-i);
+}
+.wpp .dr .ic {
+  width: 15px;
+  height: 15px;
+}
+.wpp.must {
+  --pin: var(--pri);
+  --pin-i: #fff;
+}
+.wpp.mine .dr {
+  border-style: dashed;
+}
+.wpp .st {
+  position: absolute;
+  right: -6px;
+  top: -6px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--pri);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+}
+.wpp .st .ic {
+  width: 10px;
+  height: 10px;
+  fill: currentColor;
+}
+.wpp em {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 3px);
+  transform: translateX(-50%);
+  padding: 1px 6px;
+  border-radius: 7px;
+  background: var(--tag);
+  color: var(--tag-i);
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.wpp em.nm {
+  background: #fff;
+  color: #15203a;
+}
+.wpp.sel {
+  width: 40px;
+  height: 40px;
+  margin: -48px 0 0 -20px;
+  z-index: 5;
+}
+.wpp.sel .dr {
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--pin) 28%, transparent),
+    0 3px 10px rgba(0, 0, 0, 0.3);
+}
+.wpp.sel .dr .ic {
+  width: 19px;
+  height: 19px;
+}
+.wpp-h {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border-radius: 9px;
+  background: #fff;
+  color: #15203a;
+  border: 2px solid #15203a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+.wpp-h .ic {
+  width: 15px;
+  height: 15px;
+}
+.wpp-cl {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  width: 54px;
+  height: 54px;
+  margin: -27px 0 0 -27px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--pin);
+  color: var(--pin-i);
+  border: 3px solid var(--pin-e);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  font: inherit;
+  line-height: 1.05;
+  text-align: center;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.wpp-cl b {
+  font-size: 18px;
+}
+.wpp-cl span {
+  font-size: 10.5px;
+  font-weight: 700;
+}
+.wpp-dist {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 9px;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  color: #15203a;
+  font-size: 11.5px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+}
+.wpp-dist.top {
+  left: 10px;
+  top: 60px;
+  transform: none;
+}
+.wpp-dist .ic {
+  width: 13px;
+  height: 13px;
+}
+.wpm-seg {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 6;
+  display: flex;
+  gap: 3px;
+  max-width: calc(100% - 66px);
+  overflow-x: auto;
+  padding: 4px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  box-shadow: var(--sh);
+  scrollbar-width: none;
+}
+.wpm-seg::-webkit-scrollbar {
+  display: none;
+}
+.wpm-seg button {
+  flex: none;
+  padding: 6px 9px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: var(--ink-3);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+.wpm-seg button.on {
+  background: var(--ink);
+  color: var(--surface);
+}
+.wpm .map-ctl {
+  z-index: 6;
+}
+.wpm-edge {
+  position: absolute;
+  right: 10px;
+  bottom: 44px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 6px 6px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: #15203a;
+  color: #fff;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 800;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+}
+.wpm-edge .ic {
+  width: 14px;
+  height: 14px;
+}
+.wpm-leg {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 9px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  color: var(--ink-3);
+  font-size: 11px;
+  font-weight: 700;
+}
+.wpm-leg span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.wpm-leg .lp {
+  width: 11px;
+  height: 11px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--pin);
+}
+.wpm-leg .lp.must {
+  background: var(--pri);
+}
+.wpm-leg .lh {
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1.5px solid #15203a;
+  background: #fff;
+  color: #15203a;
+}
+.wpm-leg .lh .ic {
+  width: 9px;
+  height: 9px;
+}
+.wpm-leg .lm {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px dashed var(--ink-3);
+}
+.wpm-card {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 7;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 10px 10px 10px 12px;
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+}
+.wpm-card .t {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.wpm-card .t b {
+  overflow: hidden;
+  font-size: 14.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wpm-card .t small {
+  overflow: hidden;
+  color: var(--ink-3);
+  font-size: 11.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wpm-card .acts {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 6px;
+}
+.wpm-card .acts > * {
+  height: 34px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+}
+.wpm-star {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+}
+.wpm-star .ic {
+  width: 14px;
+  height: 14px;
+}
+.wpm-star.on {
+  background: color-mix(in srgb, var(--pri) 14%, var(--surface));
+  color: var(--pri);
+}
+.wpm-star.on .ic {
+  fill: currentColor;
+}
+.wpm-card select {
+  flex: 1;
+  min-width: 0;
+  padding: 0 8px;
+}
+.wpm-card select.set {
+  color: var(--pri);
+}
+.wpm-del {
+  padding: 0 12px;
+}
+.w-ct {
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.w-row.wp b[data-act] {
+  cursor: pointer;
+}
+.w-row.wp.hl {
+  box-shadow: 0 0 0 2px var(--pri) inset;
+  background: color-mix(in srgb, var(--pri) 5%, var(--surface));
+}
+
