@@ -60,7 +60,7 @@ function h3Plan() {
   return sortedPlans().find(p => planStatus(p).k !== 'past') || null;
 }
 
-// ---- 아래 4칸 메뉴 (위쪽에 줄무늬 한 줄) ----
+// ---- 아래 4칸 메뉴 ----
 function h3NavV(on) {
   const t = on || S.htab || 'home',
     it = (k, i, l) =>

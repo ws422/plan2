@@ -7267,7 +7267,7 @@ body {
   font-weight: 800;
   cursor: pointer;
 }
-/* 아래 4칸 메뉴: 흰 바탕 위쪽 가장자리에 줄무늬 한 줄 */
+/* 아래 4칸 메뉴: 흰 바탕 (위쪽 줄무늬 띠는 없앴어요) */
 .h3-nav {
   position: fixed;
   z-index: 30;
@@ -7283,22 +7283,6 @@ body {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: start;
   background: var(--surface);
-}
-.h3-nav::before {
-  content: '';
-  position: absolute;
-  top: -2.25px;
-  left: 0;
-  right: 0;
-  height: 4.5px;
-  background: repeating-linear-gradient(
-    90deg,
-    #15203a 0 5px,
-    #d63a1f 5px 10px,
-    #d9962b 10px 15px,
-    #6b3e8e 15px 20px,
-    #2459c9 20px 25px
-  );
 }
 .h3-ni {
   display: flex;
@@ -8560,10 +8544,6 @@ button.w-t {
 .w-banner .btn.wide {
   width: 100%;
   margin-top: 10px;
-}
-/* 홈(첫 화면)에서는 아래 메뉴 위 줄무늬를 빼요. 다른 탭·계획 화면은 그대로 */
-.h3-home .h3-nav::before {
-  display: none;
 }
 /* 공항에서 시내로: 「내 숙소」·「다른 역」 */
 .s-air .chips-sel button {
