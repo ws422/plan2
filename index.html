@@ -8687,6 +8687,444 @@ html[data-vdir='back']::view-transition-new(root) {
   }
 }
 
+/* ---- 가고 싶은 곳 지도 (가고 싶은 곳으로 짜기 맨 위 · maps.js drawWpMap) ----
+   핀은 모두 남색 한 가지, ★ 꼭 갈 곳만 빨강. 종류는 핀 안의 흰 아이콘으로 */
+.wpm {
+  --pin: #15203a;
+  --pin-i: #fff;
+  --pin-e: #fff;
+  --tag: #15203a;
+  --tag-i: #fff;
+  position: relative;
+  height: 268px;
+  margin: 0 0 16px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--land);
+  box-shadow: var(--sh);
+}
+:root[data-theme='dark'] .wpm {
+  --pin: #dfe5f1;
+  --pin-i: #15203a;
+  --pin-e: #15203a;
+  --tag: #dfe5f1;
+  --tag-i: #15203a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .wpm {
+    --pin: #dfe5f1;
+    --pin-i: #15203a;
+    --pin-e: #15203a;
+    --tag: #dfe5f1;
+    --tag-i: #15203a;
+  }
+}
+.wpm-map,
+.wpm-map .rg-vmap,
+.wpm-map .rg-gl,
+.wpm-map .rg-gl.maplibregl-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.wpm-map > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.wpm-map .rg-ov {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.wpm-svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+.wpm-svg .lead {
+  stroke: #15203a;
+  stroke-width: 1.3;
+  opacity: 0.45;
+}
+.wpm-svg .dot {
+  fill: #15203a;
+  opacity: 0.55;
+}
+.wpm-svg .far {
+  fill: none;
+  stroke: #15203a;
+  stroke-width: 2;
+  stroke-dasharray: 2 5;
+  stroke-linecap: round;
+  opacity: 0.5;
+}
+.wpp {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  margin: -38px 0 0 -16px;
+  padding: 0;
+  border: 0;
+  background: none;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 3;
+  -webkit-tap-highlight-color: transparent;
+}
+.wpp .dr {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--pin);
+  border: 2.5px solid var(--pin-e);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28);
+}
+.wpp .dr > i {
+  display: grid;
+  transform: rotate(45deg);
+  color: var(--pin-i);
+}
+.wpp .dr .ic {
+  width: 15px;
+  height: 15px;
+}
+.wpp.must {
+  --pin: var(--pri);
+  --pin-i: #fff;
+}
+.wpp.mine .dr {
+  border-style: dashed;
+}
+.wpp .st {
+  position: absolute;
+  right: -6px;
+  top: -6px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--pri);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+}
+.wpp .st .ic {
+  width: 10px;
+  height: 10px;
+  fill: currentColor;
+}
+.wpp em {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 3px);
+  transform: translateX(-50%);
+  padding: 1px 6px;
+  border-radius: 7px;
+  background: var(--tag);
+  color: var(--tag-i);
+  font-style: normal;
+  font-size: 10.5px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.wpp em.nm {
+  background: #fff;
+  color: #15203a;
+}
+.wpp.sel {
+  width: 40px;
+  height: 40px;
+  margin: -48px 0 0 -20px;
+  z-index: 5;
+}
+.wpp.sel .dr {
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--pin) 28%, transparent),
+    0 3px 10px rgba(0, 0, 0, 0.3);
+}
+.wpp.sel .dr .ic {
+  width: 19px;
+  height: 19px;
+}
+.wpp-h {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border-radius: 9px;
+  background: #fff;
+  color: #15203a;
+  border: 2px solid #15203a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+.wpp-h .ic {
+  width: 15px;
+  height: 15px;
+}
+.wpp-cl {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  width: 54px;
+  height: 54px;
+  margin: -27px 0 0 -27px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--pin);
+  color: var(--pin-i);
+  border: 3px solid var(--pin-e);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  font: inherit;
+  line-height: 1.05;
+  text-align: center;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.wpp-cl b {
+  font-size: 18px;
+}
+.wpp-cl span {
+  font-size: 10.5px;
+  font-weight: 700;
+}
+.wpp-dist {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 9px;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  color: #15203a;
+  font-size: 11.5px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+}
+.wpp-dist.top {
+  left: 10px;
+  top: 60px;
+  transform: none;
+}
+.wpp-dist .ic {
+  width: 13px;
+  height: 13px;
+}
+.wpm-seg {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 6;
+  display: flex;
+  gap: 3px;
+  max-width: calc(100% - 66px);
+  overflow-x: auto;
+  padding: 4px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  box-shadow: var(--sh);
+  scrollbar-width: none;
+}
+.wpm-seg::-webkit-scrollbar {
+  display: none;
+}
+.wpm-seg button {
+  flex: none;
+  padding: 6px 9px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: var(--ink-3);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+.wpm-seg button.on {
+  background: var(--ink);
+  color: var(--surface);
+}
+.wpm .map-ctl {
+  z-index: 6;
+}
+.wpm-edge {
+  position: absolute;
+  right: 10px;
+  bottom: 44px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 6px 6px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: #15203a;
+  color: #fff;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 800;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+}
+.wpm-edge .ic {
+  width: 14px;
+  height: 14px;
+}
+.wpm-leg {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 9px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  color: var(--ink-3);
+  font-size: 11px;
+  font-weight: 700;
+}
+.wpm-leg span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.wpm-leg .lp {
+  width: 11px;
+  height: 11px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--pin);
+}
+.wpm-leg .lp.must {
+  background: var(--pri);
+}
+.wpm-leg .lh {
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1.5px solid #15203a;
+  background: #fff;
+  color: #15203a;
+}
+.wpm-leg .lh .ic {
+  width: 9px;
+  height: 9px;
+}
+.wpm-leg .lm {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px dashed var(--ink-3);
+}
+.wpm-card {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 7;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 10px 10px 10px 12px;
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+}
+.wpm-card .t {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.wpm-card .t b {
+  overflow: hidden;
+  font-size: 14.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wpm-card .t small {
+  overflow: hidden;
+  color: var(--ink-3);
+  font-size: 11.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wpm-card .acts {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 6px;
+}
+.wpm-card .acts > * {
+  height: 34px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+}
+.wpm-star {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+}
+.wpm-star .ic {
+  width: 14px;
+  height: 14px;
+}
+.wpm-star.on {
+  background: color-mix(in srgb, var(--pri) 14%, var(--surface));
+  color: var(--pri);
+}
+.wpm-star.on .ic {
+  fill: currentColor;
+}
+.wpm-card select {
+  flex: 1;
+  min-width: 0;
+  padding: 0 8px;
+}
+.wpm-card select.set {
+  color: var(--pri);
+}
+.wpm-del {
+  padding: 0 12px;
+}
+.w-ct {
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.w-row.wp b[data-act] {
+  cursor: pointer;
+}
+.w-row.wp.hl {
+  box-shadow: 0 0 0 2px var(--pri) inset;
+  background: color-mix(in srgb, var(--pri) 5%, var(--surface));
+}
+
+
 </style>
 </head>
 <body>
@@ -21316,6 +21754,84 @@ const WISH_TIMES = (() => {
   for (let m = 7 * 60; m <= 23 * 60; m += 30) r.push(m);
   return r;
 })();
+// ---- 가고 싶은 곳 지도 (화면 맨 위) ----
+// 담은 곳을 핀으로 보여 줘요. 핀은 모두 남색, ★ 꼭 갈 곳만 빨강. 안의 흰 아이콘으로 종류를 알아봐요.
+// 시내 밖(다자이후 등)에 담은 곳이 있으면 처음엔 시내만 크게, 위 버튼으로 전체·동네별로 바꿔 봐요.
+// 지도 그리기는 maps.js 의 drawWpMap (진짜 지도 MapLibre · 못 불러오면 안내 지도)
+function wpData() {
+  const D = S.draft,
+    ws = D.wset || {};
+  const items = S.wish.map(w => {
+    const p = w.sid ? SPOT[w.sid] : w;
+    return { w, id: w.id, lat: p.lat, lng: p.lng, z: (w.sid ? SPOT[w.sid].z : w.z) || 'city', a: wishArea(w), o: ws[w.id] || {} };
+  });
+  const city = items.filter(i => i.z === 'city'),
+    by = {};
+  items.filter(i => i.z !== 'city').forEach(i => (by[i.a] = by[i.a] || []).push(i));
+  const far = AREAS.filter(a => by[a.id]).map(a => ({ a, list: by[a.id] }));
+  let hotel;
+  try {
+    hotel = hotelPt(nightHotel({ set: draftSet(D) }, 0));
+  } catch (e) {
+    hotel = PLACES.hotel.hakata;
+  }
+  return { items, city, far, hotel };
+}
+function wpView(d = wpData()) {
+  let v = S.draft.wpView || (d.city.length ? 'city' : 'all');
+  if (v === 'city' && !d.city.length) v = 'all';
+  if (v !== 'all' && v !== 'city' && !d.far.some(f => f.a.id === v)) v = d.city.length ? 'city' : 'all';
+  if (v === 'all' && !d.far.length) v = 'city';
+  return v;
+}
+function wpShown(d, v) {
+  return v === 'all' ? d.items : v === 'city' ? d.city : (d.far.find(f => f.a.id === v) || { list: [] }).list;
+}
+function wDayOpts(cap, cur) {
+  return (
+    `<option value="">${L('아무 날', 'いつでも')}</option>` +
+    cap.days.map((d, k) => `<option value="${k}"${cur === k ? ' selected' : ''}>${L(`${k + 1}일차`, `${k + 1}日目`)} · ${mds(d.date)}</option>`).join('')
+  );
+}
+function wpMapV(cap) {
+  if (!S.wish.length) return '';
+  const d = wpData(),
+    v = wpView(d),
+    sel = d.items.find(i => i.id === S.draft.wpSel);
+  const segs = d.far.length
+    ? [['all', L(`전체 ${d.items.length}`, `すべて ${d.items.length}`)], d.city.length ? ['city', L(`시내 ${d.city.length}`, `市内 ${d.city.length}`)] : null, ...d.far.map(f => [f.a.id, `${areaNameT(f.a.id)} ${f.list.length}`])].filter(Boolean)
+    : [];
+  const seg = segs.length
+    ? `<div class="wpm-seg" role="group" aria-label="${L('지도 범위', '地図の範囲')}">${segs.map(([k, t]) => `<button class="${v === k ? 'on' : ''}" data-act="wpView" data-v="${k}" aria-pressed="${v === k}">${esc(t)}</button>`).join('')}</div>`
+    : '';
+  const nFar = d.far.reduce((t, f) => t + f.list.length, 0);
+  const edge =
+    v === 'city' && d.far.length && !sel
+      ? `<button class="wpm-edge" data-act="wpView" data-v="${d.far.length === 1 ? d.far[0].a.id : 'all'}">${
+          d.far.length === 1
+            ? esc(L(`${areaNameT(d.far[0].a.id)} ${nFar}곳 보기`, `${areaNameT(d.far[0].a.id)} ${nFar}か所を見る`))
+            : esc(L(`시내 밖 ${nFar}곳 보기`, `市外 ${nFar}か所を見る`))
+        }${ic('next')}</button>`
+      : '';
+  const mine = d.items.some(i => !i.w.sid);
+  const leg = sel
+    ? ''
+    : `<div class="wpm-leg" aria-hidden="true"><span><i class="lp must"></i>${L('꼭 갈 곳', '必ず行く')}</span><span><i class="lp"></i>${L('담은 곳', '入れた所')}</span>${v === 'city' ? `<span><i class="lh">${ic('home')}</i>${L('숙소', '宿')}</span>` : ''}${mine ? `<span><i class="lm"></i>${L('직접 추가', '直接追加')}</span>` : ''}</div>`;
+  let card = '';
+  if (sel) {
+    const w = sel.w,
+      o = sel.o,
+      day = o.day != null && o.day < cap.days.length ? o.day : null;
+    card = `<div class="wpm-card">
+      ${catTile(wishKind(w))}
+      <span class="t"><b>${w.sid ? esc(wishName(w)) : `<span data-notr>${esc(wishName(w))}</span>`}</b><small>${w.sid ? `<span>${esc(areaNameT(sel.a))}</span> · ` : ''}${wishMeta(w)}</small></span>
+      <button class="ib xs wpm-x" data-act="wpSel" data-id="" aria-label="${L('닫기', '閉じる')}">${ic('close')}</button>
+      <span class="acts"><button class="wpm-star${o.must ? ' on' : ''}" data-act="wMust" data-id="${w.id}" aria-pressed="${!!o.must}">${ic('star')}${L('꼭 갈 곳', '必ず行く')}</button><select data-change="wDay" data-id="${w.id}" aria-label="${L('날짜 고정', '日付の固定')}" class="${day != null ? 'set' : ''}">${wDayOpts(cap, day)}</select><button class="wpm-del" data-act="wishDel" data-id="${w.id}">${L('빼기', '外す')}</button></span>
+    </div>`;
+  }
+  return `<div class="wpm${sel ? ' has-card' : ''}" id="wpm"><div class="wpm-map" id="wpmap" role="img" aria-label="${L('가고 싶은 곳 지도', '行きたい所の地図')}"></div>${seg}<div class="map-ctl"><button class="ib sm" data-act="wpZoom" data-n="1" aria-label="${L('확대', '拡大')}">${ic('plus')}</button><button class="ib sm" data-act="wpZoom" data-n="-1" aria-label="${L('축소', '縮小')}">${ic('minus')}</button></div>${edge}${leg}${card}</div>`;
+}
+
 function wplanV() {
   const D = S.draft,
     ws = D.wset || (D.wset = {}),
@@ -21332,11 +21848,7 @@ function wplanV() {
       : pct <= 100
         ? L('일정에 딱 맞아요', 'ちょうどいい量です')
         : L('빠듯해요 · ★ 아닌 곳은 보류함으로 갈 수 있어요', 'きつめ · ★以外は保留箱に入ることがあります');
-  const dayOpts = cur =>
-    `<option value="">${L('아무 날', 'いつでも')}</option>` +
-    cap.days
-      .map((d, k) => `<option value="${k}"${cur === k ? ' selected' : ''}>${L(`${k + 1}일차`, `${k + 1}日目`)} · ${mds(d.date)}</option>`)
-      .join('');
+  const dayOpts = cur => wDayOpts(cap, cur);
   const atOpts = cur =>
     `<option value="">${L('시간 아무 때', '時間はいつでも')}</option>` +
     WISH_TIMES.map(m => `<option value="${m}"${cur === m ? ' selected' : ''}>${fmt(m)}</option>`).join('');
@@ -21344,10 +21856,10 @@ function wplanV() {
     const o = ws[w.id] || {},
       day = o.day != null && o.day < cap.days.length ? o.day : null;
     const tail = `<button class="w-x" data-act="wishDel" data-id="${w.id}" aria-label="${esc(L(`${wishName(w)} 빼기`, `${wishNameT(w)}を外す`))}">${ic('close')}</button>`;
-    return `<li class="w-row wp">
+    return `<li class="w-row wp${D.wpSel === w.id ? ' hl' : ''}">
       <button class="w-star${o.must ? ' on' : ''}" data-act="wMust" data-id="${w.id}" aria-pressed="${!!o.must}" aria-label="${esc(L(`${wishName(w)} 꼭 갈 곳`, `${wishNameT(w)} 必ず行く所`))}">${ic('star')}</button>
-      ${catTile(wishKind(w))}
-      <span class="w-t"><b>${w.sid ? esc(wishName(w)) : `<span data-notr>${esc(wishName(w))}</span><i class="w-u">${L('직접 추가', '直接追加')}</i>`}</b><small>${wishMeta(w)}</small>
+      <button class="w-ct" data-act="wpSel" data-id="${w.id}" data-from="list" aria-label="${esc(L(`${wishName(w)} 지도에서 보기`, `${wishNameT(w)}を地図で見る`))}">${catTile(wishKind(w))}</button>
+      <span class="w-t"><b data-act="wpSel" data-id="${w.id}" data-from="list">${w.sid ? esc(wishName(w)) : `<span data-notr>${esc(wishName(w))}</span><i class="w-u">${L('직접 추가', '直接追加')}</i>`}</b><small>${wishMeta(w)}</small>
         <span class="w-fix"><select data-change="wDay" data-id="${w.id}" aria-label="${L('날짜 고정', '日付の固定')}" class="${day != null ? 'set' : ''}">${dayOpts(day)}</select>${day != null ? `<select data-change="wAt" data-id="${w.id}" aria-label="${L('시간 고정', '時間の固定')}" class="${o.at != null ? 'set' : ''}">${atOpts(o.at)}</select>` : ''}</span></span>
       ${tail}</li>`;
   };
@@ -21361,6 +21873,7 @@ function wplanV() {
     appbar({ back: 'toHow', title: L(`가고 싶은 곳 ${W.length}곳`, `行きたい所 ${W.length}か所`), sub: draftSub() }) +
     progress(3) +
     `<main class="scr flow wplan">
+    ${wpMapV(cap)}
     ${list}
     <div class="row2 w-adds"><button class="btn soft" data-act="wpickSheet">${ic('star')}${L('추천 장소 담기', 'おすすめから入れる')}</button><button class="btn soft" data-act="wishAdd">${ic('pin')}${L('직접 장소 추가', '場所を直接追加')}</button></div>
     <button class="w-tog" data-act="wFill" role="switch" aria-checked="${fill}"><span><b>${L('빈 시간은 추천 장소로 채우기', '空き時間はおすすめで埋める')}</b><small>${L('담은 곳 사이에 시간이 남으면 근처 맛집·명소를 넣어요', '入れた場所の間に時間が余れば、近くのお店・見どころを入れます')}</small></span><i class="w-sw${fill ? ' on' : ''}"></i></button>
@@ -21453,11 +21966,41 @@ Object.assign(A, {
     S.keepSheetScroll = true;
     render();
   },
+  // 지도: 범위 바꾸기 (전체 · 시내 · 동네)
+  wpView(d) {
+    S.draft.wpView = d.v;
+    S.draft.wpSel = null;
+    render();
+  },
+  // 지도 핀 또는 목록을 누르면: 그 장소를 고르고 지도를 그쪽으로 (한 번 더 누르면 해제)
+  wpSel(d) {
+    const D = S.draft;
+    if (!d.id || D.wpSel === d.id) {
+      D.wpSel = null;
+      render();
+      return;
+    }
+    const dd = wpData(),
+      it = dd.items.find(i => i.id === d.id);
+    if (!it) return;
+    D.wpSel = d.id;
+    if (!wpShown(dd, wpView(dd)).includes(it)) D.wpView = it.z === 'city' ? 'city' : it.a;
+    render();
+    if (typeof WPV !== 'undefined' && WPV && WPV.map) WPV.map.easeTo({ center: [it.lng, it.lat], offset: [0, -44], duration: 420 });
+    if (d.from === 'list') {
+      const m = document.getElementById('wpm');
+      if (m && m.getBoundingClientRect().top < 40) window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  },
+  wpZoom(d) {
+    if (typeof WPV !== 'undefined' && WPV && WPV.map) Number(d.n) > 0 ? WPV.map.zoomIn() : WPV.map.zoomOut();
+  },
   wishDel(d) {
     const i = S.wish.findIndex(w => w.id === d.id);
     if (i < 0) return;
     const [w] = S.wish.splice(i, 1);
     if (S.draft && S.draft.wset) delete S.draft.wset[w.id];
+    if (S.draft && S.draft.wpSel === w.id) S.draft.wpSel = null;
     wishSave();
     S.keepSheetScroll = true;
     render();
@@ -21685,6 +22228,9 @@ function drawMaps() {
   else if (WMV) wmDrop();
   const hm = document.getElementById('hpmap');
   if (hm) drawHpMap(hm);
+  const wp = document.getElementById('wpmap');
+  if (wp) drawWpMap(wp);
+  else if (WPV) wpDrop();
 }
 // ★ 새 여행 2단계 지도 (동네 동그라미 + 내 숙소 핀)
 // 글자 폭 재기 (1px 글꼴 기준 폭을 기억해 둬요. 못 재면 대충 계산)
@@ -21875,6 +22421,7 @@ function rgFail() {
   rgDrop();
   dmDrop();
   wmDrop();
+  wpDrop();
   render();
 }
 function rgVector(el) {
@@ -22924,6 +23471,233 @@ function drawWalkSvg(el, sh) {
   });
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="걷는 길 추천 지도">${h}</svg>`;
 }
+
+// ======================================================================
+// ★ 가고 싶은 곳 지도 (가고 싶은 곳으로 짜기 화면 맨 위) — 지도 탭과 같은 진짜 지도.
+//    핀·묶음·이름표는 앱이 위에 그려요. 못 불러오면 안내 지도 위에 같은 핀을 그려요.
+//    화면 글자·버튼은 wish.js 의 wpMapV
+// ======================================================================
+let WPV = null;
+function wpDrop() {
+  if (!WPV) return;
+  try {
+    if (WPV.map) WPV.map.remove();
+  } catch (_) {}
+  WPV = null;
+}
+function drawWpMap(el) {
+  const d = wpData();
+  if (!d.items.length) return;
+  const v = wpView(d),
+    shown = wpShown(d, v);
+  if (rgMode() === 'vector') return wpVector(el, d, v, shown);
+  if (WPV) wpDrop();
+  el.classList.remove('vector');
+  wpSvg(el, d, v, shown);
+}
+function wpPts(d, v, shown) {
+  return v === 'city' ? shown.concat([d.hotel]) : shown.slice();
+}
+function wpBounds(pts) {
+  const lats = pts.map(p => p.lat),
+    lngs = pts.map(p => p.lng);
+  return [
+    [Math.min(...lngs) - 0.002, Math.min(...lats) - 0.0015],
+    [Math.max(...lngs) + 0.002, Math.max(...lats) + 0.0015]
+  ];
+}
+function wpPad() {
+  return { top: 96, bottom: S.draft && S.draft.wpSel ? 140 : 58, left: 36, right: 58 };
+}
+function wpVector(el, d, v, shown) {
+  const key = `${hpDark() ? 'd' : 'l'}${LANG}`,
+    fit = v + '|' + shown.map(i => `${i.id}:${i.lat.toFixed(5)}`).join(',');
+  if (WPV && WPV.key !== key) wpDrop();
+  if (!WPV) {
+    const box = document.createElement('div'),
+      gl = document.createElement('div'),
+      ov = document.createElement('div');
+    box.className = 'rg-vmap';
+    gl.className = 'rg-gl';
+    ov.className = 'rg-ov';
+    box.append(gl, ov);
+    WPV = { key, box, gl, ov, map: null, fit, b0: wpBounds(wpPts(d, v, shown)) };
+    loadMapLibre().then(wpInit).catch(rgFail);
+  }
+  el.classList.add('vector');
+  if (WPV.box.parentNode !== el) {
+    el.innerHTML = '';
+    el.appendChild(WPV.box);
+  }
+  if (!WPV.map) return;
+  WPV.map.resize();
+  if (WPV.fit !== fit) {
+    WPV.fit = fit;
+    WPV.map.fitBounds(wpBounds(wpPts(d, v, shown)), { padding: wpPad(), maxZoom: 15.5, duration: 450 });
+  }
+  wpOverlay();
+}
+function wpInit(gl) {
+  const V = WPV;
+  if (!V || V.map) return;
+  let map;
+  try {
+    map = new gl.Map({
+      container: V.gl,
+      style: HP_STYLE,
+      bounds: V.b0,
+      fitBoundsOptions: { padding: wpPad(), maxZoom: 15.5 },
+      minZoom: 7,
+      maxZoom: 18,
+      dragRotate: false,
+      pitchWithRotate: false,
+      touchPitch: false,
+      attributionControl: { compact: true },
+      fadeDuration: 0
+    });
+  } catch (e) {
+    rgFail();
+    return;
+  }
+  map.touchZoomRotate.disableRotation();
+  V.map = map;
+  map.on('load', () => {
+    if (WPV !== V) return;
+    V.loaded = true;
+    try {
+      hpVecStyle(map);
+      hpVecOverlay(map);
+    } catch (e) {
+      console.warn('wish map style', e);
+    }
+    wpOverlay();
+  });
+  setTimeout(() => {
+    if (WPV === V && !V.loaded) rgFail();
+  }, 10000);
+  map.on('move', wpOverlay);
+  map.on('resize', wpOverlay);
+}
+function wpOverlay() {
+  const V = WPV;
+  if (!V || !V.map || S.view !== 'wplan') return;
+  const W = V.box.clientWidth,
+    H = V.box.clientHeight;
+  if (!W || !H) return;
+  const map = V.map;
+  V.ov.innerHTML = wpPinsHTML(p => {
+    const q = map.project([p.lng, p.lat]);
+    return { x: q.x, y: q.y };
+  }, W, H);
+}
+// 인터넷이 안 될 때: 안내 지도 위에 같은 핀
+function wpSvg(el, d, v, shown) {
+  const W = el.clientWidth,
+    H = el.clientHeight;
+  if (!W || !H) return;
+  const pts = wpPts(d, v, shown),
+    sel = S.draft && S.draft.wpSel,
+    { P, s } = linear(pts, W, H - (sel ? 150 : 104), 40, 0.8),
+    P2 = (la, ln) => {
+      const q = P(la, ln);
+      return [q[0], q[1] + 58];
+    };
+  const bg = geoSVG(P2, 1, { stations: s > 160, riverW: clamp(s * 0.05, 1.5, 6), lineW: 2 });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" aria-hidden="true">${bg}</svg><div class="rg-ov">${wpPinsHTML(p => {
+    const q = P2(p.lat, p.lng);
+    return { x: q[0], y: q[1] };
+  }, W, H)}</div>`;
+}
+// 핀·묶음·이름표 (진짜 지도·안내 지도 같이 써요). proj: 장소 → 화면 좌표
+function wpPinsHTML(proj, W, H) {
+  const d = wpData(),
+    v = wpView(d),
+    shown = wpShown(d, v),
+    selId = S.draft.wpSel;
+  const tag = o => (o.at != null ? fmt(o.at) : o.day != null ? L(`${o.day + 1}일차`, `${o.day + 1}日目`) : '');
+  let svg = '',
+    html = '',
+    list = shown,
+    cl = null;
+  const cen = arr => {
+    const ps = arr.map(proj);
+    return { x: ps.reduce((t, p) => t + p.x, 0) / ps.length, y: ps.reduce((t, p) => t + p.y, 0) / ps.length, ps };
+  };
+  // 「전체」로 보면 작게 몰린 시내는 숫자 묶음 하나로
+  if (v === 'all' && d.city.length >= 2) {
+    const c = cen(d.city),
+      r = Math.max(...c.ps.map(p => Math.hypot(p.x - c.x, p.y - c.y)));
+    if (r < 95) {
+      cl = c;
+      list = shown.filter(i => i.z !== 'city');
+    }
+  }
+  // 「전체」: 시내 → 먼 동네 점선과 걸리는 시간
+  if (v === 'all') {
+    const h = cl || proj(d.hotel);
+    d.far.forEach(f => {
+      const c = cen(f.list),
+        m = { x: (h.x + c.x) / 2, y: (h.y + c.y) / 2 };
+      svg += `<path class="far" d="M${f1(h.x)},${f1(h.y)}L${f1(c.x)},${f1(c.y)}"/>`;
+      html += `<span class="wpp-dist" style="left:${f1(m.x)}px;top:${f1(m.y)}px">${ic('train')}${L(`약 ${accessMin(f.list[0].z)}분`, `約${accessMin(f.list[0].z)}分`)}</span>`;
+    });
+  } else if (v !== 'city') {
+    const z = shown[0] && shown[0].z;
+    if (z) html += `<span class="wpp-dist top">${ic('train')}${L(`시내에서 약 ${accessMin(z)}분`, `市内から約${accessMin(z)}分`)}</span>`;
+  }
+  // 겹치는 핀은 살짝 펼쳐요 (숙소 핀은 그대로)
+  const hp = proj(d.hotel),
+    showHotel = v === 'city' || (v === 'all' && !cl);
+  const arr = list.map(i => {
+    const q = proj(i);
+    return { i, x: q.x, y: q.y, ox: q.x, oy: q.y };
+  });
+  const fixed = showHotel ? [{ x: hp.x, y: hp.y + 18, fx: 1 }] : [];
+  for (let it = 0; it < 60; it++) {
+    let moved = false;
+    const all = arr.concat(fixed);
+    for (let a = 0; a < arr.length; a++)
+      for (let b = 0; b < all.length; b++) {
+        const A1 = arr[a],
+          B1 = all[b];
+        if (A1 === B1) continue;
+        let dx = A1.x - B1.x,
+          dy = A1.y - B1.y,
+          dd = Math.hypot(dx, dy);
+        if (dd >= 34) continue;
+        if (dd < 0.01) {
+          dx = Math.cos(a + b);
+          dy = Math.sin(a + b);
+          dd = 1;
+        }
+        const m = (34 - dd) / (B1.fx ? 1 : 2);
+        A1.x += (dx / dd) * m;
+        A1.y += (dy / dd) * m;
+        if (!B1.fx) {
+          B1.x -= (dx / dd) * m;
+          B1.y -= (dy / dd) * m;
+        }
+        moved = true;
+      }
+    if (!moved) break;
+  }
+  arr.forEach(q => {
+    if (Math.hypot(q.x - q.ox, q.y - q.oy) > 3)
+      svg += `<line class="lead" x1="${f1(q.ox)}" y1="${f1(q.oy)}" x2="${f1(q.x)}" y2="${f1(q.y - 4)}"/><circle class="dot" cx="${f1(q.ox)}" cy="${f1(q.oy)}" r="2.6"/>`;
+  });
+  if (showHotel) html += `<span class="wpp-h" style="left:${f1(hp.x)}px;top:${f1(hp.y)}px" title="${L('숙소', '宿')}">${ic('home')}</span>`;
+  if (cl)
+    html += `<button class="wpp-cl" data-act="wpView" data-v="city" style="left:${f1(cl.x)}px;top:${f1(cl.y)}px" aria-label="${L(`시내 ${d.city.length}곳 크게 보기`, `市内 ${d.city.length}か所を大きく見る`)}"><b>${d.city.length}</b><span>${L('시내', '市内')}</span></button>`;
+  arr
+    .sort((a, b) => (a.i.id === selId) - (b.i.id === selId) || a.y - b.y)
+    .forEach(({ i, x, y }) => {
+      const t = tag(i.o),
+        far = v === 'all' && i.z !== 'city';
+      html += `<button class="wpp${i.o.must ? ' must' : ''}${i.w.sid ? '' : ' mine'}${i.id === selId ? ' sel' : ''}" data-act="wpSel" data-id="${i.id}" style="left:${f1(x)}px;top:${f1(y)}px" aria-label="${esc(wishNameT(i.w))}" aria-pressed="${i.id === selId}"><span class="dr"><i>${ic(wishKind(i.w))}</i></span>${i.o.must ? `<b class="st">${ic('star')}</b>` : ''}${t ? `<em>${t}</em>` : far ? `<em class="nm">${esc(wishNameT(i.w))}</em>` : ''}</button>`;
+    });
+  return `<svg class="wpm-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">${svg}</svg>${html}`;
+}
+
 
 applyLang();
 applyTheme();
